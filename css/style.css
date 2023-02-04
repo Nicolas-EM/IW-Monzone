@@ -7,6 +7,10 @@ html {
     font-family: calibri;
 }
 
+#anotacion{
+    color: #f6d295; 
+}
+
 .logo{
 
     float:right;
