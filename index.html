@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Propuesta Monzone</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="Branding">
+            <img id="icon" alt="Icon Monzone" src="img/icon.png"/>
+            <h1 id="branding_title">Monzone</h1>
+        </div>
+        <h2 class="rm_margin">La aplicaci&oacute;n web para dividir gastos</h2>
+    </header>
+    
+    <main>
+        <!-- Intro -->
+        <div>
+            <h3 class="rm_margin">Introducci&oacute;n</h3>
+            <p>Monzone es la soluci&oacute;n perfecta para dividir gastos entre amigos, familiares, o compañeros de piso. Con esta aplicaci&oacute;n web se pueden crear grupos de gastos, agregar compras, y dejar que se calculen las cantidades que cada persona debe. Adem&aacute;s, Monzone es la &uacute;nica plataforma que te deja configurar un presupuesto y hacer copias de seguridad totalmente privadas.</p>
+        </div>
+        <hr>
+        <!-- Roles -->
+        <div>
+            <h3>Roles</h3>
+            <p>Al crear un grupo, autom&aacute;ticamente se asigna el rol de administrador de grupo al creador.</p>
+            <p>Cualquier otro miembro del grupo se considera un usuario no administrador.</p>
+        </div>
+        <hr>
+        <!-- Tareas -->
+        <div>
+            <h3>Tareas</h3>
+            <h4>Ver Estad&iacute;sticas</h4>
+            <ul>
+                <li>
+                    <p>Este producto se basa en poder ver cu&aacute;nto dinero cada usuario debe, y a quién se lo deber&iacute;a pagar para reducir el n&uacute;mero de pagos que tiene que hacer. Las estad&iacute;sticas muestran esto, adem&aacute;s de un an&aacute;lisis de los gastos (ej. cantidad por categor&iacute;a).</p>
+                </li>
+            </ul>
+    
+            <h4>Crear Grupo</h4>
+            <ul>
+                <li>
+                    <p>Cualquier usuario puede crear un grupo e invitar a otros usuarios para empezar a dividir los gastos.</p>
+                </li>
+            </ul>
+    
+            <h4>Añadir / Editar / Eliminar Miembros</h4>
+            <ul>
+                <li>
+                    <p>Un administrador de grupo puede añadir a miembros nuevos, eliminar a miembros que ya no deban dinero o cambiar el rol de un miembro.</p>
+                </li>
+            </ul>
+    
+            <h4>Añadir / Editar / Eliminar Gastos</h4>
+            <ul>
+                <li>
+                    <p>Cualquier usuario puede añadir un gasto, indicando cuant&iacute;a, categor&iacute;a y c&oacute;mo se divide el gasto, si equitativamente o no.</p>
+                </li>
+                <li>
+                    <p>Un administrador de grupo puede editar los gastos de cualquier otro miembro, mientras que un miembro normal solo puede editar los gastos que haya creado.</p>
+                </li>
+                <li>
+                    <p>Un administrador puede eliminar cualquier gasto.</p>
+                    <p>Al hacer cualquiera de estas operaciones, se notifica a todos los usuarios involucrados.</p>
+                </li>
+            </ul>
+    
+            <h4>Configurar Presupuesto Individual / Grupal</h4>
+            <ul>
+                <li>
+                    <p>Se notifica cuando se haya gastado un 50%, 75%, 90% y 100% del presupuesto.</p>
+                </li>
+                <li>
+                    <p>En el caso del presupuesto individual, se notifica a ese usuario. En el presupuesto grupal, se notifica a todos los usuarios del grupo.</p>
+                </li>
+            </ul>
+        </div>
+        <hr>    
+        <!-- Vistas -->
+        <div>
+            <h3>Vistas</h3>
+            <ol>
+                <li>
+                    <h4>Principal - <a href="img/vistaPrincipal.png">Demo</a></h4>
+                    <ul>
+                        <li>
+                            <p>Grupos en los que estás</p>
+                        </li>
+                        <li>
+                            <p>Botón crear grupo nuevo (casi igual que modificar grupo)</p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h4>Vista dentro de grupo - <a href="img/vistaGrupo.png">Demo</a></h4>
+                    <ul>
+                        <li>
+                            <p>Lista gastos</p>
+                        </li>
+                        <li>
+                            <p>Botón añadir gasto</p>
+                        </li>
+                        <li>
+                            <p>Botón editar gasto (si admin)</p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h4>Vista stats grupo - <a href="img/vistaStatsGrupo.png">Demo</a></h4>
+                    <ul>
+                        <li>
+                            <p>Ver quién debe cuánto a quién - Posiblemente enviar recordatorio de pagar</p>
+                        </li>
+                        <li>
+                            <p>Ver cuánto se ha gastado el grupo entero</p>
+                        </li>
+                        <li>
+                            <p>Marcar deuda como pagada</p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h4>Gestión de grupo / Miembros - <a href="img/vistaGestionGrupo.png">Demo</a></h4>
+                    <ul>
+                        <li>
+                            <p>Nombre, descripción, tipo moneda…</p>
+                        </li>
+                        <li>
+                            <p>Botón añadir/eliminar miembro (si es admin)</p>
+                        </li>
+                        <li>
+                            <p>Ver presupuesto grupal (suma de presupuestos individuales)</p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h4>Vista stats personales - <a href="img/vistaStatsPersonales.png">Demo</a></h4>
+                    <ul>
+                        <li>
+                            <p>Configuración presupuesto individual</p>
+                        </li>
+                        <li>
+                            <p>Ver cuánto has gastado al mes</p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h4>Notificaciones - <a href="img/vistaNotificaciones.png">Demo</a></h4>
+                    <ul>
+                        <li>
+                            <p>Te han invitado a un grupo, aceptar/rechazar - si aceptas configura tu presupuesto individual</p>
+                        </li>
+                        <li>
+                            <p>Se ha añadido un gasto de $X al grupo Y</p>
+                        </li>
+                        <li>
+                            <p>Te quedan sólo X€ de tu presupuesto en el grupo A</p>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+        <hr>
+    </main>
+
+    <footer>
+
+    </footer>
+</body>
+</html> 
