@@ -25,3 +25,43 @@ img.preview {
     height: 100px;
     border-radius: 10px;
 }
+
+/* BEA */
+.signinBG {
+    background: linear-gradient(#cc9705, #f5b301, #d19c09);
+    height: 100vh;
+}
+
+.newHereArea {
+    background-color: #a16100;
+}
+
+.loginArea {
+    background-color: #fed053;
+}
+
+.signupBG {
+    background: linear-gradient(#cc9705, #f5b301, #d19c09);
+    height: 100vh;
+}
+
+.alreadyArea {
+    background-color: #a16100;
+}
+
+.signupArea {
+    background-color: #fed053;
+}
+
+.space1 {
+    height: 20vh;
+}
+
+.space2 {
+    height: 60vh;
+}
+
+.space3 {
+    height: 20vh;
+}
+/* BEA */

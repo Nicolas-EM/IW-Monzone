@@ -6,9 +6,34 @@
     <title>Monzone</title>
 </head>
 
-<body class="d-flex flex-column h-100">
-    <header th:replace="fragments/nav.html :: nav"></header>
+<body>
+    <main class="flex-shrink-0">
+        <div class="container-fluid signinBG text-center">
+            <div class="row space1"></div>
+            <div class="row space2 justify-content-center">
+                <div class="col newHereArea col-lg-3 shadow-lg rounded-3">
+                    <img th:src="@{/img/logo.png}" src="/img/logo.png" alt="logo Monzone" width="40" height="32"
+                        class="d-inline-block align-text-top">
+                    New Here?
+                    <p>
+                        Sign up and split expenses with your friends
+                    </p>
+                    <button type="button" class="btn btn-light" onclick="location.href='/'">Sign Up</button>
+                </div>
+                <div class="col loginArea col-lg-4 shadow-lg rounded-3">
+                    Login
+                    <form class="form-signin" method="post" th:action="@{/login}">
+                        <input class="form-control" type="text" id="username" placeholder="Username">
+                        <input type="password" class="form-control" id="inputPassword2" placeholder="Password"></input>
+                    </form>
+                    <button type="submit" class="btn btn-dark">Sign In</button>
+                </div>
+            </div>
+            <div class="row space3"></div>
+        </div>
+    </main>
 
+    <!--
     <main class="flex-shrink-0">
         <div class="container">
             <form class="form-signin" method="post" th:action="@{/login}">
@@ -28,8 +53,9 @@
             </form>
         </div>
     </main>
-
+    
     <th:block th:replace="fragments/footer.html :: footer" />
+    -->
 </body>
 
 </html>
