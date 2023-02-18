@@ -1,0 +1,61 @@
+/* @Author: BEA */
+
+/* Background and main areas */
+.signScreen {
+    background: rgb(161,97,0);
+    background: radial-gradient(circle, rgba(161,97,0,1) 0%, rgba(245,179,1,1) 87%, rgba(242,192,56,1) 100%);
+    height: 100vh;
+}
+
+.space {
+    height: 20vh;
+}
+
+.signArea {
+    height: 60vh;
+}
+
+/* Content */
+.infoArea {
+    background-color: #a16100;
+}
+
+.formArea {
+    background-color: #fed053;
+}
+
+/* Components */
+#logo {
+    width: 30%;
+    height: 20%;
+}
+
+#changeB {
+    width: 35%;
+    height: 8%;
+}
+
+#submitB {
+    width: 25%;
+    height: 8%;
+    background-color: #dd9300;
+    border: 0;
+}
+
+/* Text */
+h1 {
+    font-family: Helvetica;
+    font-weight: bold;
+}
+
+h5 {
+    font-family: Helvetica;
+}
+
+p {
+    font-family: Helvetica;
+}
+
+#big {
+    font-size: 450%;
+}
