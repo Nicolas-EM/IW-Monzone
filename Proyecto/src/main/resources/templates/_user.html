@@ -3,55 +3,166 @@
 
 <head>
     <th:block th:replace="fragments/head :: header" />
-    <title>Monzone - Profile</title>
+    <title>Monzone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
+    
+    <div class="primera mx-auto">
+        <img class="rounded-circle shadow-4-strong mx-auto" alt="avatar" width="140rem" height="140rem" src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png" />
+    </div>
+   
+    <div class="segunda mx-auto">
+        <h3>NOMBRE APELLIDOS <button class="btn btn-warning"><i class="fa fa-pencil"></i></button></h3>
+    </div>
 
-    <main class="flex-shrink-0">
-        <div id="books" class="border border-2 border-primary rounded">
-            <label for="isbn">ISBN</label><input id="isbn" value="9780140328721" />
-            <button id="fetchBook">Buscar datos online</button>
-            <img class="preview" id="portada" alt="portada del libro" />
-            <form th:action="@{/user/__${user.id}__/pic}">
-                <button id="postPortada" class="perfilable">Usar como foto de perfil</button>
-            </form>
-        </div>
-        <div id="movies" class="border border-2 border-secondary rounded">
-            <label for="imdb">IMDB</label><input id="imdb" value="tt11286314" />
-            <button id="fetchMovie">Buscar datos online</button>
-            <img class="preview" id="poster" alt="poster de la pelicula" />
-            <form th:action="@{/user/__${user.id}__/pic}">
-                <button id="postPoster" class="perfilable">Usar como foto de perfil</button>
-            </form>
-        </div>
-        <div id="profile" class="border border-2 border-tertiary rounded">
-            <input type="file" id="f_avatar" accept="image/jpeg,image/png">
-            <img class="preview" id="avatar" alt="careto a subir" />
-            <form th:action="@{/user/__${user.id}__/pic}">
-                <button id="postAvatar">Usar como foto de perfil</button>
-            </form>
-        </div>
 
-        <div class="container">
-            <h1 class="mt-5">Perfil de <span th:text="${user.username}">Paco</span></h1>
-            <!-- recepción de mensajes -->
-            <div class="py-5 row" id="mensajes">
-            </div>
-            <!-- envío de mensajes -->
-            <div class="py-5 row ">
-                <form th:action="@{/user/__${user.id}__/msg}" method="POST">
-                    <input type="text" id="message" placeholder="escribe a este usuario" />
-                    <button id="sendmsg" class="btn btn-secondary" type="submit">Enviar</button>
-                </form>
+    <div class="container">
+    <!-- ROW Gastos del mes -->
+      <div class="row mb-2">   
+            <div class="col-sm-4 col-md-4"></div>
+            <div class="col-sm-4 col-md-4"></div>
+
+            <div class="col-sm-4 col-md-4"  style="height: 5rem;">
+                <h5 class="text-center">Gastos del mes</h5>
             </div>
         </div>
-    </main>
+    
+   <!-- ROW Gastos y mes-->
+
+        <div class="row mb-5">
+          <div class="col-sm-4 col-md-2">
+            <!-- Contenido de la primera columna -->
+            <div class="card border-warning" style="max-width: 18rem; background-color: #353535">
+                <div class="card-body">
+                  <h5 class="card-title">Grupo Piso: 100€</h5>
+                </div>
+              </div>
+
+          </div>
+          <div class="col-sm-4 col-md-2">
+            <!-- Contenido de la segunda columna -->
+            <div class="card mx-auto" style="max-width: 8rem; background-color: #00d76c">
+                <div class="card-body mx-auto">
+                  <h5 class="card-title">10€</h5>
+                </div>
+              </div>
+          </div>
+          <div class="col-sm-4 col-md-2">
+            <!-- Contenido de la tercera columna -->
+            <div class="card mx-auto" style="max-width: 8rem; background-color: #d70000">
+                <div class="card-body mx-auto">
+                  <h5 class="card-title">10€</h5>
+                </div>
+              </div>
+          </div>
+          <div class="col-sm-4 col-md-2">
+            <!-- Contenido de la cuarta columna -->
+           
+          </div>
+          <div class="col-sm-4 col-md-2">
+            <!-- Contenido de la quinta columna -->
+            <select class="form-select mx-auto">
+                <option selected>Selecciona mes</option>
+                <option value="1">Enero</option>
+                <option value="2">Febrero</option>
+                <option value="3">Marzo</option>
+                <option value="4">Abril</option>
+                <option value="5">Mayo</option>
+                <option value="6">Junio</option>
+                <option value="7">Julio</option>
+                <option value="8">Agosto</option>
+                <option value="9">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+            </select>
+          </div>
+          <div class="col-sm-4 col-md-2">
+            <!-- Contenido de la sexta columna -->
+            <div class="card bg-warning">
+                <div class="card-body mx-auto">
+                    <h5>130€</h5>
+                </div>
+            </div>
+          </div>
+        </div>
+
+   <!-- ROW Gastos-->
+        <div class="row mb-5">
+            <div class="col-sm-4 col-md-2">
+              <!-- Contenido de la primera columna -->
+  
+              <div class="card border-warning" style="max-width: 18rem; background-color: #353535">
+                  <div class="card-body">
+                    <h5 class="card-title">Casa Rural: 100€</h5>
+                  </div>
+                </div>
+  
+            </div>
+            <div class="col-sm-4 col-md-2">
+              <!-- Contenido de la segunda columna -->
+  
+              <div class="card mx-auto" style="max-width: 8rem; background-color: #00d76c">
+                  <div class="card-body mx-auto">
+                    <h5 class="card-title">20€</h5>
+                  </div>
+                </div>
+              
+            </div>
+            <div class="col-sm-4 col-md-2">
+              <!-- Contenido de la tercera columna -->
+  
+              <div class="card mx-auto" style="max-width: 8rem; background-color: #d70000">
+                  <div class="card-body mx-auto">
+                    <h5 class="card-title">10€</h5>
+                  </div>
+                </div>
+  
+  
+            </div>
+            <div class="col-sm-4 col-md-6">
+            </div>
+          </div>
+          
+   <!-- ROW Categorías-->
+        <div class="row mb-2">
+            <div class="row">
+                <div class="col-sm-4 col-md-8"></div>
+    
+                <div class="col-sm-4 col-md-4"  style="height: 4rem;">
+                    <h5 class="text-center">Categorías</h5>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="row">
+                <div class="col-sm-4 col-md-8"></div>
+    
+                <div class="col-sm-4 col-md-4">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                          <i class="fa fa-gamepad"></i>
+                           Videojuegos: 30€
+                        </li>
+                        <li class="list-group-item">
+                          <i class="fa fa-cutlery"></i>
+                            Restaurantes: 30€
+                        </li>
+                        <li class="list-group-item">
+                          <i class="fa fa-car"></i>
+                           Transporte: 70€
+                        </li>
+                      </ul>
+                </div>
+            </div>
+        </div>
+      </div>
+   
 
     <th:block th:replace="fragments/footer.html :: footer" />
-
-    <script th:src="@{/js/ajax-demo.js}"></script>
 </body>
 
 </html>
