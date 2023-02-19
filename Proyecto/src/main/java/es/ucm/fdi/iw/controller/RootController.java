@@ -26,4 +26,9 @@ public class RootController {
     }
     // BEA
     
+    // SARA
+    @GetMapping("/group_info")
+    public String groupI(Model model) {
+        return "group_info";
+    }
 }

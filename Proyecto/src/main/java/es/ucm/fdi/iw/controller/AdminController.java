@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("admin")
 public class AdminController {
 
-	private static final Logger log = LogManager.getLogger(AdminController.class);
+	//private static final Logger log = LogManager.getLogger(AdminController.class);
 
 	@GetMapping("/")
     public String index(Model model) {

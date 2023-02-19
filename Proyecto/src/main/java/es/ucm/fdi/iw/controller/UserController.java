@@ -115,11 +115,13 @@ public class UserController {
     }
 
 	@GetMapping("/home")
-    public String index(@PathVariable long id, Model model, HttpSession session) {
+    public String home(@PathVariable long id, Model model, HttpSession session) {
         User target = entityManager.find(User.class, id);
         model.addAttribute("user", target);
         return "home";
     }
+
+	
 
     /**
      * Alter or create a user
