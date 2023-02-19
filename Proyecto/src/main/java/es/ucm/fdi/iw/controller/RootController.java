@@ -14,29 +14,18 @@ public class RootController {
 
 	private static final Logger log = LogManager.getLogger(RootController.class);
 
-	@GetMapping("/login")
+	@GetMapping("/")
+    public String root(Model model) {
+        return login(model);
+    }
+
+    @GetMapping("/login")
     public String login(Model model) {
         return "login";
     }
 
-    @GetMapping("/")
-    public String signup(Model model) {
+    @GetMapping("/signup")
+    public String home(Model model) {
         return "signup";
     }
-
-    @GetMapping("/group")
-    public String group(Model model) {
-        return "group";
-    }
-
-    @GetMapping("/user")
-    public String user(Model model) {
-        return "user";
-    }
-
-    @GetMapping("/home")
-    public String home(Model model) {
-        return "home";
-    }
-
 }

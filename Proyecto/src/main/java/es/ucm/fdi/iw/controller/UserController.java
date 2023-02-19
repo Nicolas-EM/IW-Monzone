@@ -111,10 +111,21 @@ public class UserController {
     public String index(@PathVariable long id, Model model, HttpSession session) {
         User target = entityManager.find(User.class, id);
         model.addAttribute("user", target);
-        return "user";
+
+		// Tendremos que activar esto para que la pagina sea dinamica
+		
+		// Group target[] = entityManager.find(Group.class, id);
+		// model.addAttribute("groups", target);
+        return "home";
     }
 
-	
+	@GetMapping("{id}/config")
+    public String home(@PathVariable long id, Model model) {
+		User target = entityManager.find(User.class, id);
+        model.addAttribute("user", target);
+		
+        return "user";
+    }
 
     /**
      * Alter or create a user

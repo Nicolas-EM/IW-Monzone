@@ -6,49 +6,67 @@
     <th:block th:replace="fragments/head :: header" />
     <title>Monzone</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" th:href="@{/css/home.css}" href="css/home.css" type="text/css" />
 </head>
-<main class="flex-shrink-0">
+
+<body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
-    
-    <div class="row align-items-center" style="height: 30rem;">   
-        <div class="col-sm-4 col-md-4">
-            <div class="card text-white bg-warning mx-auto" style="width: 20rem; height: 10rem" role="button" onClick="click_handler()" tabindex="0">
-                <div class="card-header">GASTOS CASA 📈</div>
-                <div class="card-body">
-                  <h5 class="card-title">Grupo para los gastos del piso</h5>
-                  <p class="card-text">Descripción.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4 col-md-4">
-            <div class="card text-white bg-warning  mx-auto" style="width: 20rem; height: 10rem"  role="button" onClick="click_handler()" tabindex="0">
-                <div class="card-header">GASTOS CASA RURAL 📉</div>
-                <div class="card-body">
-                  <h5 class="card-title">Grupo para los gastos de la casa rural</h5>
-                  <p class="card-text">Descripción.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4 col-md-4">
-            <div class="card text-white bg-warning mx-auto" style="width: 20rem; height: 10rem"  role="button" onClick="click_handler()" tabindex="0">
-                <div class="card-header">GASTOS FINDE 📉</div>
-                <div class="card-body">
-                  <h5 class="card-title">Grupo para los gastos del finde</h5>
-                  <p class="card-text">Descripción.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-10"></div>
-        <div class="col-md-1">
-            <button class="btn-lg btn-warning"><i class="fa fa-plus"></i></button></h3>
-        </div>
-    </div>
 
-</main>
+    <!-- Body - Group cards -->
+    <main class="container-fluid pt-4">
+        <div id="home_groups"
+            class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 g-4 gy-4 align-items-center">
+            <!-- Dynamic groups with Thymeleaf -->
+            <!-- <div th:replace="fragments/group_info_card.html :: div"></div> -->
 
-<th:block th:replace="fragments/footer.html :: footer" />
+            <div class="col">
+                <div class="card text-white bg-warning h-100 mx-auto" role="button" onClick="click_handler()"
+                    tabindex="0">
+                    <div class="card-header">GASTOS CASA 📈</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Grupo para los gastos del piso</h5>
+                        <p class="card-text">Descripción.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-warning h-100 mx-auto" role="button" onClick="click_handler()"
+                    tabindex="0">
+                    <div class="card-header">GASTOS CASA RURAL 📉</div>
+                    <div class="card-body">
+                        <h5 class="card-title">TITLE</h5>
+                        <p class="card-text">Descripción.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-warning h-100 mx-auto" role="button" onClick="click_hanbodydler()"
+                    tabindex="0">
+                    <div class="card-header">GASTOS FINDE 📉</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Grupo para los gastos del finde</h5>
+                        <p class="card-text">Descripción.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-warning h-100 mx-auto" role="button" onClick="click_handler()"
+                    tabindex="0">
+                    <div class="card-header">GASTOS CASA RURAL 📉</div>
+                    <div class="card-body">
+                        <h5 class="card-title">TITLE</h5>
+                        <p class="card-text">Descripción.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- newGroupBtn -->
+            <div class="col text-center">
+                <button class="btn-lg btn-warning"><i class="fa fa-plus"></i></button></h3>
+            </div>
+        </div>
+    </main>
+
+    <th:block th:replace="fragments/footer.html :: footer" />
 </body>
 
 </html>

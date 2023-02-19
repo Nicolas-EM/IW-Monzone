@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>Group Info Card fragment - rest intentionally left empty</title>
+</head>
+
+<body>
+    <tr th:each="group: ${groups}">
+        <col>
+            <div class="card text-white bg-warning" role="button" onClick="click_handler()" tabindex="0">
+                <td th:text="${group.name}" class="card-header">GASTOS CASA 📈</td>
+                <div class="card-body">
+                    <h5 th:text="${group.description}" class="card-title">Grupo para los gastos del piso</h5>
+                    <p th:text="${group.footer}" class="card-text">Footer</p>
+                </div>
+            </div>
+        </col>
+    </tr>
+</body>
+
+</html>

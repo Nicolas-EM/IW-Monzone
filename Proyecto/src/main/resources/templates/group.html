@@ -1,89 +1,56 @@
 <!DOCTYPE html>
 <html class="h-100" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <th:block th:replace="fragments/head :: header" />
     <title>Monzone - Group</title>
-    
 </head>
+
 <body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
-    <div class="card text-dark bg-warning mx-auto" style="width: 70%;">
-        <div> 
-            <h1>Aparment's Expenses</h1>
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col">
-                        This is the group for aparments's expenses <img src="/img/euro.png" width="30px" style="float:right"> </img>       
-                    </div>
-                    
-                         
-                    
-
-                </div>
+        <!--CARTAS GRUPO-->
+        <div class="card border-light text-white bg-warning mb-3 mx-auto" style="max-width: 50rem" role="button"
+            onClick="click_handler()" tabindex="0">
+            <div class="card-header"><strong>GASTOS PISO</strong></div>
+            <div class="card-body">
+                <h7 class="card-title" style="float :left">Grupo para los gastos del piso</h7>
+                <h4 style="text-align: right; color:#20c997">+20,70€</h4>
             </div>
-            
-           
         </div>
-       
-        <div class="border border-white">
-            <ul>
-                <li>
-                    <div class="row">
-                        <div class="col">
-                            Nico V
-                        </div>
-                        <div class="col" > <button type="button" class="btn btn-danger">X</button></div>
-                        
-                    </div> 
-                </li>
-                <li>
-                    <div class="row">
-                        <div class="col">
-                            Bea Doc 
-                        </div>
-                        <div class="col" > <button type="button" class="btn btn-danger">X</button></div>
-                        
-                    </div> 
-                </li>
-                <li>
-                    <div class="row">
-                        <div class="col">
-                            SaraSan
-                        </div>
-                        <div class="col" > <button type="button" class="btn btn-danger">X</button></div>
-                        
-                    </div> 
-                </li>
-                <li>
-                    <div class="row">
-                        <div class="col">
-                            Albet
-                        </div>
-                        <div class="col" > <button type="button" class="btn btn-danger">X</button></div>
-                        
-                    </div> 
-                </li>
-                <li>
-                    <div class="row">
-                        <div class="col">
-                            Vic
-                        </div>
-                        <div class="col" > <button type="button" class="btn btn-danger">X</button></div>
-                        
-                    </div> 
-                </li>
-            </ul>
-        </div>
-        <div class="container-fluid"> 
-            <div class="row">
-                <div class="col"><p>Total Budget: <mark class="text-success ">30</mark> <img class="btn ps-4" src="/img/agregar-contacto.png" width="80" style="float:right"></img></p></div>
-                
+        <!--CARTAS GASTOS-->
+        <div class="card border-light text-white bg-warning mb-3 mx-auto" style="max-width: 30rem" role="button"
+            onClick="click_handler()" tabindex="0">
+            <div class="card-header"><strong>GAS</strong></div>
+            <div class="card-body">
+                <h7 class="card-title" style="float :left">Factura trimestral del gas</h7>
+                <h5 style="text-align: right;">33,55€</h5>
             </div>
-
         </div>
-    </div>
+        <div class="card border-light text-white bg-warning mb-3 mx-auto" style="max-width: 30rem" role="button"
+            onClick="click_handler()" tabindex="0">
+            <div class="card-header"><strong>CENA</strong></div>
+            <div class="card-body">
+                <h7 class="card-title" style="float :left">Cena del viernes 10 de febrero</h7>
+                <h5 style="text-align: right;">23,30€</h5>
+            </div>
+        </div>
+        <div class="card border-light text-white bg-warning mb-3 mx-auto" style="max-width: 30rem" role="button"
+            onClick="click_handler()" tabindex="0">
+            <div class="card-header"><strong>WIFI</strong></div>
+            <div class="card-body">
+                <h7 class="card-title" style="float :left">Factura mensual del WIFI</h7>
+                <h5 style="text-align: right;">5,25€</h5>
+            </div>
+        </div>
+        <!--BUTTONS-->
+        <button type="button" class="btn btn-outline-warning mr-4"
+            style="float: right; margin: 0rem 20rem; width: 7rem; height: 4rem;">ADD EXPENSE</button>
+
+    </main>
+
+    <th:block th:replace="fragments/footer.html :: footer" />
+
+    <script th:src="@{/js/ajax-demo.js}"></script>
 </body>
+
 </html>
