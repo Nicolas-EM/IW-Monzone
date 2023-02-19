@@ -12,7 +12,7 @@
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
             <div class="container-fluid">
                 <!-- nombre del sitio; es un enlace que lleva a la página ppal -->
-                <a class="navbar-brand" th:href="@{/}" href="/">
+                <a class="navbar-brand" th:href="@{/user/{id}(id=${session.u.id})}" href="/">
                     <img th:src="@{/img/logo.png}" src="/img/logo.png" alt="logo Monzone" width="auto" height="32" class="d-inline-block align-text-top"> Monzone
                 </a>
                 <!-- menu hamburguesa si no cabe todo -->
@@ -27,7 +27,7 @@
                             </li>
 
                             <li class="nav-item mx-2">
-                                <a class="nav-link" th:href="@{/user/{id}(id=${session.u.id})}">
+                                <a class="nav-link" th:href="@{/user/{id}/config(id=${session.u.id})}">
                                     <img class="iwthumb rounded" th:src="@{/user/{id}/pic(id=${session.u.id})}">
                                     <span th:text="${session.u.username}">Pepe</span>
                                 </a>
