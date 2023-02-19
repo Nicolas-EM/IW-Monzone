@@ -29,7 +29,7 @@ body {
 .form-box {
     background-color: #fed053;
     border-radius: 0px 8px 8px 0px;
-    width: 60%;
+    width: 100%;
 }
 
 /* ----------- PANEL IZQUIERDO -----------*/
@@ -60,18 +60,21 @@ body {
     display: flex;
     align-items: center;
     flex-direction: column;
-    margin: 5% 10%;
+    margin-left: 10%;
+    margin-right: 10%;
     height: 80%;
 }
 
 .form-content h1{
-    font-size: 450%;
+    font-size: 350%;
     margin-bottom: 10%;
+    margin-top: 10%;
 }
 
 .form-content h2{
-    font-size: 250%;
+    font-size: 195%;
     margin-bottom: 7%;
+    margin-top: 5%;
 }
 
 .form-content input{
@@ -93,13 +96,61 @@ body {
 
 
 .form-content button{
-    color: white;
-    background-color:#dd9300;
     border-style: none;
     outline: none;
-    width: 30%;
-    height: 8%;
+    width: 35%;
+    height: 10%;
 }
+
+.form-content .btn-primary {
+    color: white;
+    background-color:#dd9300;
+}
+
+/* Nico */
+.info-box {
+    display: none;
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .info-box {
+        display: block;
+    }
+
+    .form-content {
+        margin: 5% 10%;
+        justify-content: center !important;
+    }
+
+    .form-content h1{
+        font-size: 450%;
+    }
+
+    .form-content h2{
+        font-size: 215%;
+    }
+
+    .form-content button{
+        height: 10%;
+        width: 30%;
+    }
+
+    .form-box {
+        width: 60%;
+    }
+}
+
+/* X-Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    .form-content h2{
+        font-size: 250%;
+        margin-bottom: 7%;
+    }
+}
+
+/* XX-Large devices (larger desktops, 1400px and up) */
+@media (min-width: 1400px) {}
 
 
 
