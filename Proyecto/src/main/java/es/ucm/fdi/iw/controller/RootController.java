@@ -19,17 +19,24 @@ public class RootController {
         return "login";
     }
 
-    // BEA
     @GetMapping("/")
     public String signup(Model model) {
         return "signup";
     }
-    // BEA
-    
-    // SARA
+
     @GetMapping("/group")
-    public String groupI(Model model) {
+    public String group(Model model) {
         return "group";
     }
-    
+
+    @GetMapping("/user")
+    public String user(Model model) {
+        return "user";
+    }
+
+    @GetMapping("/home")
+    public String home(Model model) {
+        return "home";
+    }
+
 }

@@ -22,12 +22,14 @@
                     </div>
                 </div>
                 <div class="col formArea col-lg-4 shadow-lg rounded">
-                    <h1 id="big">Login</h1>
-                    <form class="form-signin" method="post" th:action="@{/login}">
-                        <input class="form-control w-50 rounded-pill p-2 mt-5 mb-2" type="text" id="username" placeholder=" Username">
-                        <input class="form-control w-50 rounded-pill p-2" type="password" id="inputPassword2" placeholder=" Password"></input>
-                    </form>
-                    <button type="submit" id="submitB" class="btn btn-dark rounded-pill fw-bold mt-4">Sign In</button>
+                    <div>
+                        <h1 id="big">Login</h1>
+                        <form class="form-signin" method="post" th:action="@{/login}">
+                            <input class="form-control mx-auto w-50 rounded-pill p-2 mt-5 mb-2" type="text" id="username" placeholder=" Username">
+                            <input class="form-control mx-auto w-50 rounded-pill p-2" type="password" id="inputPassword2" placeholder=" Password"></input>
+                        </form>
+                        <button type="submit" id="submitB" class="btn btn-dark rounded-pill fw-bold mt-4">Sign In</button>
+                    </div>                    
                 </div>
             </div>
             <div class="row space"></div>
