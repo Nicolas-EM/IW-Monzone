@@ -2,56 +2,60 @@
 <html class="h-100" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <th:block th:replace="fragments/head :: header" />
-    <title>Monzone - Purchase</title>
+    <script src="/js/expense.js"></script>
+    <title>Monzone - Group</title>
 </head>
 
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column h-100"> 
     <header th:replace="fragments/nav.html :: nav"></header>
 
-    <main class="flex-shrink-0">
-        <div id="books" class="border border-2 border-primary rounded">
-            <label for="isbn">ISBN</label><input id="isbn" value="9780140328721" />
-            <button id="fetchBook">Buscar datos online</button>
-            <img class="preview" id="portada" alt="portada del libro" />
-            <form th:action="@{/user/__${user.id}__/pic}">
-                <button id="postPortada" class="perfilable">Usar como foto de perfil</button>
-            </form>
-        </div>
-        <div id="movies" class="border border-2 border-secondary rounded">
-            <label for="imdb">IMDB</label><input id="imdb" value="tt11286314" />
-            <button id="fetchMovie">Buscar datos online</button>
-            <img class="preview" id="poster" alt="poster de la pelicula" />
-            <form th:action="@{/user/__${user.id}__/pic}">
-                <button id="postPoster" class="perfilable">Usar como foto de perfil</button>
-            </form>
-        </div>
-        <div id="profile" class="border border-2 border-tertiary rounded">
-            <input type="file" id="f_avatar" accept="image/jpeg,image/png">
-            <img class="preview" id="avatar" alt="careto a subir" />
-            <form th:action="@{/user/__${user.id}__/pic}">
-                <button id="postAvatar">Usar como foto de perfil</button>
-            </form>
-        </div>
+    <div class="container">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <form class="form-horizontal">
+              <div class="form-group">
+                <label for="braind" class="col-sm-5 control-label">Marca</label>
+                <div class="col-sm-4">
+                  <select name="braind" id="braind" class="form-control" >
+                    <option value="carmel">Carmel</option>
+                    <option value="pcfk">Pcfk</option>
+                    <option value="loguin">Loguin</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="campaign" class="col-sm-5 control-label">Campaña</label>
+                <div class="col-sm-4">
+                  <input type="text" class="form-control" value="texto de dentro" id="campaign" readonly>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="edition" class="col-sm-5 control-label">Edicion</label>
+                <div class="col-sm-4">
+                  <select name="edition" id="edition" class="form-control" >
+                    <option value="1">Piloto</option>
+                    <option value="2">Otras zonas</option>
+                  </select>
+                </div>
+              </div>
+              
+            
+              
 
-        <div class="container">
-            <h1 class="mt-5">Perfil de <span th:text="${user.username}">Paco</span></h1>
-            <!-- recepción de mensajes -->
-            <div class="py-5 row" id="mensajes">
+            </form>
+
+            <div>
+                <button onclick="editar();"> Editar</button>
+                <button onclick="bloquear();"> bloquear</button>
+            
             </div>
-            <!-- envío de mensajes -->
-            <div class="py-5 row ">
-                <form th:action="@{/user/__${user.id}__/msg}" method="POST">
-                    <input type="text" id="message" placeholder="escribe a este usuario" />
-                    <button id="sendmsg" class="btn btn-secondary" type="submit">Enviar</button>
-                </form>
-            </div>
+          </div>
         </div>
-    </main>
 
-    <th:block th:replace="fragments/footer.html :: footer" />
-
-    <script th:src="@{/js/ajax-demo.js}"></script>
 </body>
 
 </html>
