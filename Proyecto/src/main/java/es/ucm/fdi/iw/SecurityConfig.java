@@ -50,18 +50,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.ignoringAntMatchers("/api/**")
 				.and()
 	        .authorizeRequests()
-			.antMatchers("**").permitAll() // temporal para testing
+			// .antMatchers("**").permitAll() // temporal para testing
 	            .antMatchers("/css/**", "/js/**", "/img/**", "/", "/error").permitAll()
 				.antMatchers("/api/**").permitAll()            // <-- public api access
 				.antMatchers("/admin/**").hasRole("ADMIN")	   // <-- administration
-	            // .antMatchers("/user/**").hasRole("USER")	   // <-- logged-in users
-				// .antMatchers("/group/**").hasRole("USER")	   // <-- logged-in users
-				// .antMatchers("/user/**").hasRole("USER")	   // <-- logged-in users
-				// .antMatchers("/signup/**").hasRole("USER")	   // <-- logged-in users
 	            .anyRequest().authenticated()
 	            .and()
 			.formLogin()
-				.loginPage("/")
+				.loginPage("/login")
 				.permitAll().successHandler(loginSuccessHandler); // <-- called when login Ok; can redirect
 	}
 	
