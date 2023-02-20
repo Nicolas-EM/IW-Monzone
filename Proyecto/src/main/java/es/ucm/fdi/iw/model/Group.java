@@ -23,7 +23,7 @@ import java.util.List;
                         + "WHERE u.username = :username AND u.enabled = TRUE"),
 })
 @Table(name="IWGroup")
-public class Group {
+public class Group implements Transferable<Group.Transfer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen")
@@ -37,4 +37,23 @@ public class Group {
 
 	@OneToMany(mappedBy = "groupEntity")
 	private List<Member> members = new ArrayList<>();
+
+    @Getter
+    @AllArgsConstructor
+    public static class Transfer {
+		private long id;
+        private String title;
+		private String description;
+		private List<Member> members;
+    }
+
+	@Override
+    public Transfer toTransfer() {
+		return new Transfer(id,	title, description, members);
+	}
+	
+	@Override
+	public String toString() {
+		return toTransfer().toString();
+	}
 }

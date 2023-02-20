@@ -28,13 +28,16 @@ public class Member {
 	@ManyToOne
     @MapsId("groupId")
     @JoinColumn(name = "group_id")
+    @Getter
     private Group groupEntity;
 
     @ManyToOne
     @MapsId("userId")
     @JoinColumn(name = "user_id")
+    @Getter
     private User userEntity;
 
+    @Getter
     private Role role;
 
     public Member(){}

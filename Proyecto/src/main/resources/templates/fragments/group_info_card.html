@@ -9,7 +9,7 @@
     <tr th:each="group: ${groups}">
         <col>
             <div class="card text-white bg-warning" role="button" onClick="click_handler()" tabindex="0">
-                <td th:text="${group.name}" class="card-header">GASTOS CASA 📈</td>
+                <td th:text="${group.title}" class="card-header">GASTOS CASA 📈</td>
                 <div class="card-body">
                     <h5 th:text="${group.description}" class="card-title">Grupo para los gastos del piso</h5>
                     <p th:text="${group.footer}" class="card-text">Footer</p>

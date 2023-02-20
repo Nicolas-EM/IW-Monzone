@@ -51,6 +51,7 @@ public class User implements Transferable<User.Transfer> {
     private String roles; // split by ',' to separate roles
 
     @OneToMany(mappedBy = "userEntity")
+    @Getter
     private List<Member> miembroDe = new ArrayList<>();
 
 	@OneToMany
