@@ -27,4 +27,9 @@ public class GroupController {
     public String groupConfig(Model model) {
         return "group_config";
     }
+
+    @GetMapping("{id}/{expense}")
+    public String groupExpense(Model model) {
+        return "expense";
+    }
 }

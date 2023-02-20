@@ -53,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			// .antMatchers("**").permitAll() // temporal para testing
 	            .antMatchers("/css/**", "/js/**", "/img/**", "/", "/error").permitAll()
 				.antMatchers("/api/**").permitAll()            // <-- public api access
+				.antMatchers("/signup/**").permitAll()            // <-- publics access
 				.antMatchers("/admin/**").hasRole("ADMIN")	   // <-- administration
 	            .anyRequest().authenticated()
 	            .and()

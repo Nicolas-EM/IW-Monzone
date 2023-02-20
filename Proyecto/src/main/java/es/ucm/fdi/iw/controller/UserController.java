@@ -1,6 +1,8 @@
 package es.ucm.fdi.iw.controller;
 
 import es.ucm.fdi.iw.LocalData;
+import es.ucm.fdi.iw.model.Group;
+import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.Message;
 import es.ucm.fdi.iw.model.Transferable;
 import es.ucm.fdi.iw.model.User;
@@ -40,6 +42,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.*;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -110,12 +113,12 @@ public class UserController {
 	@GetMapping("{id}")
     public String index(@PathVariable long id, Model model, HttpSession session) {
         User target = entityManager.find(User.class, id);
-        model.addAttribute("user", target);
-
-		// Tendremos que activar esto para que la pagina sea dinamica
-		
-		// Group target[] = entityManager.find(Group.class, id);
-		// model.addAttribute("groups", target);
+		List<Member> memberOf = target.getMiembroDe();
+		List<Group> groups = new ArrayList<>();
+		for(Member m : memberOf){
+			groups.add(m.getGroupEntity());
+		}
+		model.addAttribute("groups", groups);
         return "home";
     }
 
