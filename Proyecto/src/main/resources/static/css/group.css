@@ -1,27 +1,17 @@
 /* usa este fichero para personalizar tus vistas */
 
-.iwthumb {
-    height: 32px;
-    width: 32px;
+#group_card{
+    width: 30rem;
 }
 
-.errTable tr>td:first-child {
-    min-width: 200px;
-    max-width: 200px;
-    word-break: break-all;
-    font-weight: bold;
-    color: gray;
+#group_group{
+    width: 50rem; 
+    margin-top:3rem;
 }
 
-.errTable td {
-    vertical-align: top;
-    border-top: 1px solid gray;
-    border-bottom: 1px solid gray;
-}
-
-img.preview {
-    object-fit: cover;
-    width: 10%;
-    height: 100px;
-    border-radius: 10px;
+#button_add_expense{
+    float: right; 
+    margin: 0rem 70rem; 
+    width: 7rem; 
+    height: 4rem;
 }
