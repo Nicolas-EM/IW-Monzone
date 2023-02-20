@@ -15,3 +15,16 @@
     width: 7rem; 
     height: 4rem;
 }
+
+#card_title{
+    float: left;
+}
+
+#prize_expense{
+    text-align: right;
+}
+
+#prize_expense_group{
+    text-align: right;
+    color:#20c997;
+}
