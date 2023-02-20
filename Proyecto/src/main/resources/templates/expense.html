@@ -2,18 +2,18 @@
 <html class="h-100" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <th:block th:replace="fragments/head :: header" />
-    <script src="/js/expense.js"></script>
-    <title>Monzone - Group</title>
+	 <script src="/js/expense.js"></script>
+    <title>Monzone - Purchase</title>
 </head>
 
-<body class="d-flex flex-column h-100"> 
+<body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
 
-    <div class="container">
+    <main class="flex-shrink-0">
+        <!-- TODO: hacer esto -->
+        <h1>THIS IS AN EXPENSE</h1>
+		<div class="container">
         <div class="panel panel-default">
           <div class="panel-body">
             <form class="form-horizontal">
@@ -55,7 +55,11 @@
             </div>
           </div>
         </div>
+    </main>
 
+    <th:block th:replace="fragments/footer.html :: footer" />
+
+    <script th:src="@{/js/ajax-demo.js}"></script>
 </body>
 
 </html>

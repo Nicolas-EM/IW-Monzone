@@ -3,37 +3,35 @@
 
 <head>
     <th:block th:replace="fragments/head :: header" />
+    <link rel="stylesheet" th:href="@{/css/sign.css}" href="css/sign.css" type="text/css" />
     <title>Monzone</title>
 </head>
 
-<body class="d-flex flex-column h-100">
-    <main class="flex-shrink-0">
-        <div class="container-fluid signScreen text-center">
-            <div class="row space"></div>
-            <div class="row signArea justify-content-center">
-                <div class="col infoArea col-lg-3 shadow-lg rounded">
-                    <div class="mt-3">
-                        <img th:src="@{/img/logo.png}" src="/img/logo.png" alt="logo Monzone" width="40" height="32" id="logo">
-                    </div>
-                    <div>
-                        <h5>Already have an account?</h5>
-                        <button type="button" id="changeB" class="btn btn-light rounded-pill fw-bold mt-2" onclick="location.href='./login'">Sign In</button>
-                    </div>
+<body>
+    <div class="container">
+        <div class="general-box col-8 offset-sm-2 d-flex justify-content-center">
+            <div class="info-box col-6">
+                <div class="row">
+                    <img th:src="@{/img/logo.png}" src="/img/logo.png" alt="logo Monzone" class="logo">
                 </div>
-                <div class="col formArea col-lg-4 shadow-lg rounded">
-                    <h1>Create an account</h1>
-                    <form class="form-signup" method="post" th:action="@{/signup}">
-                        <input class="form-control mx-auto w-50 rounded-pill p-2 mt-4 mb-2" type="text" id="name" placeholder=" Name">
-                        <input class="form-control mx-auto w-50 rounded-pill p-2 mb-2" type="text" id="username" placeholder=" Username">
-                        <input class="form-control mx-auto w-50 rounded-pill p-2 mb-2" type="password" id="inputPassword2" placeholder=" Password"></input>
-                        <input class="form-control mx-auto w-50 rounded-pill p-2" type="password" id="inputPassword2" placeholder=" Repeat password"></input>
-                    </form>
-                    <button type="submit" id="submitB" class="btn btn-dark rounded-pill fw-bold mt-4">Sign Up</button>
+                <div class="info-content row">
+                    <h5 class="mt-5 mb-2">Already have an account?</h5>
+                    <button id="btn-change" class="btn btn-light rounded-pill fw-bold mt-2" onclick="location.href='./'">Sign In</button>
                 </div>
             </div>
-            <div class="row space"></div>
+            <div class="form-box col-7 justify-content-center">
+                <button class="btn btn-light rounded-pill fw-bold mt-3 ms-3 d-lg-none" onclick="location.href='./'">Sign In</button>
+                <form class="form-content">
+                    <h2 class="fw-bold">Create an account</h2>
+                    <input type="text" placeholder="Name">
+                    <input type="text" placeholder="Username">
+                    <input type="password" placeholder="Password">
+                    <input type="password" placeholder="Repeat password">
+                    <button type="submit" id="bnt-signup" class="btn btn-primary rounded-pill fw-bold mt-4">Sign Up</button>
+                </form>
+            </div>
         </div>
-    </main>
+    </div>
 </body>
 
 </html>
