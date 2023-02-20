@@ -118,7 +118,7 @@ public class UserController {
 		for(Member m : memberOf){
 			groups.add(m.getGroupEntity());
 		}
-		model.addAttribute("groups", target);
+		model.addAttribute("groups", groups);
         return "home";
     }
 

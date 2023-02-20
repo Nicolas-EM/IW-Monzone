@@ -42,7 +42,9 @@ public class Group implements Transferable<Group.Transfer> {
     @AllArgsConstructor
     public static class Transfer {
 		private long id;
+        @Getter
         private String title;
+        @Getter
 		private String description;
 		private List<Member> members;
     }

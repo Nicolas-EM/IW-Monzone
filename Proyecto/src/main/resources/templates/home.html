@@ -14,56 +14,24 @@
 
     <!-- Body - Group cards -->
     <main class="container-fluid pt-4">
-        <div id="home_groups"
-            class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 g-4 gy-4 align-items-center">
-            <!-- Dynamic groups with Thymeleaf -->
-            <!-- <div th:replace="fragments/group_info_card.html :: div"></div> -->
-
-            <div class="col">
-                <div class="card text-white bg-warning h-100 mx-auto" role="button" onClick="location.href='/group/1'"
-                    tabindex="0">
-                    <div class="card-header">GASTOS CASA 📈</div>
-                    <div class="card-body">
-                        <h5 class="card-title">Grupo para los gastos del piso</h5>
-                        <p class="card-text">Descripción.</p>
+        <!-- Dynamic groups with Thymeleaf -->
+        <div id="home_groups" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 g-4 gy-4 align-items-center">
+            <tr th:each="group: ${groups}">
+                <div class="col">
+                    <div class="card text-white bg-warning h-100 mx-auto" role="button" onClick="location.href='/group/1'"
+                        tabindex="0">
+                        <div class="card-header"><h5>[[${group.getTitle()}]]</h5></div>
+                        <div class="card-body">
+                            <td th:text="${group.getDescription()}" class="card-title">Grupo para los gastos del finde</td>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="card text-white bg-warning h-100 mx-auto" role="button" onClick="location.href='/group/1'"
-                    tabindex="0">
-                    <div class="card-header">GASTOS CASA RURAL 📉</div>
-                    <div class="card-body">
-                        <h5 class="card-title">TITLE</h5>
-                        <p class="card-text">Descripción.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card text-white bg-warning h-100 mx-auto" role="button" onClick="location.href='/group/1'"
-                    tabindex="0">
-                    <div class="card-header">GASTOS FINDE 📉</div>
-                    <div class="card-body">
-                        <h5 class="card-title">Grupo para los gastos del finde</h5>
-                        <p class="card-text">Descripción.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card text-white bg-warning h-100 mx-auto" role="button" onClick="location.href='/group/1'"
-                    tabindex="0">
-                    <div class="card-header">GASTOS CASA RURAL 📉</div>
-                    <div class="card-body">
-                        <h5 class="card-title">TITLE</h5>
-                        <p class="card-text">Descripción.</p>
-                    </div>
-                </div>
-            </div>
+            </tr>
             <!-- newGroupBtn -->
             <div class="col text-center">
                 <button class="btn-lg btn-warning"><i class="fa fa-plus"></i></button></h3>
             </div>
-        </div>
+        </div>        
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />
