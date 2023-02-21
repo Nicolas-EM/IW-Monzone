@@ -22,7 +22,7 @@
             <!-- Dynamic member list with Thymeleaf -->
             <tr th:each="user: ${groupMembers}">
                 <div class="row pb-2">
-                    <div class="col my-auto">[[${user.getUsername()}]]</div>
+                    <div class="col my-auto">[[${user.getName()}]]</div>
                     <div class="col text-end"> <button type="button" class="btn btn-danger">X</button></div>
                 </div>
             </tr>

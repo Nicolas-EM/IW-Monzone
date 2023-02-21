@@ -44,8 +44,8 @@ public class User implements Transferable<User.Transfer> {
     @Column(nullable = false)
     private String password;
 
-    private String firstName;
-    private String lastName;
+    @Column(nullable = false)
+    private String name;
 
     private boolean enabled;
     private String roles; // split by ',' to separate roles
@@ -75,13 +75,14 @@ public class User implements Transferable<User.Transfer> {
     @AllArgsConstructor
     public static class Transfer {
 		private long id;
-        @Getter
         private String username;
+        @Getter
+        private String name;
     }
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(id,	username);
+		return new Transfer(id,	username, name);
 	}
 	
 	@Override

@@ -1,12 +1,12 @@
 -- insert admin (username a, password aa)
-INSERT INTO IWUser (id, enabled, roles, username, password)
-VALUES (1, TRUE, 'ADMIN,USER', 'a',
+INSERT INTO IWUser (id, enabled, name, roles, username, password)
+VALUES (1, TRUE, 'admin', 'ADMIN,USER', 'a',
     '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W');
-INSERT INTO IWUser (id, enabled, roles, username, password)
-VALUES (2, TRUE, 'USER', 'b',
+INSERT INTO IWUser (id, enabled, name, roles, username, password)
+VALUES (2, TRUE, 'bonito', 'USER', 'b',
     '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W');
-INSERT INTO IWUser (id, enabled, roles, username, password)
-VALUES (3, TRUE, 'ADMIN,USER', 'Nico',
+INSERT INTO IWUser (id, enabled, name, roles, username, password)
+VALUES (3, TRUE, 'Nicoooooo', 'ADMIN,USER', 'Nico',
     '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W');
 
 -- Groups
@@ -18,6 +18,8 @@ VALUES (2, 'G2 Desc', 'G2 Title');
 -- Membership
 INSERT INTO IWMember (GROUP_ID, USER_ID, ROLE)
 VALUES (1, 2, 0);
+INSERT INTO IWMember (GROUP_ID, USER_ID, ROLE)
+VALUES (1, 3, 0);
 INSERT INTO IWMember (GROUP_ID, USER_ID, ROLE)
 VALUES (2, 2, 0);
 
