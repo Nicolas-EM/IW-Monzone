@@ -25,3 +25,9 @@ img.preview {
     height: 100px;
     border-radius: 10px;
 }
+
+/* Nav Customization */
+
+#notifsTab {
+    width: 85%;
+}
