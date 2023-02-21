@@ -3,48 +3,71 @@
 
 <head>
     <th:block th:replace="fragments/head :: header" />
+    <link rel="stylesheet" th:href="@{/css/group.css}" href="css/group.css" type="text/css" />
     <title>Monzone - Group</title>
 </head>
 
 <body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
-        <!--CARTAS GRUPO-->
-        <div class="card border-light text-white bg-warning mb-3 mx-auto" style="width: 50rem; margin-top:3rem" role="button"
-            onClick="location.href='/group/1/config'" tabindex="0">
-            <div class="card-header"><strong>GASTOS PISO</strong></div>
-            <div class="card-body">
-                <h7 class="card-title" style="float :left">Grupo para los gastos del piso</h7>
-                <h4 style="text-align: right; color:#20c997">+20,70€</h4>
+    <div class="row mx-auto">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home"
+                    type="button" role="tab" aria-controls="pills-home" aria-selected="true">Expenses</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile"
+                    type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Balance</button>
+            </li>
+        </ul>
+    </div>
+
+
+    <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+            <!--CARTAS GRUPO-->
+            <div id="group_group" class="card border-light text-white bg-warning mb-3 mx-auto" role="button"
+                onClick="location.href='/group/1/config'" tabindex="0">
+                <div class="card-header"><strong>GASTOS PISO</strong></div>
+                <div class="card-body">
+                    <h7 class="card-title">Grupo para los gastos del piso</h7>
+                    <h4 class="prize-expense-group">+20,70€</h4>
+                </div>
             </div>
-        </div>
-        <!--CARTAS GASTOS-->
-        <div class="card border-light text-white bg-warning mb-3 mx-auto" style="width: 30rem" role="button"
-            onClick="location.href='/group/1/1'" tabindex="0">
-            <div class="card-header"><strong>GAS</strong></div>
-            <div class="card-body">
-                <h7 class="card-title" style="float :left">Factura trimestral del gas</h7>
-                <h5 style="text-align: right;">33,55€</h5>
+            <!--CARTAS GASTOS-->
+            <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button"
+                onClick="location.href='/group/1/1'" tabindex="0">
+                <div class="card-header"><strong>GAS</strong></div>
+                <div class="card-body">
+                    <h7 class="card-title">Factura trimestral del gas</h7>
+                    <h5 class="prize-expense">33,55€</h5>
+                </div>
             </div>
-        </div>
-        <div class="card border-light text-white bg-warning mb-3 mx-auto" style="width: 30rem" role="button"
-            onClick="location.href='/group/1/1'" tabindex="0">
-            <div class="card-header"><strong>CENA</strong></div>
-            <div class="card-body">
-                <h7 class="card-title" style="float :left">Cena del viernes 10 de febrero</h7>
-                <h5 style="text-align: right;">23,30€</h5>
+            <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button"
+                onClick="location.href='/group/1/1'" tabindex="0">
+                <div class="card-header"><strong>CENA</strong></div>
+                <div class="card-body">
+                    <h7 class="card-title">Cena del viernes 10 de febrero</h7>
+                    <h5 class="prize-expense">23,30€</h5>
+                </div>
             </div>
-        </div>
-        <div class="card border-light text-white bg-warning mb-3 mx-auto" style="width: 30rem" role="button"
-            onClick="location.href='/group/1/1'" tabindex="0">
-            <div class="card-header"><strong>WIFI</strong></div>
-            <div class="card-body">
-                <h7 class="card-title" style="float :left">Factura mensual del WIFI</h7>
-                <h5 style="text-align: right;">5,25€</h5>
+            <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button"
+                onClick="location.href='/group/1/1'" tabindex="0">
+                <div class="card-header"><strong>WIFI</strong></div>
+                <div class="card-body">
+                    <h7 class="card-title">Factura mensual del WIFI</h7>
+                    <h5 class="prize-expense">5,25€</h5>
+                </div>
             </div>
+            <!--BUTTONS-->
+            <button class="btn button-add-expense btn-outline-warning" type="button">ADD EXPENSE</button>
+
         </div>
-        <!--BUTTONS-->
-        <button type="button" class="btn btn-outline-warning mr-4"
-            style="float: right; margin: 0rem 70rem; width: 7rem; height: 4rem;">ADD EXPENSE</button>
+
+        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">...</div>
+    </div>
+
+
 
     </main>
 
