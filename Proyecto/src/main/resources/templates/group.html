@@ -10,7 +10,7 @@
 <body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
         <!--CARTAS GRUPO-->
-        <div id="group_group" class="card border-light text-white bg-warning mb-3 mx-auto" role="button"
+        <!--<div id="group_group" class="card border-light text-white bg-warning mb-3 mx-auto" role="button"
             onClick="location.href='/group/1/config'" tabindex="0">
             <div class="card-header"><strong>GASTOS PISO</strong></div>
             <div class="card-body">
@@ -18,34 +18,23 @@
                 <h4 class="prize-expense-group">+20,70€</h4>
             </div>
         </div>
+         -->
         <!--CARTAS GASTOS-->
-        <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button"
-            onClick="location.href='/group/1/1'" tabindex="0">
-            <div class="card-header"><strong>GAS</strong></div>
-            <div class="card-body">
-                <h7 class="card-title">Factura trimestral del gas</h7>
-                <h5 class="prize-expense">33,55€</h5>
-            </div>
+        <!-- Dynamic expenses with Thymeleaf -->
+        <!-- <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto"
+            role="button" onClick="location.href='/group/1/1'" tabindex="0">
+            <tr th:each="expense: ${groups.getExpenses}">
+                <div class="card-header"><strong>[[${expense.getTitle()}]]</strong></div>
+                <div class="card-body">
+                    <h7 class="card-title">[[${expense.getDescription()}]]</h7>
+                    <h5 class="prize-expense">[[${expense.getPrize()}]]</h5>
+                </div>
         </div>
-        <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button"
-            onClick="location.href='/group/1/1'" tabindex="0">
-            <div class="card-header"><strong>CENA</strong></div>
-            <div class="card-body">
-                <h7 class="card-title">Cena del viernes 10 de febrero</h7>
-                <h5 class="prize-expense">23,30€</h5>
-            </div>
-        </div>
-        <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button"
-            onClick="location.href='/group/1/1'" tabindex="0">
-            <div class="card-header"><strong>WIFI</strong></div>
-            <div class="card-body">
-                <h7 class="card-title">Factura mensual del WIFI</h7>
-                <h5 class="prize-expense">5,25€</h5>
-            </div>
-        </div>
+        -->
         <!--BUTTONS-->
-        <button class="btn button-add-expense btn-outline-warning" type="button" >ADD EXPENSE</button>
+        <!-- <button class="btn button-add-expense btn-outline-warning" type="button" >ADD EXPENSE</button>-->
 
+        <!--BALANCE-->
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />
