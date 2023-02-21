@@ -1,6 +1,6 @@
 /* usa este fichero para personalizar tus vistas */
 
-#group_card{
+.card-gasto{
     width: 30rem;
 }
 
@@ -9,22 +9,22 @@
     margin-top:3rem;
 }
 
-#button_add_expense{
+.button-add-expense{
     float: right; 
     margin: 0rem 70rem; 
     width: 7rem; 
     height: 4rem;
 }
 
-#card_title{
+.card-title{
     float: left;
 }
 
-#prize_expense{
+.prize-expense{
     text-align: right;
 }
 
-#prize_expense_group{
+.prize-expense-group{
     text-align: right;
     color:#20c997;
 }
