@@ -9,6 +9,22 @@
     margin-top:3rem;
 }
 
+.back_balance_pos{
+    background-color:#F5A300
+}
+
+.back_balance_neg{
+    background-color:#AF7302
+}
+
+hr{
+    margin-left: 3rem;
+    width: 90%;
+}
+
+#debts{
+   margin-left: 3rem 
+}
 .button-add-expense{
     float: center; 
     margin: 0rem 70rem; 

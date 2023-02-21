@@ -9,15 +9,14 @@
 
 <body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
+
     <div class="row mx-auto">
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home"
-                    type="button" role="tab" aria-controls="pills-home" aria-selected="true">Expenses</button>
+                <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Expenses</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile"
-                    type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Balance</button>
+                <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Balance</button>
             </li>
         </ul>
     </div>
@@ -26,8 +25,7 @@
     <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
             <!--CARTAS GRUPO-->
-            <div id="group_group" class="card border-light text-white bg-warning mb-3 mx-auto" role="button"
-                onClick="location.href='/group/1/config'" tabindex="0">
+            <div id="group_group" class="card border-light text-white bg-warning mb-3 mx-auto" role="button" onClick="location.href='/group/1/config'" tabindex="0">
                 <div class="card-header"><strong>GASTOS PISO</strong></div>
                 <div class="card-body">
                     <h7 class="card-title">Grupo para los gastos del piso</h7>
@@ -35,24 +33,21 @@
                 </div>
             </div>
             <!--CARTAS GASTOS-->
-            <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button"
-                onClick="location.href='/group/1/1'" tabindex="0">
+            <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button" onClick="location.href='/group/1/1'" tabindex="0">
                 <div class="card-header"><strong>GAS</strong></div>
                 <div class="card-body">
                     <h7 class="card-title">Factura trimestral del gas</h7>
                     <h5 class="prize-expense">33,55€</h5>
                 </div>
             </div>
-            <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button"
-                onClick="location.href='/group/1/1'" tabindex="0">
+            <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button" onClick="location.href='/group/1/1'" tabindex="0">
                 <div class="card-header"><strong>CENA</strong></div>
                 <div class="card-body">
                     <h7 class="card-title">Cena del viernes 10 de febrero</h7>
                     <h5 class="prize-expense">23,30€</h5>
                 </div>
             </div>
-            <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button"
-                onClick="location.href='/group/1/1'" tabindex="0">
+            <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button" onClick="location.href='/group/1/1'" tabindex="0">
                 <div class="card-header"><strong>WIFI</strong></div>
                 <div class="card-body">
                     <h7 class="card-title">Factura mensual del WIFI</h7>
@@ -64,35 +59,52 @@
 
         </div>
 
-        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">...</div>
+        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+            <div class="row">
+                <div class="col-md-6 text-center">
+                    <h5>Ana</h5>
+                    <h5 class="back_balance_neg">-17.32€</h5>
+                    <h5>Pablo</h5>
+                    <h5 class="back_balance_neg">-6.33€</h5>
+
+                </div>
+                <div class="col-md-6 text-center">
+                    <h5 class="back_balance_pos">+23.47€</h5>
+                    <h5>Marta</h5>
+                    <h5>0.00€</h5>
+                    <h5>Marcos</h5>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <hr>
+                    <h5 id="debts">DEBTS</h5>
+                    <hr>
+                    <ul class="list-group">
+                        <li class="list-group-item list-group-item-warning">
+                            <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                            Marta owes Ana 17.32€
+                        </li>
+                        <li class="list-group-item list-group-item-warning">
+                            <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                            Pablo owes Marta 2.53€
+                        </li>
+                        <li class="list-group-item list-group-item-warning">
+                            <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                             Marcos owes Ana 6.33€
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+
+
+        </div>
     </div>
 
-    <!--CARTAS GRUPO-->
-        <!--<div id="group_group" class="card border-light text-white bg-warning mb-3 mx-auto" role="button"
-            onClick="location.href='/group/1/config'" tabindex="0">
-            <div class="card-header"><strong>GASTOS PISO</strong></div>
-            <div class="card-body">
-                <h7 class="card-title">Grupo para los gastos del piso</h7>
-                <h4 class="prize-expense-group">+20,70€</h4>
-            </div>
-        </div>
-         -->
-        <!--CARTAS GASTOS-->
-        <!-- Dynamic expenses with Thymeleaf -->
-        <!-- <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto"
-            role="button" onClick="location.href='/group/1/1'" tabindex="0">
-            <tr th:each="expense: ${groups.getExpenses}">
-                <div class="card-header"><strong>[[${expense.getTitle()}]]</strong></div>
-                <div class="card-body">
-                    <h7 class="card-title">[[${expense.getDescription()}]]</h7>
-                    <h5 class="prize-expense">[[${expense.getPrize()}]]</h5>
-                </div>
-        </div>
-        -->
-        <!--BUTTONS-->
-        <!-- <button class="btn button-add-expense btn-outline-warning" type="button" >ADD EXPENSE</button>-->
 
-        <!--BALANCE-->
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />
