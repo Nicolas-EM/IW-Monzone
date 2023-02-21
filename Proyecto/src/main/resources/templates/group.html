@@ -67,8 +67,32 @@
         <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">...</div>
     </div>
 
+    <!--CARTAS GRUPO-->
+        <!--<div id="group_group" class="card border-light text-white bg-warning mb-3 mx-auto" role="button"
+            onClick="location.href='/group/1/config'" tabindex="0">
+            <div class="card-header"><strong>GASTOS PISO</strong></div>
+            <div class="card-body">
+                <h7 class="card-title">Grupo para los gastos del piso</h7>
+                <h4 class="prize-expense-group">+20,70€</h4>
+            </div>
+        </div>
+         -->
+        <!--CARTAS GASTOS-->
+        <!-- Dynamic expenses with Thymeleaf -->
+        <!-- <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto"
+            role="button" onClick="location.href='/group/1/1'" tabindex="0">
+            <tr th:each="expense: ${groups.getExpenses}">
+                <div class="card-header"><strong>[[${expense.getTitle()}]]</strong></div>
+                <div class="card-body">
+                    <h7 class="card-title">[[${expense.getDescription()}]]</h7>
+                    <h5 class="prize-expense">[[${expense.getPrize()}]]</h5>
+                </div>
+        </div>
+        -->
+        <!--BUTTONS-->
+        <!-- <button class="btn button-add-expense btn-outline-warning" type="button" >ADD EXPENSE</button>-->
 
-
+        <!--BALANCE-->
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />
