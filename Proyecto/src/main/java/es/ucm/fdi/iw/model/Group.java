@@ -46,6 +46,7 @@ public class Group implements Transferable<Group.Transfer> {
         private String title;
         @Getter
 		private String description;
+        @Getter
 		private List<Member> members;
     }
 

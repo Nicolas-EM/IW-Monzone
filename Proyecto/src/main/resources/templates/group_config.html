@@ -12,75 +12,23 @@
 
 <body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
-    <div class="card text-dark bg-warning mx-auto" style="width: 70%;">
-        <div>
-            <h1>Aparment's Expenses</h1>
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col">
-                        This is the group for aparments's expenses <img src="/img/euro.png" width="30px"
-                            style="float:right"> </img>
-                    </div>
-                </div>
-            </div>
+
+    <div class="card text-dark bg-warning mx-auto">
+        <div class="card-header">
+            <h1>Group Title's Configuration</h1>
+            <h3 class="card-subtitle">Something <img src="/img/euro.png" width="30px" style="float:right"> </img></h3>
         </div>
-
-        <div class="border border-white">
-            <ul>
-                <li>
-                    <div class="row">
-                        <div class="col">
-                            Nico V
-                        </div>
-                        <div class="col"> <button type="button" class="btn btn-danger">X</button></div>
-
-                    </div>
-                </li>
-                <li>
-                    <div class="row">
-                        <div class="col">
-                            Bea Doc
-                        </div>
-                        <div class="col"> <button type="button" class="btn btn-danger">X</button></div>
-
-                    </div>
-                </li>
-                <li>
-                    <div class="row">
-                        <div class="col">
-                            SaraSan
-                        </div>
-                        <div class="col"> <button type="button" class="btn btn-danger">X</button></div>
-
-                    </div>
-                </li>
-                <li>
-                    <div class="row">
-                        <div class="col">
-                            Albet
-                        </div>
-                        <div class="col"> <button type="button" class="btn btn-danger">X</button></div>
-
-                    </div>
-                </li>
-                <li>
-                    <div class="row">
-                        <div class="col">
-                            Vic
-                        </div>
-                        <div class="col"> <button type="button" class="btn btn-danger">X</button></div>
-
-                    </div>
-                </li>
-            </ul>
-        </div>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col">
-                    <p>Total Budget: <mark class="text-success ">30</mark> <img class="btn ps-4"
-                            src="/img/agregar-contacto.png" width="80" style="float:right"></img></p>
+        <div class="card-body">
+            <!-- Dynamic member list with Thymeleaf -->
+            <tr th:each="user: ${groupMembers}">
+                <div class="row pb-2">
+                    <div class="col my-auto">[[${user.getUsername()}]]</div>
+                    <div class="col text-end"> <button type="button" class="btn btn-danger">X</button></div>
                 </div>
-            </div>
+            </tr>
+        </div>
+        <div class="card-footer">
+            <p>Total Budget: <mark class="text-success">30</mark> <img class="btn ps-4" src="/img/agregar-contacto.png" width="80" style="float:right"></img></p>
         </div>
     </div>
 </body>
