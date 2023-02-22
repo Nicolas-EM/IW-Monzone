@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,9 +30,13 @@ public class Group implements Transferable<Group.Transfer> {
 	private long id;
 
     @Column(nullable = false, unique = true)
-    private String title;
+    private String name;
     @Column(nullable = false)
-    private String description;
+    private String desc;
+    @Column(nullable = false)
+    private Integer numMembers;
+    @Column(nullable = false)
+    private Float totBudget;
 
 	@OneToMany(mappedBy = "groupEntity")
 	private List<Member> members = new ArrayList<>();
@@ -43,20 +46,25 @@ public class Group implements Transferable<Group.Transfer> {
     public static class Transfer {
 		private long id;
         @Getter
-        private String title;
+        private String name;
         @Getter
-		private String description;
+		private String desc;
+        @Getter
+        private Integer numMembers;
+        @Getter
+        private Float totBudget;
         @Getter
 		private List<Member> members;
     }
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(id,	title, description, members);
+		return new Transfer(id,	name, desc, numMembers, totBudget, members);
 	}
 	
 	@Override
 	public String toString() {
 		return toTransfer().toString();
 	}
+
 }
