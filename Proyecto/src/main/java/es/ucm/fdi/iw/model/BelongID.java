@@ -5,21 +5,23 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Data;
 
 /**
- * Member ID
+ * Belong ID
  */
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Embeddable
-public class MemberID implements Serializable {
-    @Getter
+public class BelongID implements Serializable {
     @Column(name = "group_id")
     private long groupId;
     
-    @Getter
+    @Column(name = "expense_id")
+    private long expenseId;
+    
     @Column(name = "user_id")
     private long userId;
 }

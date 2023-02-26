@@ -20,7 +20,7 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(name="User.byUsername",
                 query="SELECT u FROM User u "
-                        + "WHERE u.username = :username AND u.enabled = TRUE"),
+                        + "WHERE u.username = :username"),
         @NamedQuery(name="User.hasUsername",
                 query="SELECT COUNT(u) "
                         + "FROM User u "
@@ -46,13 +46,13 @@ public class User implements Transferable<User.Transfer> {
 
     @Column(nullable = false)
     private String name;
-
-    private boolean enabled;
     private String roles; // split by ',' to separate roles
 
     @OneToMany(mappedBy = "userEntity")
-    @Getter
     private List<Member> miembroDe = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Notification> notifications = new ArrayList<>();
 
 	@OneToMany
 	@JoinColumn(name = "sender_id")
@@ -73,10 +73,10 @@ public class User implements Transferable<User.Transfer> {
 
     @Getter
     @AllArgsConstructor
+    @Data
     public static class Transfer {
 		private long id;
         private String username;
-        @Getter
         private String name;
     }
 
