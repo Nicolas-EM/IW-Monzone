@@ -28,6 +28,40 @@ img.preview {
 
 /* Nav Customization */
 
+#bell {
+    fill: #fed053;
+}  
+
+#bell:hover {
+    fill: #bb911f;
+}
+
+#dropMenu {
+    position:absolute;
+    top: 55px;
+    left: auto;
+    right: 5px;
+    background-color: #565e69;
+}
+
+.nav-link {
+    color: #f5a302;
+}
+
+.nav-link:hover {
+    color: #bb911f;
+}
+
+#interactive-tab[aria-selected="true"] {
+    color: white;
+    background-color: #f5a302;
+}
+
+#notifs-tab[aria-selected="true"] {
+    color: white;
+    background-color: #f5a302;
+}
+
 #notifsTab {
     width: 85%;
 }

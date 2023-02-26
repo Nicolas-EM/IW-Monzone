@@ -13,7 +13,8 @@
             <div class="container-fluid">
                 <!-- nombre del sitio; es un enlace que lleva a la página ppal -->
                 <a class="navbar-brand" th:href="@{/user/{id}(id=${session.u.id})}" href="/">
-                    <img th:src="@{/img/logo.png}" src="/img/logo.png" alt="logo Monzone" width="auto" height="32" class="d-inline-block align-text-top"> Monzone
+                    <img th:src="@{/img/icon.png}" src="/img/icon.png" alt="icon Monzone" width="auto" height="50" class="d-inline-block align-text-top">
+                    <img th:src="@{/img/name.png}" src="/img/name.png" alt="name Monzone" width="auto" height="40" class="d-inline-block align-text-top mt-1">
                 </a>
                 <!-- menu hamburguesa si no cabe todo -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,20 +24,24 @@
                     <ul class="navbar-nav ms-auto">
                         <th:block th:if="${session.u}">
                             <li class="nav-item mx-3">
-                                <a class="nav-link" th:if="${session.u.hasRole('ADMIN')}" th:href="@{/admin/}">Administrar</a>
+                                <a class="nav-link" th:if="${session.u.hasRole('ADMIN')}" th:href="@{/admin/}">
+                                    <button type="button" class="btn btn-outline-secondary">Admin</button>
+                                </a>
                             </li>
                             <li class="nav-item align-self-center me-4">
-                                <button type="button" class="btn btn-outline-primary btn-sm position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav" aria-controls="offcanvasNav">
-                                    🔔 <span id="nav-unread" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary">+99 <span class="visually-hidden">unread messages</span></span>
+                                <button id="notifB" type="button" class="btn btn-sm position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav" aria-controls="offcanvasNav">
+                                    <svg id="bell" xmlns="http://www.w3.org/2000/svg" width="30" height="30" class="bi bi-bell" viewBox="0 0 16 16">
+                                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                                    </svg>                                    
+                                    <span id="nav-unread" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary">+99 <span class="visually-hidden">unread messages</span></span>
                                 </button>
                             </li>
                             <!-- Profile Dropdown Menu -->
                             <li class="nav-item align-self-center dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <img class="iwthumb rounded" th:src="@{/user/{id}/pic(id=${session.u.id})}">
-                                    <span th:text="${session.u.username}">Pepe</span>
+                                    <img th:src="@{/user/{id}/pic(id=${session.u.id})}" class="iwthumb rounded-circle border border-secondary">
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-dark">
+                                <ul id="dropMenu" class="dropdown-menu dropdown-menu-dark">
                                     <!-- Profile Btn -->
                                     <li>
                                         <a class="dropdown-item" th:href="@{/user/{id}/config(id=${session.u.id})}">Profile</a>
@@ -63,10 +68,10 @@
             <div class="offcanvas-header">
                 <ul class="nav nav-pills nav-justified" id="notifsTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="interactive-tab" data-bs-toggle="tab" data-bs-target="#interactive-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Home</button>
+                        <button class="nav-link active" id="interactive-tab" data-bs-toggle="tab" data-bs-target="#interactive-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Warnings</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="notifs-tab" data-bs-toggle="tab" data-bs-target="#notifs-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Profile</button>
+                        <button class="nav-link" id="notifs-tab" data-bs-toggle="tab" data-bs-target="#notifs-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Notifications</button>
                     </li>
                 </ul>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
