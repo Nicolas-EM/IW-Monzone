@@ -16,6 +16,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@NamedQueries({
+    @NamedQuery(name="Group.getAllGroups",
+                query="SELECT obj FROM Group obj")
+}
+)
 @Table(name="IWGroup")
 public class Group implements Transferable<Group.Transfer> {
 

@@ -4,6 +4,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.EntityManager;
+
+import java.util.List;
+import java.util.ArrayList;
+
+import es.ucm.fdi.iw.model.Group;
 
 /**
  *  Site administration.
@@ -15,10 +23,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminController {
 
 	//private static final Logger log = LogManager.getLogger(AdminController.class);
-
+    @Autowired
+	private EntityManager entityManager;
+    
 	@GetMapping("/")
     public String index(Model model) {
-        return "login"; // FALTA IMPLEMENTAR
+        List<Group> groups = entityManager.createNamedQuery("Group.getAllGroups").getResultList();
+        model.addAttribute("groups", groups);
+        return "home";
     }
-    
 }
