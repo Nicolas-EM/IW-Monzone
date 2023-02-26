@@ -1,0 +1,31 @@
+
+/* ------------ COLUMNAS ------------ */
+
+.col-box {
+    margin-top: 9vh;
+    margin-bottom: 9vh;
+    width: 36%;
+}
+
+/* ------------ COL-1 ------------ */
+
+.input-box {
+    border-radius: 8px;
+    padding-left: 10px;
+    height: 4vh;
+}
+
+#desc {
+    resize: none;
+    height: 100%;
+}
+
+/* ------------ COL-2 ------------ */
+
+#middle-col {
+    margin-left: 6%;
+    margin-right: 6%;
+    width: 50%;
+}
+
+/* ------------ COL-3 ------------ */

@@ -2,134 +2,41 @@
 <html class="h-100" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <th:block th:replace="fragments/head :: header" />
-  <script src="/js/expense.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <title>Monzone - Purchase</title>
+
+    <th:block th:replace="fragments/head :: header" />
+    <title>Monzone - Expense</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" th:href="@{/css/expense.css}" href="css/expense.css" type="text/css" />
 </head>
 
-<body class="d-flex flex-column h-100">
-  <header th:replace="fragments/nav.html :: nav"></header>
+<body>
+    <header th:replace="fragments/nav.html :: nav"></header>
 
-  <main class="flex-shrink-0">
-    <!-- TODO: hacer esto -->
-    <div class="card text-dark bg-warning mx-auto" style="width: 70%; margin-top: 5%; margin-bottom: 5%;">
-      <div class="mx-auto text-center">
-        <h1>EXPENSE'S NAME</h1>
-        <p>Description: This is a simple description of the expense</p>
-      </div>
-      <div class="container-fluid text-center">
-        <div class="row">
-          <div class="col">
-            BeaGG
+    <div class="container">
+        <div class="general-box d-flex justify-content-center">
+          <div class="col-box col-5">
+            <h1>Edit Expense</h1>
+            <div>
+              <label for="name" class="form-label mt-4 w-100" >Name</label>
+              <input id="name" type="text" class="input-box mb-4 w-100" required="required">
+              <label for="desc" class="form-label w-100">Description (optional)</label>
+              <textarea id="desc" class="input-box form-control" rows="5"></textarea>
+              <label for="date" class="form-label mt-4 w-100">Date</label>
+              <input type="date" id="date" class="input-box w-100" required="required">
+              <label for="amount" class="form-label mt-4 w-100">Amount (€)</label>
+              <input id="amount" type="text" class="input-box mb-4 w-100" required="required">
+            </div>              
           </div>
-          <div class="col">
-            180€
+          <div id="middle-col" class="col-box col-5 bg-secondary">
+              paidby, type, forwhom
           </div>
-          <div class="col">
-            12/01/2023
-          </div>
-
-          <div class="container">
-            <div draggable="true" class="box" style="margin-top: 1%;"><img src="/img/ticket.jpg" width="20%" height="30%" style="float:auto"> </img></div>
-          </div>
-
-        </div>
-        <div class= "align-right"></i>
-          <p>For 2 Participants</p>
-        </div>
-
-      </div>
-      <div class="container mx-auto">
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <form class="form-horizontal">
-
-              <div class="container-fluid text-center">
-                <div class="row">
-                    <div class="col text-center">
-                      <div class="form-group">
-                        <label for="username" class="col-sm-5 control-label">User</label>
-                        <div class="col-sm-4 mx-auto">
-                          <input type="text" class="form-control" value="Sara" id="username" readonly>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col">
-
-                      <div class="form-group">
-                        <label for="paid" class="col-sm-5 control-label">Paid</label>
-                        <div class="col-sm-4 mx-auto">
-                          <input type="text" class="form-control" value="yes" id="paid" readonly>
-                        </div>
-                      </div>
-
-                    </div>
-
-                    <div class="col">
-
-                      <div class="form-group">
-                        <label for="amount" class="col-sm-5 control-label">Amount</label>
-                        <div class="col-sm-4 mx-auto">
-                          <input type="text" class="form-control" value="50" id="amount" readonly>
-                        </div>
-                      </div>
-
-                    </div>
-
-
-                </div>
-
-
-                <div class="row">
-                  <div class="col text-center">
-                    <div class="form-group">
-                      <div class="col-sm-4 mx-auto">
-                        <input type="text" class="form-control" value="Alberto" id="username" readonly>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col">
-
-                    <div class="form-group">
-                      <div class="col-sm-4 mx-auto">
-                        <input type="text" class="form-control" value="no" id="paid" readonly>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  <div class="col">
-
-                    <div class="form-group">
-                      <div class="col-sm-4 mx-auto">
-                        <input type="text" class="form-control" value="130" id="amount" readonly>
-                      </div>
-                    </div>
-
-                  </div>
-
-
-              </div>
-
-            </div>
-
-            </form>
-
-            <div class="mx-auto aling-items-center text-center" style="margin-top: 5%; margin-bottom: 3%;">
-              <button class="btn btn-primary"onclick="editar();"><i class="fa fa-pencil"></i></button>
-              <button class="btn btn-primary"onclick="bloquear();"><i class="fa fa-save"></i></button>
-
-            </div>
-
+          <div class="col-box col-5 bg-warning">
+              picture, ok
           </div>
         </div>
-      </div>
-  </main>
+    </div>
 
-  <th:block th:replace="fragments/footer.html :: footer" />
-
-  <script th:src="@{/js/ajax-demo.js}"></script>
+    <th:block th:replace="fragments/footer.html :: footer" />
 </body>
 
 </html>
