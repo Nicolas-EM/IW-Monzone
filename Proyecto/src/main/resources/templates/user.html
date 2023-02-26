@@ -10,158 +10,24 @@
 <body class="d-flex flex-column h-100">
   <header th:replace="fragments/nav.html :: nav"></header>
 
-  <div class="primera mx-auto">
-    <img class="rounded-circle shadow-4-strong mx-auto" alt="avatar" width="140rem" height="140rem"
-      src="/img/avatar.png" />
-  </div>
-
-  <div class="segunda mx-auto">
-    <h3>NAME SURNAMES<button class="btn btn-warning"><i class="fa fa-pencil"></i></button></h3>
-  </div>
-
-
-  <div class="container">
-    <!-- ROW Gastos del mes -->
-    <div class="row mb-2">
-      <div class="col-sm-4 col-md-4"></div>
-      <div class="col-sm-4 col-md-4"></div>
-
-      <div class="col-sm-4 col-md-4" style="height: 5rem;">
-        <h5 class="text-center">Expenses of the month</h5>
-      </div>
-    </div>
-
-    <!-- ROW Gastos y mes-->
-
-    <div class="row mb-5">
-      <div class="col-sm-4 col-md-2">
-        <!-- Contenido de la primera columna -->
-        <div class="card border-warning" style="max-width: 18rem; background-color: #353535">
-          <div class="card-body">
-            <h5 class="card-title">Floor Group: 100€</h5>
-          </div>
-        </div>
-
-      </div>
-      <div class="col-sm-4 col-md-2">
-        <!-- Contenido de la segunda columna -->
-        <div class="card mx-auto" style="max-width: 8rem; background-color: #00d76c">
-          <div class="card-body mx-auto">
-            <h5 class="card-title">10€</h5>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-4 col-md-2">
-        <!-- Contenido de la tercera columna -->
-        <div class="card mx-auto" style="max-width: 8rem; background-color: #d70000">
-          <div class="card-body mx-auto">
-            <h5 class="card-title">10€</h5>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-4 col-md-2">
-        <!-- Contenido de la cuarta columna -->
-
-      </div>
-      <div class="col-sm-4 col-md-2">
-        <!-- Contenido de la quinta columna -->
-        <select class="form-select mx-auto">
-          <option selected>Choose month</option>
-          <option value="1">January</option>
-          <option value="2">February</option>
-          <option value="3">MArch</option>
-          <option value="4">April</option>
-          <option value="5">May</option>
-          <option value="6">June</option>
-          <option value="7">July</option>
-          <option value="8">August</option>
-          <option value="9">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option>
-        </select>
-      </div>
-      <div class="col-sm-4 col-md-2">
-        <!-- Contenido de la sexta columna -->
-        <div class="card bg-warning">
-          <div class="card-body mx-auto">
-            <h5>130€</h5>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ROW Gastos-->
-    <div class="row mb-5">
-      <div class="col-sm-4 col-md-2">
-        <!-- Contenido de la primera columna -->
-
-        <div class="card border-warning" style="max-width: 18rem; background-color: #353535">
-          <div class="card-body">
-            <h5 class="card-title">Country House: 80€</h5>
-          </div>
-        </div>
-
-      </div>
-      <div class="col-sm-4 col-md-2">
-        <!-- Contenido de la segunda columna -->
-
-        <div class="card mx-auto" style="max-width: 8rem; background-color: #00d76c">
-          <div class="card-body mx-auto">
-            <h5 class="card-title">20€</h5>
-          </div>
-        </div>
-
-      </div>
-      <div class="col-sm-4 col-md-2">
-        <!-- Contenido de la tercera columna -->
-
-        <div class="card mx-auto" style="max-width: 8rem; background-color: #d70000">
-          <div class="card-body mx-auto">
-            <h5 class="card-title">10€</h5>
-          </div>
-        </div>
-
-
-      </div>
-      <div class="col-sm-4 col-md-6">
-      </div>
-    </div>
-
-    <!-- ROW Categorías-->
-    <div class="row mb-2">
+  <div class="row-col-1 row-col-lg-2">
+    <!-- User info -->
+    <div class="col">
       <div class="row">
-        <div class="col-sm-4 col-md-8"></div>
-
-        <div class="col-sm-4 col-md-4" style="height: 4rem;">
-          <h5 class="text-center">Categories</h5>
-        </div>
+        <h2>Your Profile</h2>
       </div>
-    </div>
-    <div class="row mb-2">
       <div class="row">
-        <div class="col-sm-4 col-md-8"></div>
+        <!-- Profile pic -->
+        <div class="col">
+          
+        </div>
+        <!-- Username + Displayname -->
+        <div class="col">
 
-        <div class="col-sm-4 col-md-4">
-          <ul class="list-group">
-            <li class="list-group-item">
-              <i class="fa fa-gamepad"></i>
-              Videogames: 30€
-            </li>
-            <li class="list-group-item">
-              <i class="fa fa-cutlery"></i>
-              Restaurants: 30€
-            </li>
-            <li class="list-group-item">
-              <i class="fa fa-car"></i>
-              Transport: 70€
-            </li>
-          </ul>
         </div>
       </div>
     </div>
   </div>
-
 
   <th:block th:replace="fragments/footer.html :: footer" />
 </body>

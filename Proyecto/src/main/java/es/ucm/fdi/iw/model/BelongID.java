@@ -11,17 +11,13 @@ import lombok.Data;
 /**
  * Belong ID
  */
+@Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Embeddable
 public class BelongID implements Serializable {
-    @Column(name = "group_id")
-    private long groupId;
     
-    @Column(name = "expense_id")
-    private long expenseId;
-    
-    @Column(name = "user_id")
-    private long userId;
+    private long expenseID;
+    private long userID;
+
 }

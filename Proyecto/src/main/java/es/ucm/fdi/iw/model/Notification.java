@@ -17,6 +17,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Table(name="IWNotification")
 public class Notification implements Transferable<Notification.Transfer> {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen")
     @SequenceGenerator(name = "gen", sequenceName = "gen")
@@ -34,7 +35,6 @@ public class Notification implements Transferable<Notification.Transfer> {
     @ManyToOne
     private User user;
   
-    @Getter
     @AllArgsConstructor
     @Data
     public static class Transfer {
@@ -54,5 +54,6 @@ public class Notification implements Transferable<Notification.Transfer> {
 	public String toString() {
 		return toTransfer().toString();
 	}
+
 }
 

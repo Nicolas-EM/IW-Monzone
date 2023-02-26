@@ -18,6 +18,7 @@ public class Debt implements Transferable<Debt.Transfer> {
 
     @EmbeddedId private DebtID dId;
     
+    @Column(nullable = false)
     private float amount;
 
 	@ManyToOne

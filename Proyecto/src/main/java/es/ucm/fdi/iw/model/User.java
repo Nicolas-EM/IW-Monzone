@@ -2,12 +2,10 @@ package es.ucm.fdi.iw.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,6 +14,7 @@ import java.util.List;
  */
 @Entity
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @NamedQueries({
         @NamedQuery(name="User.byUsername",
@@ -48,18 +47,11 @@ public class User implements Transferable<User.Transfer> {
     private String name;
     private String roles; // split by ',' to separate roles
 
-    @OneToMany(mappedBy = "userEntity")
-    private List<Member> miembroDe = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<Member> memberOf;
 
     @OneToMany(mappedBy = "user")
-    private List<Notification> notifications = new ArrayList<>();
-
-	@OneToMany
-	@JoinColumn(name = "sender_id")
-	private List<Message> sent = new ArrayList<>();
-	@OneToMany
-	@JoinColumn(name = "recipient_id")	
-	private List<Message> received = new ArrayList<>();
+    private List<Notification> notifications;
 
     /**
      * Checks whether this user has a given role.
@@ -71,8 +63,8 @@ public class User implements Transferable<User.Transfer> {
         return Arrays.asList(roles.split(",")).contains(roleName);
     }
 
-    @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     @Data
     public static class Transfer {
 		private long id;
@@ -89,5 +81,6 @@ public class User implements Transferable<User.Transfer> {
 	public String toString() {
 		return toTransfer().toString();
 	}
+
 }
 

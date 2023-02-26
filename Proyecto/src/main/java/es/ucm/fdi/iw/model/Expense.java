@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 
@@ -16,6 +15,7 @@ import java.util.Date;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @NamedQueries({
         @NamedQuery(name="Expense.byId",
                 query="SELECT u FROM Expense u "
@@ -32,7 +32,6 @@ public class Expense implements Transferable<Expense.Transfer> {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private String desc;
 
     @Column(nullable = false)
@@ -45,19 +44,16 @@ public class Expense implements Transferable<Expense.Transfer> {
     private String picture;
 
     @ManyToOne
-    @MapsId("typeId")
-    @JoinColumn(name = "type_id")
-    private Type typeEntity;
+    private Type type;
 
     @ManyToOne
-    @MapsId("paidBy")
-    @JoinColumn(name = "paid_by")
-    private User userEntity;
+    private User paidBy;
 
-    @OneToMany(mappedBy = "expenseEntity")
-    private List<Belong> userbelong = new ArrayList<>();
+    @OneToMany(mappedBy = "expense")
+    private List<Belong> belong;
 
     @Data
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class Transfer {
 		private long id;
@@ -66,18 +62,18 @@ public class Expense implements Transferable<Expense.Transfer> {
         private long amount;
         private Date date;
         private String picture;
-        private Type typeEntity;
-        private Long userId;
+        private long typeID;
+        private long paidByID;
     }
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(id,	name, desc, amount, date, picture, typeEntity, userEntity.getId());
+		return new Transfer(id,	name, desc, amount, date, picture, type.getId(), paidBy.getId());
 	}
 	
 	@Override
 	public String toString() {
 		return toTransfer().toString();
 	}
-}
 
+}

@@ -41,7 +41,7 @@ public class GroupController {
         Group group = entityManager.find(Group.class, id);
         List<User> members = new ArrayList<>();
         for(Member m : group.getMembers()){
-            members.add(m.getUserEntity());
+            members.add(m.getUser());
         }
 		model.addAttribute("groupMembers", members);
         return "group_config";

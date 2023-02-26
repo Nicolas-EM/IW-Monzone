@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +15,7 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name="IWGroup")
 public class Group implements Transferable<Group.Transfer> {
 
@@ -30,10 +30,9 @@ public class Group implements Transferable<Group.Transfer> {
     @SequenceGenerator(name = "gen", sequenceName = "gen")
 	private long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
-    @Column(nullable = false)
     private String desc;
+    @Column(nullable = false, unique = true)
+    private String name;    
     @Column(nullable = false)
     private Integer numMembers;
     @Column(nullable = false)
@@ -41,8 +40,8 @@ public class Group implements Transferable<Group.Transfer> {
     @Column(nullable = false)
     private Currency currency;
 
-	@OneToMany(mappedBy = "groupEntity")
-	private List<Member> members = new ArrayList<>();
+	@OneToMany(mappedBy = "group")
+	private List<Member> members;
 
     @Getter
     @Data

@@ -19,15 +19,15 @@ public class Belong {
     @EmbeddedId private BelongID bId;
 
 	@ManyToOne
-    @MapsId("groupId")
-    private Group groupEntity;
+    private Group group;
 
     @ManyToOne
-    @MapsId("userId")
-    private User userEntity;
+    @MapsId("userID")
+    private User user;
 
     @ManyToOne
-    @MapsId("expenseId")
-    private Expense expenseEntity;
+    @MapsId("expenseID")
+    private Expense expense;
+
 }
 

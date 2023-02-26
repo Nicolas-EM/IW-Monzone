@@ -24,17 +24,18 @@ public class Member {
     @EmbeddedId private MemberID mId;
 
 	@ManyToOne
-    @MapsId("groupId")
-    @JoinColumn(name = "group_id")
-    private Group groupEntity;
+    @MapsId("groupID")
+    private Group group;
 
     @ManyToOne
-    @MapsId("userId")
-    @JoinColumn(name = "user_id")
-    private User userEntity;
+    @MapsId("userID")
+    private User user;
 
+    @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
     private Float budget;
+
 }
 
