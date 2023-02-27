@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html class="h-100" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="fragments/head :: header" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Monzone - Group</title>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <header th:replace="fragments/nav.html :: nav"></header>
+
+    <main>
+        <!-- Titulo -->
+        <div class="row">
+            <!--GRUPO-->
+            <div class="group_group">
+                <h3><strong>GASTOS PISO</strong></h3>
+                <h7 id="description">Grupo para los gastos del piso</h7>
+                <button class="btn button_config btn-outline-warning" type="button" th:onclick="|location.href='/group/${groupId}/config'|"><i class="fa fa-cog fa-2x"></i></button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="row">
+            <div class="col align-self-center text-center">
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Expenses</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Balance</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Contenido -->
+        <div class="tab-content" id="pills-tabContent">
+            <!-- Expenses -->
+            <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                <!-- CARTAS GASTOS -->
+                <div class="row">
+                    <!-- Dynamic expenses with Thymeleaf  -->
+                    <tr th:each="expense: ${expenses}">
+                        <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button" th:onclick="|location.href='/group/${groupId}/${expense.getId()}'|">
+                            <div class="card-header"><strong>[[${expense.getName()}]]</strong></div>
+                            <div class="card-body">
+                                <h7 class="card-title">[[${expense.getDesc()}]]</h7>
+                                <h5 class="prize-expense">[[${expense.getAmount()}]]</h5>
+                            </div>
+                        </div>
+                    </tr>
+                    <!-- No hay gastos -->
+                    <div th:unless="${!expenses.isEmpty()}" class="card card-gasto border-light text-white bg-warning mb-3 mx-auto">
+                        <div class="card-header"><strong>There are no expenses in this group!</strong></div>
+                    </div>
+                </div>
+                <!-- newExpenseBtn -->
+                <div class="row text-center">
+                    <div class="col align-self-center">
+                        <button class="btn button-add-expense btn-outline-warning" type="button">ADD EXPENSE</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Balance -->
+            <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                <div class="row">
+                    <div class="col-md-6 text-center">
+                        <h5>Ana</h5>
+                        <h5 class="back_balance_neg">-17.32€</h5>
+                        <h5>Pablo</h5>
+                        <h5 class="back_balance_neg">-6.33€</h5>
+
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <h5 class="back_balance_pos">+23.47€</h5>
+                        <h5>Marta</h5>
+                        <h5>0.00€</h5>
+                        <h5>Marcos</h5>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr>
+                        <h5 id="debts">DEBTS</h5>
+                        <hr>
+                        <ul class="list-group">
+                            <li class="list-group-item list-group-item-warning">
+                                <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                Marta owes Ana 17.32€
+                            </li>
+                            <li class="list-group-item list-group-item-warning">
+                                <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                Pablo owes Marta 2.53€
+                            </li>
+                            <li class="list-group-item list-group-item-warning">
+                                <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                Marcos owes Ana 6.33€
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <th:block th:replace="fragments/footer.html :: footer" />
+
+    <script th:src="@{/js/ajax-demo.js}"></script>
+</body>
+
+</html>
