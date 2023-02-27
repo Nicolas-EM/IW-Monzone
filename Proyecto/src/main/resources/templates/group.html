@@ -12,8 +12,9 @@
 <body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
 
-    <main class="container">
+    <main class="container my-auto">
         <!-- Title -->
+        <!-- TODO: title no es responsive en pantallas muy pequeñas... y creo que no está centrado -->
         <div class="row">
             <div class="col align-self-center text-center">
                 <h3><strong>GASTOS PISO</strong></h3>
@@ -31,12 +32,16 @@
             <!-- Tabs -->
             <div class="row">
                 <div class="col align-self-center text-center">
-                    <ul class="nav justify-content-center nav-pills nav-justified mb-3" id="pills-tab" role="tablist">
+                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Expenses</button>
+                            <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
+                                aria-selected="true">Expenses</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Balance</button>
+                            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile"
+                                aria-selected="false">Balance</button>
                         </li>
                     </ul>
                 </div>
@@ -46,26 +51,48 @@
                 <!-- Expenses -->
                 <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                     <!-- CARTAS GASTOS -->
-                    <div class="row">
+                    <div class="row row-cols-1 row-cols-lg-2">
                         <!-- Dynamic expenses with Thymeleaf  -->
                         <tr th:each="expense: ${expenses}">
-                            <div class="card card-gasto border-light text-white bg-warning mb-3 mx-auto" role="button" th:onclick="|location.href='/group/${groupId}/${expense.getId()}'|">
-                                <div class="card-header"><strong>[[${expense.getName()}]]</strong></div>
-                                <div class="card-body">
-                                    <h7 class="card-title">[[${expense.getDesc()}]]</h7>
-                                    <h5 class="prize-expense">[[${expense.getAmount()}]]</h5>
+                            <div class="col">
+                                <div class="card border-light text-white bg-warning mb-3 mx-auto" role="button" th:onclick="|location.href='/group/${groupId}/${expense.getId()}'|">
+                                    <div class="row row-cols-2 row-cols-md-4 g-0">
+                                        <!-- Icon -->
+                                        <div class="col text-center">
+                                            <img th:src="@{/img/type/{icon}(icon=${expense.getType().getIcon()})}" src="/img/type/food.png" alt="Category Icon" width="auto" height="50">
+                                        </div>
+                                        <!-- Text Info -->
+                                        <div class="col">
+                                            <div class="row card-text-row">
+                                                <div class="card-title">[[${expense.getName()}]]</div>
+                                            </div>
+                                            <div class="row card-text-row">
+                                                <div class="card-subtitle">[[${expense.getDesc()}]]</div>
+                                            </div>
+                                        </div>
+                                        <!-- Date -->
+                                        <div class="col d-flex align-items-center justify-content-center">
+                                            <div class="card-text">[[${expense.getDate()}]]</div>
+                                        </div>
+                                        <!-- Amount -->
+                                        <div class="col d-flex align-items-center justify-content-center expense-amount">
+                                            <div class="card-text">[[${expense.getAmount()}]]</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </tr>
                         <!-- No hay gastos -->
-                        <div th:unless="${!expenses.isEmpty()}" class="card card-gasto border-light text-white bg-warning mb-3 mx-auto">
+                        <div th:unless="${!expenses.isEmpty()}"
+                            class="card border-light text-white bg-warning mb-3 mx-auto">
                             <div class="card-header"><strong>There are no expenses in this group!</strong></div>
                         </div>
                     </div>
                     <!-- newExpenseBtn -->
                     <div class="row text-center">
                         <div class="col align-self-center">
-                            <button class="btn button-add-expense btn-outline-warning" type="button">ADD EXPENSE</button>
+                            <button class="btn button-add-expense btn-outline-warning" type="button">ADD
+                                EXPENSE</button>
                         </div>
                     </div>
                 </div>

@@ -2,11 +2,14 @@ package es.ucm.fdi.iw.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 
 import javax.persistence.*;
 
 import java.util.List;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -37,6 +40,7 @@ public class Expense implements Transferable<Expense.Transfer> {
     @Column(nullable = false)
     private long amount;
 
+    @Getter(AccessLevel.NONE)
     @Column(nullable = false)
     private Date date;
 
@@ -76,4 +80,9 @@ public class Expense implements Transferable<Expense.Transfer> {
 		return toTransfer().toString();
 	}
 
+    public String getDate(){
+        String pattern = "d MMM yyyy";
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        return dateFormat.format(date);
+    }
 }

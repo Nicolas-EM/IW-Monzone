@@ -26,7 +26,7 @@ VALUES (2, 2, 4, 0);
 
 -- Expenses Type
 INSERT INTO IWTYPE (ID, ICON, NAME)
-VALUES (1, '/icon', 'Comida');
+VALUES (1, 'food.png', 'Comida');
 
 -- Expenses
 INSERT INTO IWExpense (ID, AMOUNT, DATE, DESC, NAME, PICTURE, PAID_BY_ID, TYPE_ID)

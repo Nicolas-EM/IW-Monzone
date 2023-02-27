@@ -1,13 +1,18 @@
 /* usa este fichero para personalizar tus vistas */
 
-.card-gasto{
-    width: 30rem;
+#card {
+    /* width: 30rem; */
     text-align: center;
 }
 
-.group_group{
-    text-align: center; 
-    margin-top:3rem;
+.card-text-row {
+    text-align: center !important;
+}
+
+@media (min-width: 768px) {
+    .card-text-row {
+        text-align: left !important;
+    }
 }
 
 .back_balance_pos{
