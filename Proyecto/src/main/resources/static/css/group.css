@@ -2,10 +2,11 @@
 
 .card-gasto{
     width: 30rem;
+    text-align: center;
 }
 
-#group_group{
-    width: 50rem; 
+.group_group{
+    text-align: center; 
     margin-top:3rem;
 }
 
@@ -27,13 +28,24 @@ hr{
 }
 .button-add-expense{
     float: center; 
-    margin: 0rem 70rem; 
     width: 7rem; 
     height: 4rem;
 }
 
 .card-title{
     float: left;
+}
+
+#description{
+    margin-left: 4rem;
+}
+
+.button_config{
+    width: 3.5rem; 
+    height: 3rem;
+    display: inline-block;
+    text-align: center;
+    margin-left: 1rem;
 }
 
 .prize-expense{

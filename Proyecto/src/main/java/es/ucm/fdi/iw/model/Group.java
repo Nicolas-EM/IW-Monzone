@@ -48,6 +48,9 @@ public class Group implements Transferable<Group.Transfer> {
 	@OneToMany(mappedBy = "group")
 	private List<Member> members;
 
+    @OneToMany(mappedBy = "group")
+    private List<Owns> owns;
+
     @Getter
     @Data
     @AllArgsConstructor

@@ -1,16 +1,18 @@
-function editar(){
-    document.getElementById("username").removeAttribute("readonly", false) ;
-    document.getElementById("username").value="Sari_";
+$(document).on("click", ".browse", function() {
+   var file = $(this).parents().find(".file");
+   console.log("cliiick");
+   file.trigger("click");
+ });
 
-    document.getElementById("paid").removeAttribute("readonly", false) ;
-    document.getElementById("paid").value="yes_";
-
-    document.getElementById("amount").removeAttribute("readonly", false) ;
-    document.getElementById("amount").value="50_";
-  }
-  
-  function bloquear(){
-     document.getElementById("username").setAttribute("readonly", true) ;
-     document.getElementById("paid").setAttribute("readonly", true) ;
-     document.getElementById("amount").setAttribute("readonly", true) ;
-  }
+ $('input[type="file"]').change(function(e) {
+   var fileName = e.target.files[0].name;
+   $("#file").val(fileName);
+ 
+   var reader = new FileReader();
+   reader.onload = function(e) {
+     // get loaded data and render thumbnail.
+     document.getElementById("preview").src = e.target.result;
+   };
+   // read the image file as a data URL.
+   reader.readAsDataURL(this.files[0]);
+ });

@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 import lombok.Data;
 
 /**
- * Ow ID
+ * Owns ID
  */
 @Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class BelongID implements Serializable {
+public class OwnsID implements Serializable {
     
     private long expenseID;
     private long userID;

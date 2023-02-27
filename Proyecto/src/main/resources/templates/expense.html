@@ -9,11 +9,12 @@
     <link rel="stylesheet" th:href="@{/css/expense.css}" href="css/expense.css" type="text/css" />
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
 
     <div class="container">
-        <div class="general-box d-flex justify-content-center">
+        <form method="post" class="general-box d-flex justify-content-center">
+          <!-- Basic Info -->
           <div class="col-box col-5">
             <h1>Edit Expense</h1>
             <div>
@@ -27,7 +28,9 @@
               <input id="amount" type="text" class="input-box mb-4 w-100" required="required">
             </div>              
           </div>
+          <!-- Advanced info -->
           <div id="middle-col" class="col-box col-5">
+            <!-- Dropdown paidby -->
             <label for="paidby" class="form-label w-100" >Paid by</label>
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle bg-white" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
@@ -37,6 +40,7 @@
                 <li><a class="dropdown-item" href="#">Miembro 3</a></li>
               </ul>
             </div>
+            <!-- Dropdown type -->
             <label class="form-label mt-3 w-100" >Type</label>
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle bg-white" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
@@ -46,12 +50,36 @@
                 <li><a class="dropdown-item" href="#">Categoría 3</a></li>
               </ul>
             </div>
-            <label class="form-label mt-3 w-100" >For whom</label>
+            <!-- List "for whom" -->
+            <label for="for-whom" class="form-label mt-3 w-100" >For whom</label>
+            <div id="for-whom" class="border border-white">
+              <ul class="mt-3 mb-3">
+                <li><div class="form-check">
+                    <input class="check-box form-check-input" type="checkbox" value="" checked>
+                    <label class="form-check-label" for="flexCheckDefault">Miembro 1</label>
+                    <label class="balance">14.50€</label>
+                </div></li>
+                <li><div class="form-check">
+                  <input class="check-box form-check-input" type="checkbox" value="">
+                  <label class="form-check-label" for="flexCheckDefault">Miembro 2</label>
+                  <label class="balance">0.00€</label>
+                </div></li>
+                <li><div class="form-check">
+                  <input class="check-box form-check-input" type="checkbox" value="" checked>
+                  <label class="form-check-label" for="flexCheckDefault">Miembro 3</label>
+                  <label class="balance">14.50€</label>
+                </div></li>
+              </ul>
+            </div>
           </div>
-          <div class="col-box col-5 bg-warning">
-              picture, ok
+          <!-- Image -->
+          <div id="right-col" class="col-box col-5">
+            <label for="picture" class="form-label w-100" >Picture (optional)</label>
+            <input type="file" name="img[]" class="file" accept="image/*">
+            <img src="https://placehold.it/80x80" id="preview" class="img-thumbnail" role="button">
+            <button type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Save</button>
           </div>
-        </div>
+        </form>
     </div>
 
     <th:block th:replace="fragments/footer.html :: footer" />

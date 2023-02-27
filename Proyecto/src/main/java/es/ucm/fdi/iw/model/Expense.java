@@ -50,7 +50,7 @@ public class Expense implements Transferable<Expense.Transfer> {
     private User paidBy;
 
     @OneToMany(mappedBy = "expense")
-    private List<Belong> belong;
+    private List<Owns> belong;
 
     @Data
     @NoArgsConstructor

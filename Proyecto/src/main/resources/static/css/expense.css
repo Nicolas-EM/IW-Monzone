@@ -2,8 +2,7 @@
 /* ------------ COLUMNAS ------------ */
 
 .col-box {
-    margin-top: 3%;
-    margin-bottom: 3%;
+    margin-top: 2%;
     width: 30%;
 }
 
@@ -23,7 +22,7 @@
 /* ------------ COL-2 ------------ */
 
 #middle-col {
-    margin-top: 9%;
+    margin-top: 8%;
     margin-left: 6%;
     margin-right: 6%;
     width: 40%;
@@ -36,4 +35,41 @@
     color: black;
 }
 
+#for-whom {
+    height: 29vh;
+    border-radius: 8px;
+}
+
+#for-whom ul {
+    list-style-type: none;
+}
+
+.balance {
+    float: right;
+    margin-right: 25px;
+}
+
+.check-box:checked {
+    background-color: #d19900;
+    border-color: #886402;
+}
+
 /* ------------ COL-3 ------------ */
+
+#right-col {
+    margin-top: 8%;
+}
+
+.file {
+    visibility: hidden;
+    position: absolute;
+}
+
+#btn-save {
+    border-style: none;
+    outline: none;
+    width: 30%;
+    height: 10%;
+    background-color: #d19900;
+    margin-top: 10vh;
+}

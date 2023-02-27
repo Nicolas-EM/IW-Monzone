@@ -18,8 +18,7 @@
         <div id="home_groups" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 g-4 gy-4 align-items-center">
             <tr th:each="group: ${groups}">
                 <div class="col">
-                    <div class="card text-white bg-warning h-100 mx-auto" role="button" onClick="location.href='/group/1'"
-                        tabindex="0">
+                    <div class="card text-white bg-warning h-100 mx-auto" role="button" th:onclick="|location.href='/group/${group.getId()}'|" tabindex="0">
                         <div class="card-header"><h5>[[${group.getName()}]]</h5></div>
                         <div class="card-body">
                             <td th:text="${group.getDesc()}" class="card-title">Grupo para los gastos del finde</td>
