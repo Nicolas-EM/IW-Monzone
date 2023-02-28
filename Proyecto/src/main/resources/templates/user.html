@@ -10,26 +10,45 @@
   <header th:replace="fragments/nav.html :: nav"></header>
 
   <main class="container align-items-center my-4">
-    <div class="row row-cols-1 row-cols-lg-2 gx-5">
+    <div class="row row-cols-1 row-cols-lg-2 gx-5 gy-2">
       <!-- User info -->
-      <div class="col">
-        <div class="row">
-          <h2>Your Profile</h2>
-        </div>
-        <div class="row row-cols-1 row-cols-md-2">
-          <!-- Profile pic -->
-          <div class="col">
-            
+      <form method="post" class="col">
+        <div class="row gy-2">
+          <!-- Title -->
+          <div class="col-12">
+            <h2>Your Profile</h2>
+          </div>
+          <!-- Profile Pic -->
+          <div class="col-3">
+            <img th:src="@{/user/{id}/pic(id=${session.u.id})}" style="min-width: 60%;" class="rounded-circle border border-secondary">
           </div>
           <!-- Displayname + username -->
-          <div class="col">
-  
+          <div class="col-9">
+            <div class="row">
+              <h4>Name</h4>
+              <p>[[${session.u.name}]]</p>
+            </div>
+            <div class="row">
+              <h4>Username</h4>
+              <p>[[${session.u.username}]]</p>
+            </div>
+          </div>
+          <!-- Password -->
+          <div class="col-12">
+            <div class="row">
+              Do you want to change your password?
+            </div>
+          </div>
+          <!-- Save Btn -->
+          <div class="col-12">
+            <button type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Save</button>
           </div>
         </div>
-      </div>
+      </form>
+
       <!-- Stats -->
       <div class="col">
-        <div class="row">
+        <div class="row gy-2">
           <h3>Your Stats</h3>
         </div>
         <!-- Monthly Expenses -->

@@ -30,9 +30,9 @@ VALUES (1, 'food.png', 'Comida');
 
 -- Expenses
 INSERT INTO IWExpense (ID, AMOUNT, DATE, DESC, NAME, PICTURE, PAID_BY_ID, TYPE_ID)
-VALUES (1, 10, DATE '2015-12-17', 'Descrip 1', 'Nom 1', '/nom1',1,1);
+VALUES (1, 10, '2023-02-28T14:30:00', 'Descrip 1', 'Nom 1', '/nom1',1,1);
 INSERT INTO IWExpense (ID, AMOUNT, DATE, DESC, NAME, PICTURE, PAID_BY_ID, TYPE_ID)
-VALUES (2, 69, DATE '2015-12-17', 'Descrip 2', 'Nom 2', '/nom2',1,1);
+VALUES (2, 69, '2023-02-28T14:30:00', 'Descrip 2', 'Nom 2', '/nom2',1,1);
 
 -- Owns
 INSERT INTO IWOwns (USER_ID, EXPENSE_ID, GROUP_ID)

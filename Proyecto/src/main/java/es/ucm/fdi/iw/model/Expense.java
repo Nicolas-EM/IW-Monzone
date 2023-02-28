@@ -10,7 +10,8 @@ import javax.persistence.*;
 
 import java.util.List;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;  
 
 /**
  * An authorized user of the system.
@@ -42,7 +43,7 @@ public class Expense implements Transferable<Expense.Transfer> {
 
     @Getter(AccessLevel.NONE)
     @Column(nullable = false)
-    private Date date;
+    private LocalDateTime date;
 
     @Column(nullable = false)
     private String picture;
@@ -64,7 +65,7 @@ public class Expense implements Transferable<Expense.Transfer> {
         private String name;
         private String desc;
         private long amount;
-        private Date date;
+        private LocalDateTime date;
         private String picture;
         private long typeID;
         private long paidByID;
@@ -81,8 +82,7 @@ public class Expense implements Transferable<Expense.Transfer> {
 	}
 
     public String getDate(){
-        String pattern = "d MMM yyyy";
-        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
-        return dateFormat.format(date);
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");  
+        return date.format(format);  
     }
 }

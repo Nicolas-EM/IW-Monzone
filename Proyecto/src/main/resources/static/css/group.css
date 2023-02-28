@@ -23,22 +23,23 @@
     background-color:#AF7302
 }
 
-hr{
-    margin-left: 3rem;
-    width: 90%;
-}
-
-#debts{
-   margin-left: 3rem 
-}
 .button-add-expense{
     float: center; 
-    width: 7rem; 
+    width: 4rem; 
     height: 4rem;
+}
+
+.form-check-input:checked {
+    background-color: #d19900;
+    border-color: #886402;
 }
 
 .card-title{
     float: left;
+}
+
+.colscroll{
+    height: 300px;
 }
 
 #description{
@@ -60,4 +61,9 @@ hr{
 .prize-expense-group{
     text-align: right;
     color:#20c997;
+}
+
+#nav-tab[aria-selected="true"] {
+    color: white;
+    background-color: #f5a302;
 }

@@ -6,7 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 /**
  * Notifications of the system.
@@ -30,7 +31,7 @@ public class Notification implements Transferable<Notification.Transfer> {
     @Column(nullable = false)
     private boolean actionRequired;
     @Column(nullable = false)
-    private Date date;
+    private LocalDateTime date;
 
     @ManyToOne
     private User user;
@@ -41,7 +42,7 @@ public class Notification implements Transferable<Notification.Transfer> {
         private String desc;
         private boolean read;
         private boolean actionRequired;
-        private Date date;
+        private LocalDateTime date;
         private long idUser;
     }
 

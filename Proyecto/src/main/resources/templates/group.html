@@ -24,6 +24,7 @@
             <div class="col align-self-center text-center">
                 <h7 id="description">Grupo para los gastos del piso</h7>
                 <button class="btn button_config btn-outline-warning" type="button" th:onclick="|location.href='/group/${groupId}/config'|"><i class="fa fa-cog fa-2x"></i></button>
+                <hr>
             </div>
         </div>
 
@@ -31,25 +32,22 @@
         <div class="body">
             <!-- Tabs -->
             <div class="row">
-                <div class="col align-self-center text-center">
-                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <div>
+                    <ul class="nav nav-pills nav-fill">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
-                                data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
-                                aria-selected="true">Expenses</button>
+                            <button class="nav-link active" id="nav-tab" data-bs-toggle="pill" data-bs-target="#pills-expenses" type="button" role="tab" aria-controls="pills-expenses" aria-selected="true">Expenses</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
-                                data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile"
-                                aria-selected="false">Balance</button>
+                            <button class="nav-link" id="nav-tab" data-bs-toggle="pill" data-bs-target="#pills-balance" type="button" role="tab" aria-controls="pills-balance" aria-selected="false">Balance</button>
                         </li>
                     </ul>
                 </div>
             </div>
+            <hr>
             <!-- Contenido Tabs -->
             <div class="tab-content" id="pills-tabContent">
                 <!-- Expenses -->
-                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                <div class="tab-pane fade show active" id="pills-expenses" role="tabpanel" aria-labelledby="pills-expenses-tab">
                     <!-- CARTAS GASTOS -->
                     <div class="row row-cols-1 row-cols-lg-2">
                         <!-- Dynamic expenses with Thymeleaf  -->
@@ -74,64 +72,106 @@
                                         <div class="col d-flex align-items-center justify-content-center">
                                             <div class="card-text">[[${expense.getDate()}]]</div>
                                         </div>
-                                        <!-- Amount -->
+                                        <!-- Amount (poner la divisa correspondiente) -->
                                         <div class="col d-flex align-items-center justify-content-center expense-amount">
-                                            <div class="card-text">[[${expense.getAmount()}]]</div>
+                                            <div class="card-text">[[${expense.getAmount()}]] €</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </tr>
                         <!-- No hay gastos -->
-                        <div th:unless="${!expenses.isEmpty()}"
-                            class="card border-light text-white bg-warning mb-3 mx-auto">
+                        <div th:unless="${!expenses.isEmpty()}" class="card border-light text-white bg-warning mb-3 mx-auto">
                             <div class="card-header"><strong>There are no expenses in this group!</strong></div>
                         </div>
                     </div>
                     <!-- newExpenseBtn -->
                     <div class="row text-center">
                         <div class="col align-self-center">
-                            <button class="btn button-add-expense btn-outline-warning" type="button">ADD
-                                EXPENSE</button>
+                            <button class="btn button-add-expense btn-outline-warning" type="button"><i class="fa fa-plus fa-2x"></i></button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Balance -->
-                <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                <div class="tab-pane fade" id="pills-balance" role="tabpanel" aria-labelledby="pills-balance-tab">
                     <div class="row">
-                        <div class="col-md-6 text-center">
+                        <div class="colscroll col-md-3 text-center">
                             <h5>Ana</h5>
                             <h5 class="back_balance_neg">-17.32€</h5>
                             <h5>Pablo</h5>
                             <h5 class="back_balance_neg">-6.33€</h5>
                         </div>
-                        <div class="col-md-6 text-center">
+
+                        <div class="colscroll col-md-3 text-center">
                             <h5 class="back_balance_pos">+23.47€</h5>
                             <h5>Marta</h5>
                             <h5>0.00€</h5>
                             <h5>Marcos</h5>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
+                        <div class="colscroll col-md-6">
+                            <h5>DEBTS</h5>
                             <hr>
-                            <h5 id="debts">DEBTS</h5>
-                            <hr>
-                            <ul class="list-group">
-                                <li class="list-group-item list-group-item-warning">
-                                    <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                    Marta owes Ana 17.32€
-                                </li>
-                                <li class="list-group-item list-group-item-warning">
-                                    <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                    Pablo owes Marta 2.53€
-                                </li>
-                                <li class="list-group-item list-group-item-warning">
-                                    <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                    Marcos owes Ana 6.33€
-                                </li>
-                            </ul>
+                            <div class="colscroll overflow-auto">
+                                <ul class="list-group">
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marta owes Ana 17.32€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Pablo owes Marta 2.53€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                    <li class="list-group-item list-group-item-warning">
+                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        Marcos owes Ana 6.33€
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
