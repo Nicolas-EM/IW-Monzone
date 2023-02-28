@@ -13,24 +13,26 @@
 <body class="d-flex flex-column h-100">
     <header th:replace="fragments/nav.html :: nav"></header>
 
-    <div class="card text-dark bg-warning mx-auto">
-        <div class="card-header">
-            <h1>Group Title's Configuration</h1>
-            <h3 class="card-subtitle">Something <img src="/img/euro.png" width="30px" style="float:right"> </img></h3>
+    <main class="container my-4">
+        <div class="card text-dark bg-warning mx-auto">
+            <div class="card-header">
+                <h1>Group Title's Configuration</h1>
+                <h3 class="card-subtitle">Something <img src="/img/euro.png" width="30px" style="float:right"> </img></h3>
+            </div>
+            <div class="card-body">
+                <!-- Dynamic member list with Thymeleaf -->
+                <tr th:each="user: ${groupMembers}">
+                    <div class="row pb-2">
+                        <div class="col my-auto">[[${user.getName()}]]</div>
+                        <div class="col text-end"> <button type="button" class="btn btn-danger">X</button></div>
+                    </div>
+                </tr>
+            </div>
+            <div class="card-footer">
+                <p>Total Budget: <mark class="text-success">30</mark> <img class="btn ps-4" src="/img/agregar-contacto.png" width="80" style="float:right"></img></p>
+            </div>
         </div>
-        <div class="card-body">
-            <!-- Dynamic member list with Thymeleaf -->
-            <tr th:each="user: ${groupMembers}">
-                <div class="row pb-2">
-                    <div class="col my-auto">[[${user.getName()}]]</div>
-                    <div class="col text-end"> <button type="button" class="btn btn-danger">X</button></div>
-                </div>
-            </tr>
-        </div>
-        <div class="card-footer">
-            <p>Total Budget: <mark class="text-success">30</mark> <img class="btn ps-4" src="/img/agregar-contacto.png" width="80" style="float:right"></img></p>
-        </div>
-    </div>
+    </main>
 </body>
 
 </html>
