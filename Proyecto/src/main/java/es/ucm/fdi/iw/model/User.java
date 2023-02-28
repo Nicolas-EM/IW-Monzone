@@ -47,7 +47,7 @@ public class User implements Transferable<User.Transfer> {
     private String name;
     private String roles; // split by ',' to separate roles
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     private List<Member> memberOf;
 
     @OneToMany(mappedBy = "user")

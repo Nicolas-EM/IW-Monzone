@@ -12,7 +12,7 @@
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
             <div class="container-fluid">
                 <!-- nombre del sitio; es un enlace que lleva a la página ppal -->
-                <a class="navbar-brand" th:href="@{/user/{id}(id=${session.u.id})}" href="/">
+                <a class="navbar-brand" th:href="@{/user/}" href="/">
                     <img th:src="@{/img/icon.png}" src="/img/icon.png" alt="icon Monzone" width="auto" height="50" class="d-inline-block align-text-top">
                     <img th:src="@{/img/name.png}" src="/img/name.png" alt="name Monzone" width="auto" height="40" class="d-inline-block align-text-top mt-1">
                 </a>
@@ -44,7 +44,7 @@
                                 <ul id="dropMenu" class="dropdown-menu dropdown-menu-dark">
                                     <!-- Profile Btn -->
                                     <li>
-                                        <a class="dropdown-item" th:href="@{/user/{id}/config(id=${session.u.id})}">Profile</a>
+                                        <a class="dropdown-item" th:href="@{/user/config}">Profile</a>
                                     </li>
                                     <li>
                                         <hr class="dropdown-divider">

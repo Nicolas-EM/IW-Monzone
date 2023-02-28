@@ -96,9 +96,9 @@ public class UserController {
     /**
      * Landing page for a user profile
      */
-	@GetMapping("{id}")
-    public String index(@PathVariable long id, Model model, HttpSession session) {
-        User user = entityManager.find(User.class, id);
+	@GetMapping("/")
+    public String index(Model model, HttpSession session) {
+        User user = (User)session.getAttribute("u");
 		List<Member> memberOf = user.getMemberOf();
 		List<Group> groups = new ArrayList<>();
 		for(Member m : memberOf){
@@ -108,11 +108,10 @@ public class UserController {
         return "home";
     }
 
-	@GetMapping("{id}/config")
-    public String home(@PathVariable long id, Model model) {
-		User target = entityManager.find(User.class, id);
-        model.addAttribute("user", target);
-		
+	@GetMapping("/config")
+    public String home(Model model, HttpSession session) {
+		User target = (User)session.getAttribute("u");
+    model.addAttribute("user", target);
         return "user";
     }
 
