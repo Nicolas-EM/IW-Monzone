@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import es.ucm.fdi.iw.model.User.Role;
+
 import java.util.List;
 
 /**
@@ -73,4 +75,15 @@ public class Group implements Transferable<Group.Transfer> {
 		return toTransfer().toString();
 	}
 
+    public Boolean isMember(User u){
+        if(u.hasRole(Role.ADMIN)){
+            return true;
+        }
+        for(Member m : members){
+            if(m.getUser().getUsername().equals(u.getUsername())){
+                return true;
+            }
+        }
+        return false;
+    }
 }
