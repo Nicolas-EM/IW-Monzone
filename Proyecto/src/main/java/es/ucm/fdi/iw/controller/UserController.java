@@ -175,7 +175,7 @@ public class UserController {
     private static InputStream defaultPic() {
 	    return new BufferedInputStream(Objects.requireNonNull(
             UserController.class.getClassLoader().getResourceAsStream(
-                "static/img/default-pic.jpg")));
+                "static/img/profile/default-profile.png")));
     }
 
     /**

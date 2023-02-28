@@ -4,30 +4,49 @@
 <head>
   <th:block th:replace="fragments/head :: header" />
   <title>Monzone</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body class="d-flex flex-column h-100">
   <header th:replace="fragments/nav.html :: nav"></header>
 
-  <div class="row-col-1 row-col-lg-2">
-    <!-- User info -->
-    <div class="col">
-      <div class="row">
-        <h2>Your Profile</h2>
-      </div>
-      <div class="row">
-        <!-- Profile pic -->
-        <div class="col">
-          
+  <main class="container align-items-center mt-3">
+    <div class="row row-cols-1 row-cols-lg-2 gx-5 gy-3">
+      <!-- User info -->
+      <div class="col">
+        <div class="row">
+          <h2>Your Profile</h2>
         </div>
-        <!-- Username + Displayname -->
-        <div class="col">
-
+        <div class="row row-cols-1 row-cols-md-2">
+          <!-- Profile pic -->
+          <div class="col">
+            
+          </div>
+          <!-- Displayname + username -->
+          <div class="col">
+  
+          </div>
+        </div>
+      </div>
+      <!-- Stats -->
+      <div class="col">
+        <div class="row">
+          <h3>Your Stats</h3>
+        </div>
+        <!-- Monthly Expenses -->
+        <div class="row">
+          <h4>Monthly Expenses</h4>
+        </div>
+        <!-- Categories -->
+        <div class="row">
+          <h4>Categories</h4>
+        </div>
+        <!-- Groups -->
+        <div class="row">
+          <h4>Your Groups</h4>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <th:block th:replace="fragments/footer.html :: footer" />
 </body>
