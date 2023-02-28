@@ -7,11 +7,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.ArrayList;
 
 import es.ucm.fdi.iw.model.Group;
+import es.ucm.fdi.iw.model.User;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *  Site administration.
@@ -22,12 +27,16 @@ import es.ucm.fdi.iw.model.Group;
 @RequestMapping("admin")
 public class AdminController {
 
-	//private static final Logger log = LogManager.getLogger(AdminController.class);
+	private static final Logger log = LogManager.getLogger(AdminController.class);
+
     @Autowired
 	private EntityManager entityManager;
     
 	@GetMapping("/")
-    public String index(Model model) {
+    public String index(Model model, HttpSession session) {
+        User u = (User)session.getAttribute("u");
+        log.warn("Usuario {} ha accedido a admin", u.getUsername());
+
         List<Group> groups = entityManager.createNamedQuery("Group.getAllGroups").getResultList();
         model.addAttribute("groups", groups);
         return "home";
