@@ -1,10 +1,10 @@
 
 /* ------------ COLUMNAS ------------ */
 
-.col-box {
+/* .col {
     margin-top: 2%;
     width: 30%;
-}
+} */
 
 /* ------------ COL-1 ------------ */
 
@@ -23,9 +23,9 @@
 
 #middle-col {
     margin-top: 8%;
-    margin-left: 6%;
-    margin-right: 6%;
-    width: 40%;
+    /* margin-left: 6%;
+    margin-right: 6%; */
+    /* width: 40%; */
 }
 
 .dropdown button {
@@ -65,11 +65,17 @@
     position: absolute;
 }
 
+#imgBtn {
+    min-width: 320px;
+    min-height: auto;
+    max-width: 320px;
+    max-height: 50vh;
+}
+
 #btn-save {
     border-style: none;
     outline: none;
     width: 30%;
     height: 10%;
     background-color: #d19900;
-    margin-top: 10vh;
 }
