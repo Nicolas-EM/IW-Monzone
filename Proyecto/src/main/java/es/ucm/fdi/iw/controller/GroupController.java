@@ -18,6 +18,7 @@ import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.Owns;
+import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
 
 /**
@@ -57,7 +58,16 @@ public class GroupController {
     }
 
     @GetMapping("{id}/{expense}")
-    public String groupExpense(Model model) {
+    public String groupExpense(@PathVariable long id, Model model) {
+        Group group = entityManager.find(Group.class, id);
+        List<User> members = new ArrayList<>();
+        for(Member m : group.getMembers()){
+            members.add(m.getUser());
+        }
+		model.addAttribute("groupMembers", members);
+
+        List<Type> types = entityManager.createNamedQuery("Type.getAllTypes").getResultList();
+        model.addAttribute("types", types);
         return "expense";
     }
 }

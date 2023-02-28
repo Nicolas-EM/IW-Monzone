@@ -34,49 +34,33 @@
         <div id="middle-col" class="col">
           <!-- Dropdown paidby -->
           <label for="paidby" class="form-label w-100">Paid by</label>
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle bg-white" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">You</a></li>
-              <li><a class="dropdown-item" href="#">Miembro 2</a></li>
-              <li><a class="dropdown-item" href="#">Miembro 3</a></li>
-            </ul>
-          </div>
+          <select class="form-select" aria-label="Default select example">
+            <option selected disabled hidden>Select Payer</option>
+            <tr th:each="user: ${groupMembers}">
+              <option th:value="${user.getId()}">[[${user.getName()}]]</option>
+            </tr>
+          </select>
           <!-- Dropdown type -->
           <label class="form-label mt-3 w-100">Type</label>
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle bg-white" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Others</a></li>
-              <li><a class="dropdown-item" href="#">Categoría 2</a></li>
-              <li><a class="dropdown-item" href="#">Categoría 3</a></li>
-            </ul>
-          </div>
+          <select class="form-select" aria-label="Default select example">
+            <option selected disabled hidden>Select Type</option>
+            <tr th:each="type: ${types}">
+              <option th:value="${type.getId()}">[[${type.getName()}]]</option>
+            </tr>
+          </select>
           <!-- List "for whom" -->
           <label for="for-whom" class="form-label mt-3 w-100">For whom</label>
           <div id="for-whom" class="border border-white">
             <ul class="mt-3 mb-3">
-              <li>
-                <div class="form-check">
-                  <input class="check-box form-check-input" type="checkbox" value="" checked>
-                  <label class="form-check-label" for="flexCheckDefault">Miembro 1</label>
-                  <label class="balance">14.50€</label>
-                </div>
-              </li>
-              <li>
-                <div class="form-check">
-                  <input class="check-box form-check-input" type="checkbox" value="">
-                  <label class="form-check-label" for="flexCheckDefault">Miembro 2</label>
-                  <label class="balance">0.00€</label>
-                </div>
-              </li>
-              <li>
-                <div class="form-check">
-                  <input class="check-box form-check-input" type="checkbox" value="" checked>
-                  <label class="form-check-label" for="flexCheckDefault">Miembro 3</label>
-                  <label class="balance">14.50€</label>
-                </div>
-              </li>
+              <tr th:each="user: ${groupMembers}">
+                <li>
+                  <div class="form-check">
+                    <input class="check-box form-check-input" type="checkbox" value="" checked>
+                    <label class="form-check-label" for="flexCheckDefault">[[${user.getName()}]]</label>
+                    <label class="balance">14.50€</label>
+                  </div>
+                </li>
+              </tr>
             </ul>
           </div>
         </div>

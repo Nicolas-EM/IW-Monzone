@@ -15,6 +15,10 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@NamedQueries({
+    @NamedQuery(name="Type.getAllTypes",
+                query="SELECT obj FROM Type obj")}
+)
 @Table(name="IWType")
 public class Type implements Transferable<Type.Transfer> {
 
