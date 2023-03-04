@@ -1,44 +1,72 @@
 -- insert admin (username a, password aa)
 INSERT INTO IWUser (id, name, roles, username, password)
 VALUES (1, 'admin', 'ADMIN,USER', 'a',
+    '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W'),
+    (2, 'bonito', 'USER', 'b',
+    '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W'),
+    (3, 'Nicoooooo', 'ADMIN,USER', 'Nico',
     '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W');
+
+-- Generate 10 random users
 INSERT INTO IWUser (id, name, roles, username, password)
-VALUES (2, 'bonito', 'USER', 'b',
-    '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W');
-INSERT INTO IWUser (id, name, roles, username, password)
-VALUES (3, 'Nicoooooo', 'ADMIN,USER', 'Nico',
-    '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W');
+SELECT t.id + 3, CONCAT('User ', t.id), 'USER', CONCAT('user', t.id), '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W'
+FROM (
+  SELECT 1 AS id UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+) AS t;
 
--- Groups
-
+-- Generate 3 random groups
 INSERT INTO IWGroup (ID, CURRENCY, DESC, NAME, NUM_MEMBERS, TOT_BUDGET)
-VALUES (1, 0, 'G1 Desc', 'G1 Name', 0, 0);
-INSERT INTO IWGroup (ID, CURRENCY, DESC, NAME, NUM_MEMBERS, TOT_BUDGET)
-VALUES (2, 1, 'G2 Desc', 'G2 Name', 0, 0);
+SELECT t.ID, FLOOR(RAND() * 2), CONCAT('Group ', t.ID, ' description'), CONCAT('Group ', t.ID, ' name'), FLOOR(RAND() * 9) + 1, 0
+FROM (
+  SELECT 1 AS ID UNION SELECT 2 UNION SELECT 3
+) AS t;
 
--- Membership
+-- Generate random group memberships for each user
 INSERT INTO IWMember (GROUP_ID, USER_ID, BUDGET, ROLE)
-VALUES (1, 2, 100, 0);
+SELECT
+    FLOOR(RAND() * 3) + 1, -- choose a random group ID between 1 and 5
+    IWUser.id,
+    FLOOR(RAND() * 1000) + 1, -- choose a random budget between 1 and 1000
+    0 -- set role to 0
+FROM
+    IWUser;
+-- Generate random group memberships for each empty group
 INSERT INTO IWMember (GROUP_ID, USER_ID, BUDGET, ROLE)
-VALUES (1, 3, 999, 0);
-INSERT INTO IWMember (GROUP_ID, USER_ID, BUDGET, ROLE)
-VALUES (2, 2, 4, 0);
+SELECT
+    g.ID,
+    FLOOR(RAND() * 13) + 1, -- choose a random user ID between 1 and 13
+    FLOOR(RAND() * g.TOT_BUDGET) + 1, -- choose a random budget between 1 and the group's total budget
+    0 -- set role to 0
+FROM
+    IWGroup g
+WHERE
+    g.ID NOT IN (
+        SELECT GROUP_ID FROM IWMember
+    );
 
 -- Expenses Type
 INSERT INTO IWTYPE (ID, ICON, NAME)
-VALUES (1, 'food.png', 'Comida');
+VALUES 
+  (1, 'food.png', 'Food'),
+  (2, 'transport.png', 'Transportation'),
+  (3, 'entertainment.png', 'Entertainment'),
+  (4, 'housing.png', 'Housing'),
+  (5, 'shopping.png', 'Shopping');
 
--- Expenses
+-- Generate 10 random expenses
 INSERT INTO IWExpense (ID, AMOUNT, DATE, DESC, NAME, PICTURE, PAID_BY_ID, TYPE_ID)
-VALUES (1, 10, '2023-02-28T14:30:00', 'Descrip 1', 'Nom 1', '/nom1',1,1);
-INSERT INTO IWExpense (ID, AMOUNT, DATE, DESC, NAME, PICTURE, PAID_BY_ID, TYPE_ID)
-VALUES (2, 69, '2023-02-28T14:30:00', 'Descrip 2', 'Nom 2', '/nom2',1,1);
+SELECT t.ID, FLOOR(RAND() * 100), DATEADD('DAY', -FLOOR(RAND() * 30), '2023-03-04 00:00:00'), CONCAT('Expense ', t.ID, ' description'), CONCAT('Expense ', t.ID, ' name'), CONCAT('/picture', t.ID),
+  (SELECT id FROM IWUser ORDER BY RAND() LIMIT 1), FLOOR(RAND() * 5) + 1
+FROM (
+  SELECT 1 AS ID UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
+) AS t;
 
--- Owns
+-- Generate random owns relations
 INSERT INTO IWOwns (USER_ID, EXPENSE_ID, GROUP_ID)
-VALUES (2, 1, 1);
-INSERT INTO IWOwns (USER_ID, EXPENSE_ID, GROUP_ID)
-VALUES (2, 2, 1);
+SELECT USER_ID, ID, GROUP_ID
+FROM IWExpense e
+INNER JOIN IWMember m ON e.PAID_BY_ID = m.USER_ID;
+
 
 -- start id numbering from a value that is larger than any assigned above
 ALTER SEQUENCE "PUBLIC"."GEN" RESTART WITH 1024;

@@ -5,6 +5,7 @@ import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
+import es.ucm.fdi.iw.model.Type;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,26 +37,28 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
- *  User management.
+ * User management.
  *
- *  Access to this end-point is authenticated.
+ * Access to this end-point is authenticated.
  */
 @Controller()
 @RequestMapping("user")
 public class UserController {
 
-	private static final Logger log = LogManager.getLogger(UserController.class);
+    private static final Logger log = LogManager.getLogger(UserController.class);
 
-	@Autowired
-	private EntityManager entityManager;
+    @Autowired
+    private EntityManager entityManager;
 
-	@Autowired
+    @Autowired
     private LocalData localData;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /**
      * Exception to use when denying access to unauthorized users.
@@ -63,26 +66,27 @@ public class UserController {
      * In general, admins are always authorized, but users cannot modify
      * each other's profiles.
      */
-	@ResponseStatus(
-		value=HttpStatus.FORBIDDEN, 
-		reason="No eres administrador, y éste no es tu perfil")  // 403
-	public static class NoEsTuPerfilException extends RuntimeException {}
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "No eres administrador, y éste no es tu perfil") // 403
+    public static class NoEsTuPerfilException extends RuntimeException {
+    }
 
-	/**
-	 * Encodes a password, so that it can be saved for future checking. Notice
-	 * that encoding the same password multiple times will yield different
-	 * encodings, since encodings contain a randomly-generated salt.
-	 * @param rawPassword to encode
-	 * @return the encoded password (typically a 60-character string)
-	 * for example, a possible encoding of "test" is 
-	 * {bcrypt}$2y$12$XCKz0zjXAP6hsFyVc8MucOzx6ER6IsC1qo5zQbclxhddR1t6SfrHm
-	 */
-	public String encodePassword(String rawPassword) {
-		return passwordEncoder.encode(rawPassword);
-	}
+    /**
+     * Encodes a password, so that it can be saved for future checking. Notice
+     * that encoding the same password multiple times will yield different
+     * encodings, since encodings contain a randomly-generated salt.
+     * 
+     * @param rawPassword to encode
+     * @return the encoded password (typically a 60-character string)
+     *         for example, a possible encoding of "test" is
+     *         {bcrypt}$2y$12$XCKz0zjXAP6hsFyVc8MucOzx6ER6IsC1qo5zQbclxhddR1t6SfrHm
+     */
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
 
     /**
      * Generates random tokens. From https://stackoverflow.com/a/44227131/15472
+     * 
      * @param byteLength
      * @return
      */
@@ -90,44 +94,48 @@ public class UserController {
         SecureRandom secureRandom = new SecureRandom();
         byte[] token = new byte[byteLength];
         secureRandom.nextBytes(token);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(token); //base64 encoding
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(token); // base64 encoding
     }
 
     /**
      * Landing page for a user profile
      */
-	@GetMapping("/")
+    @GetMapping("/")
     public String index(Model model, HttpSession session) {
-        User user = (User)session.getAttribute("u");
-		List<Member> memberOf = user.getMemberOf();
-		List<Group> groups = new ArrayList<>();
-		for(Member m : memberOf){
-			groups.add(m.getGroup());
-		}
-		model.addAttribute("groups", groups);
+        User user = (User) session.getAttribute("u");
+        List<Member> memberOf = user.getMemberOf();
+        List<Group> groups = new ArrayList<>();
+        for (Member m : memberOf) {
+            groups.add(m.getGroup());
+        }
+        model.addAttribute("groups", groups);
         return "home";
     }
 
-	@GetMapping("/config")
+    @GetMapping("/config")
     public String home(Model model, HttpSession session) {
-		User target = (User)session.getAttribute("u");
-    model.addAttribute("user", target);
+        User user = (User) session.getAttribute("u");
+        model.addAttribute("user", user);
+        List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
+        model.addAttribute("types", types);
+
+        List<Member> memberOf = user.getMemberOf();
+        List<Group> groups = new ArrayList<>();
+        for (Member m : memberOf) {
+            groups.add(m.getGroup());
+        }
+        model.addAttribute("groups", groups);
         return "user";
     }
 
     /**
      * Alter or create a user
      */
-	@PostMapping("/{id}")
-	@Transactional
-	public String postUser(
-			HttpServletResponse response,
-			@PathVariable long id, 
-			@ModelAttribute User edited, 
-			@RequestParam(required=false) String pass2,
-			Model model, HttpSession session) throws IOException {
+    @PostMapping("/{id}")
+    @Transactional
+    public String postUser(HttpServletResponse response, @PathVariable long id, @ModelAttribute User edited, @RequestParam(required = false) String pass2, Model model, HttpSession session) throws IOException {
 
-        User requester = (User)session.getAttribute("u");
+        User requester = (User) session.getAttribute("u");
         User target = null;
         if (id == -1 && requester.hasRole(Role.ADMIN)) {
             // create new user with random password
@@ -135,36 +143,36 @@ public class UserController {
             target.setPassword(encodePassword(generateRandomBase64Token(12)));
             entityManager.persist(target);
             entityManager.flush(); // forces DB to add user & assign valid id
-            id = target.getId();   // retrieve assigned id from DB
+            id = target.getId(); // retrieve assigned id from DB
         }
-        
+
         // retrieve requested user
         target = entityManager.find(User.class, id);
         model.addAttribute("user", target);
-		
-		if (requester.getId() != target.getId() &&
-				! requester.hasRole(Role.ADMIN)) {
-			throw new NoEsTuPerfilException();
-		}
-		
-		if (edited.getPassword() != null) {
-            if ( ! edited.getPassword().equals(pass2)) {
+
+        if (requester.getId() != target.getId() &&
+                !requester.hasRole(Role.ADMIN)) {
+            throw new NoEsTuPerfilException();
+        }
+
+        if (edited.getPassword() != null) {
+            if (!edited.getPassword().equals(pass2)) {
                 // FIXME: complain
             } else {
                 // save encoded version of password
                 target.setPassword(encodePassword(edited.getPassword()));
             }
-		}		
-		target.setUsername(edited.getUsername());
-		target.setName(edited.getName());
+        }
+        target.setUsername(edited.getUsername());
+        target.setName(edited.getName());
 
-		// update user session so that changes are persisted in the session, too
+        // update user session so that changes are persisted in the session, too
         if (requester.getId() == target.getId()) {
             session.setAttribute("u", target);
         }
 
-		return "user";
-	}	
+        return "user";
+    }
 
     /**
      * Returns the default profile pic
@@ -172,9 +180,9 @@ public class UserController {
      * @return
      */
     private static InputStream defaultPic() {
-	    return new BufferedInputStream(Objects.requireNonNull(
-            UserController.class.getClassLoader().getResourceAsStream(
-                "static/img/profile/default-profile.png")));
+        return new BufferedInputStream(Objects.requireNonNull(
+                UserController.class.getClassLoader().getResourceAsStream(
+                        "static/img/profile/default-profile.png")));
     }
 
     /**
@@ -186,9 +194,8 @@ public class UserController {
      */
     @GetMapping("{id}/pic")
     public StreamingResponseBody getPic(@PathVariable long id) throws IOException {
-        File f = localData.getFile("user", ""+id+".jpg");
-        InputStream in = new BufferedInputStream(f.exists() ?
-            new FileInputStream(f) : UserController.defaultPic());
+        File f = localData.getFile("user", "" + id + ".jpg");
+        InputStream in = new BufferedInputStream(f.exists() ? new FileInputStream(f) : UserController.defaultPic());
         return os -> FileCopyUtils.copy(in, os);
     }
 
@@ -200,35 +207,33 @@ public class UserController {
      * @throws IOException
      */
     @PostMapping("{id}/pic")
-	@ResponseBody
-    public String setPic(@RequestParam("photo") MultipartFile photo, @PathVariable long id, 
-        HttpServletResponse response, HttpSession session, Model model) throws IOException {
+    @ResponseBody
+    public String setPic(@RequestParam("photo") MultipartFile photo, @PathVariable long id,
+            HttpServletResponse response, HttpSession session, Model model) throws IOException {
 
         User target = entityManager.find(User.class, id);
         model.addAttribute("user", target);
-		
-		// check permissions
-		User requester = (User)session.getAttribute("u");
-		if (requester.getId() != target.getId() &&
-				! requester.hasRole(Role.ADMIN)) {
+
+        // check permissions
+        User requester = (User) session.getAttribute("u");
+        if (requester.getId() != target.getId() && !requester.hasRole(Role.ADMIN)) {
             throw new NoEsTuPerfilException();
-		}
-		
-		log.info("Updating photo for user {}", id);
-		File f = localData.getFile("user", ""+id+".jpg");
-		if (photo.isEmpty()) {
-			log.info("failed to upload photo: emtpy file?");
-		} else {
-			try (BufferedOutputStream stream =
-					new BufferedOutputStream(new FileOutputStream(f))) {
-				byte[] bytes = photo.getBytes();
-				stream.write(bytes);
+        }
+
+        log.info("Updating photo for user {}", id);
+        File f = localData.getFile("user", "" + id + ".jpg");
+        if (photo.isEmpty()) {
+            log.info("failed to upload photo: emtpy file?");
+        } else {
+            try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
+                byte[] bytes = photo.getBytes();
+                stream.write(bytes);
                 log.info("Uploaded photo for {} into {}!", id, f.getAbsolutePath());
-			} catch (Exception e) {
+            } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				log.warn("Error uploading " + id + " ", e);
-			}
-		}
-		return "{\"status\":\"photo uploaded correctly\"}";
+                log.warn("Error uploading " + id + " ", e);
+            }
+        }
+        return "{\"status\":\"photo uploaded correctly\"}";
     }
 }

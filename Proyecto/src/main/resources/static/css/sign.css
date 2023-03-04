@@ -12,8 +12,10 @@ body {
 /* ------------ PANEL GENERAL ------------*/
 
 .general-box {
+    margin: auto;
     height: 70vh;
     min-height: 385px;
+    min-width: 300px;
     margin-top: 15vh;
     border-radius: 8px;
     box-shadow: rgba(63, 43, 0, 0.5) 0px 0px 80px 10px;
@@ -99,7 +101,7 @@ body {
 .form-content button{
     border-style: none;
     outline: none;
-    width: 35%;
+    min-width: 35%;
     height: 10%;
 }
 

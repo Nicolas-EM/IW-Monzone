@@ -1,0 +1,6 @@
+.groups {
+    max-height: 35vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    border: 1px white solid;
+}

@@ -4,6 +4,7 @@
 <head>
   <th:block th:replace="fragments/head :: header" />
   <title>Monzone</title>
+  <link rel="stylesheet" th:href="@{/css/user.css}" href="css/user.css" type="text/css" />
 </head>
 
 <body class="d-flex flex-column h-100">
@@ -25,18 +26,26 @@
           <!-- Displayname + username -->
           <div class="col-9">
             <div class="row">
-              <h4>Name</h4>
-              <p>[[${session.u.name}]]</p>
+              <label for="name" class="form-label w-100">Name</label>
+              <input id="name" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${session.u.name}">
             </div>
             <div class="row">
-              <h4>Username</h4>
-              <p>[[${session.u.username}]]</p>
+              <label for="username" class="form-label w-100">Username</label>
+              <input id="username" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${session.u.username}">
             </div>
           </div>
           <!-- Password -->
           <div class="col-12">
             <div class="row">
               Do you want to change your password?
+            </div>
+            <div class="row">
+              <label for="oldPwd" class="form-label w-100">Old Password</label>
+              <input id="oldPwd" type="text" class="rounded-corners mb-4 w-100">
+            </div>
+            <div class="row">
+              <label for="newPwd" class="form-label w-100">New Password</label>
+              <input id="newPwd" type="text" class="rounded-corners mb-4 w-100">
             </div>
           </div>
           <!-- Save Btn -->
@@ -59,11 +68,34 @@
         <div class="row">
           <h4>Categories</h4>
         </div>
+        <!-- Thymeleaf categories -->
+        <div class="row row-cols-1 row-cols-lg-auto">
+          <tr th:each="type: ${types}">
+            <div class="col">
+              <img th:src="@{/img/type/{icon}(icon=${type.getIcon()})}" src="/img/type/food.png" alt="Category Icon" width="auto" height="50">
+              <p>Amount</p>
+            </div>
+          </tr>
+        </div>
         <!-- Groups -->
         <div class="row">
           <h4>Your Groups</h4>
+          </div>
+          <div class="groups p-2">
+            <tr th:each="group: ${groups}">
+              <div class="row mb-3">
+                <div class="card text-white bg-warning h-100 mx-auto">
+                  <div class="card-header">
+                    <h5>[[${group.getName()}]]</h5>
+                  </div>
+                  <div class="card-body">
+                    <td th:text="${group.getDesc()}" class="card-title">Grupo para los gastos del finde</td>
+                  </div>
+                </div>
+              </div>
+            </tr>
+          </div>
         </div>
-      </div>
     </div>
   </main>
 

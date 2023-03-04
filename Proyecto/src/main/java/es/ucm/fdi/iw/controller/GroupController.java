@@ -30,74 +30,95 @@ import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
 
 /**
- *  Site administration.
+ * Site administration.
  *
- *  Access to this end-point is authenticated - see SecurityConfig
+ * Access to this end-point is authenticated - see SecurityConfig
  */
 @Controller
 @RequestMapping("group")
 public class GroupController {
 
-	//private static final Logger log = LogManager.getLogger(GroupController.class);
+    // private static final Logger log =
+    // LogManager.getLogger(GroupController.class);
     @Autowired
-	private EntityManager entityManager;
+    private EntityManager entityManager;
 
     @Autowired
     private LocalData localData;
 
-    @ResponseStatus(
-		value=HttpStatus.FORBIDDEN, 
-		reason="No eres miembro de este grupo")  // 403
-	public static class NoEresMiembro extends RuntimeException {}
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "No eres miembro de este grupo") // 403
+    public static class NoEresMiembro extends RuntimeException {}
 
-	@GetMapping("{id}")
-    public String group(@PathVariable long id, Model model, HttpSession session) {
-        User user = (User)session.getAttribute("u");
+    /**
+     * Group home page
+     */
+    @GetMapping("{id}")
+    public String index(@PathVariable long id, Model model, HttpSession session) {
+        User user = (User) session.getAttribute("u");
         Group group = entityManager.find(Group.class, id);
-        if(!group.isMember(user)){
+        if (!group.isMember(user)) {
             throw new NoEresMiembro();
-    }
+        }
 
         List<Expense> expenses = new ArrayList<>();
-        for(Owns o : group.getOwns()){
+        for (Owns o : group.getOwns()) {
             expenses.add(o.getExpense());
         }
-		model.addAttribute("expenses", expenses);
+        model.addAttribute("expenses", expenses);
         model.addAttribute("groupId", id);
         return "group";
     }
 
+    /**
+     * Group configuration
+     */
     @GetMapping("{id}/config")
-    public String groupConfig(@PathVariable long id, Model model, HttpSession session) {
-        User user = (User)session.getAttribute("u");
+    public String config(@PathVariable long id, Model model, HttpSession session) {
+        User user = (User) session.getAttribute("u");
         Group group = entityManager.find(Group.class, id);
-        if(!group.isMember(user)){
+        if (!group.isMember(user)) {
             throw new NoEresMiembro();
         }
 
         List<User> members = new ArrayList<>();
-        for(Member m : group.getMembers()){
+        for (Member m : group.getMembers()) {
             members.add(m.getUser());
         }
-		model.addAttribute("groupMembers", members);
+        model.addAttribute("groupMembers", members);
         return "group_config";
     }
 
-    @GetMapping("{groupId}/{expenseId}")
-    public String groupExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model) {
+    private void setExpenseAttributes(long groupId, long expenseId, Model model, Boolean newExpense) {
         Group group = entityManager.find(Group.class, groupId);
         List<User> members = new ArrayList<>();
-        for(Member m : group.getMembers()){
+        for (Member m : group.getMembers()) {
             members.add(m.getUser());
         }
-		model.addAttribute("groupMembers", members);
+        model.addAttribute("groupMembers", members);
 
-        List<Type> types = entityManager.createNamedQuery("Type.getAllTypes").getResultList();
+        List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
         model.addAttribute("types", types);
-
         model.addAttribute("groupId", groupId);
-        model.addAttribute("expenseId", expenseId);
+        model.addAttribute("newExpense", newExpense);
+    }
 
+    /**
+     * Edit Group expense
+     */
+    @GetMapping("{groupId}/{expenseId}")
+    public String expense(@PathVariable long groupId, @PathVariable long expenseId, Model model) {
+        setExpenseAttributes(groupId, expenseId, model, false);
+        Expense expense = entityManager.find(Expense.class, expenseId);
+        model.addAttribute("expense", expense);
+        return "expense";
+    }
+
+    /**
+     * Create Group expense
+     */
+    @GetMapping("{groupId}/new")
+    public String createExpense(@PathVariable long groupId, Model model) {
+        setExpenseAttributes(groupId, 0, model, true);
         return "expense";
     }
 
@@ -107,7 +128,8 @@ public class GroupController {
      * @return
      */
     private static InputStream defaultExpensePic() {
-	    return new BufferedInputStream(Objects.requireNonNull(GroupController.class.getClassLoader().getResourceAsStream("static/img/add-image.png")));
+        return new BufferedInputStream(Objects.requireNonNull(
+                GroupController.class.getClassLoader().getResourceAsStream("static/img/add-image.png")));
     }
 
     /**
@@ -118,9 +140,11 @@ public class GroupController {
      * @throws IOException
      */
     @GetMapping("{groupId}/{expenseId}/pic")
-    public StreamingResponseBody expensePic(@PathVariable long groupId, @PathVariable long expenseId, Model model)  throws IOException {
+    public StreamingResponseBody expensePic(@PathVariable long groupId, @PathVariable long expenseId, Model model)
+            throws IOException {
         File f = localData.getFile("expense", String.format("%d-%d.jpg", groupId, expenseId));
-        InputStream in = new BufferedInputStream(f.exists() ? new FileInputStream(f) : GroupController.defaultExpensePic());
+        InputStream in = new BufferedInputStream(
+                f.exists() ? new FileInputStream(f) : GroupController.defaultExpensePic());
         return os -> FileCopyUtils.copy(in, os);
     }
 }
