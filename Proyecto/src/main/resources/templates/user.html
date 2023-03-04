@@ -70,19 +70,19 @@
         </div>
         <!-- Thymeleaf categories -->
         <div class="row row-cols-1 row-cols-lg-auto">
-          <tr th:each="type: ${types}">
+          <div th:each="type: ${types}">
             <div class="col">
               <img th:src="@{/img/type/{icon}(icon=${type.getIcon()})}" src="/img/type/food.png" alt="Category Icon" width="auto" height="50">
               <p>Amount</p>
             </div>
-          </tr>
+          </div>
         </div>
         <!-- Groups -->
         <div class="row">
           <h4>Your Groups</h4>
           </div>
           <div class="groups p-2">
-            <tr th:each="group: ${groups}">
+            <div th:each="group: ${groups}">
               <div class="row mb-3">
                 <div class="card text-white bg-warning h-100 mx-auto">
                   <div class="card-header">
@@ -93,7 +93,7 @@
                   </div>
                 </div>
               </div>
-            </tr>
+            </div>
           </div>
         </div>
     </div>

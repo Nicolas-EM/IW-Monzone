@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Table(name="IWMember")
 public class Member {
 
-    public enum Role {
+    public enum GroupRole {
         GROUP_USER,			// normal users 
         GROUP_ADMIN,          // admin users
     }
@@ -32,7 +32,7 @@ public class Member {
     private User user;
 
     @Column(nullable = false)
-    private Role role;
+    private GroupRole role;
 
     @Column(nullable = false)
     private Float budget;

@@ -82,5 +82,12 @@ public class User implements Transferable<User.Transfer> {
 		return toTransfer().toString();
 	}
 
+    public float getBudget(long groupId){
+        for(Member m : memberOf){
+            if(m.getGroup().getId() == groupId)
+                return m.getBudget();
+        }
+        return 0;
+    }
 }
 

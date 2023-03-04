@@ -17,7 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -48,6 +50,9 @@ public class GroupController {
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "No eres miembro de este grupo") // 403
     public static class NoEresMiembro extends RuntimeException {}
+
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "No eres admin de este grupo") // 403
+    public static class NoEresAdmin extends RuntimeException {}
 
     /**
      * Group home page
@@ -80,9 +85,33 @@ public class GroupController {
             throw new NoEresMiembro();
         }
 
+        model.addAttribute("group", group);
+
         List<User> members = new ArrayList<>();
         for (Member m : group.getMembers()) {
             members.add(m.getUser());
+        }
+        model.addAttribute("groupMembers", members);
+        return "group_config";
+    }
+
+    /**
+     * Remove member
+     */
+    @PostMapping("{id}/config")
+    public String removeUser(@PathVariable long id, Model model, HttpSession session, @RequestParam(required = true) long removeId) {
+        User user = (User) session.getAttribute("u");
+        Group group = entityManager.find(Group.class, id);
+        if (!group.isGroupAdmin(user)) {
+            throw new NoEresAdmin();
+        }
+
+        // FIXME: eliminar usuario de grupo
+
+        List<User> members = new ArrayList<>();
+        for (Member m : group.getMembers()) {
+            if(!(m.getUser().getId() == removeId))
+                members.add(m.getUser());
         }
         model.addAttribute("groupMembers", members);
         return "group_config";

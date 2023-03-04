@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html class="h-100" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:replace="fragments/head :: header" />
+    <title>Monzone</title>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <header th:replace="fragments/nav.html :: nav"></header>
+
+    <main class="container my-4">
+        <div class="card text-dark bg-warning mx-auto">
+            <div class="card-header">
+                <h1>[[$group.getName()]]</h1>
+                <h3 class="card-subtitle">[[${group.getDesc()}]] 
+                    <img th:if="${group.getCurrency==0}" src="/img/euro.png" width="30px" style="float:right"> </img>
+                    <img th:if="${group.getCurrency==1}" src="/img/dolar.png" width="30px" style="float:right"> </img>
+                    <img th:if="${group.getCurrency==2}" src="/img/pound-sterling.png" width="30px" style="float:right"> </img>
+                </h3>
+            </div>
+            <div class="card-body">
+                <!-- Dynamic member list with Thymeleaf -->
+                <tr th:each="member ${groupMembers}">
+                    <div class="row pb-2">
+                        <div class="col my-auto">[[${member.getUser().getUsername()}]]</div>
+                        <div class="col text-end"> <button type="button" class="btn btn-danger">X</button></div>
+                    </div>
+                </tr>
+                <script>
+                    var total = 0;
+                    for(var i = 0; i < group.getGroupMembers().lenght(); i++){
+                        total += member.getBudget();
+                    }
+                    group.setTotBudget() = total;
+                </script>
+            </div>
+            <div class="card-footer">
+                <p>Total Budget: <mark class="text-success">[[${group.getTotBudget()}]]</mark> <img class="btn ps-4" src="/img/agregar-contacto.png" width="80" style="float:right"></img></p>
+            </div>
+        </div>
+    </main>
+
+    <th:block th:replace="fragments/footer.html :: footer" />
+</body>
+
+</html>

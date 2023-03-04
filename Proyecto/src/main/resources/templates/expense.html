@@ -39,23 +39,23 @@
           <label for="paidby" class="form-label w-100">Paid by</label>
           <select class="form-select rounded-corners" aria-label="Default select example">
             <option selected disabled hidden>Select Payer</option>
-            <tr th:each="user: ${groupMembers}">
+            <div th:each="user: ${groupMembers}">
               <option th:value="${user.getId()}">[[${user.getName()}]]</option>
-            </tr>
+            </div>
           </select>
           <!-- Dropdown type -->
           <label class="form-label mt-3 w-100">Type</label>
           <select class="form-select rounded-corners" aria-label="Default select example">
             <option selected disabled hidden>Select Type</option>
-            <tr th:each="type: ${types}">
+            <div th:each="type: ${types}">
               <option th:value="${type.getId()}">[[${type.getName()}]]</option>
-            </tr>
+            </div>
           </select>
           <!-- List "for whom" -->
           <label for="for-whom" class="form-label mt-3 w-100">For whom</label>
           <div id="for-whom" class="border border-white rounded-corners">
             <ul class="mt-3 mb-3">
-              <tr th:each="user: ${groupMembers}">
+              <div th:each="user: ${groupMembers}">
                 <li>
                   <div class="form-check">
                     <input class="check-box form-check-input" type="checkbox" value="" checked>
@@ -63,7 +63,7 @@
                     <label class="balance">14.50€</label>
                   </div>
                 </li>
-              </tr>
+              </div>
             </ul>
           </div>
         </div>
