@@ -30,5 +30,5 @@ Feature: flujo de la app
     And input('#password', 'aa')
     When submit().click(".form-signin button")
     Then waitForUrl(baseUrl + '/admin')
-    When submit().click(".logoutForm button")
+    When submit().click("#logoutForm a")
     Then waitForUrl(baseUrl + '/login')
