@@ -37,8 +37,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * User management.
@@ -66,9 +64,8 @@ public class UserController {
      * In general, admins are always authorized, but users cannot modify
      * each other's profiles.
      */
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "No eres administrador, y éste no es tu perfil") // 403
-    public static class NoEsTuPerfilException extends RuntimeException {
-    }
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not an admin, and this is not your profile") // 403
+    public static class NotYourProfileException extends RuntimeException {}
 
     /**
      * Encodes a password, so that it can be saved for future checking. Notice
@@ -152,7 +149,7 @@ public class UserController {
 
         if (requester.getId() != target.getId() &&
                 !requester.hasRole(Role.ADMIN)) {
-            throw new NoEsTuPerfilException();
+            throw new NotYourProfileException();
         }
 
         if (edited.getPassword() != null) {
@@ -217,7 +214,7 @@ public class UserController {
         // check permissions
         User requester = (User) session.getAttribute("u");
         if (requester.getId() != target.getId() && !requester.hasRole(Role.ADMIN)) {
-            throw new NoEsTuPerfilException();
+            throw new NotYourProfileException();
         }
 
         log.info("Updating photo for user {}", id);
