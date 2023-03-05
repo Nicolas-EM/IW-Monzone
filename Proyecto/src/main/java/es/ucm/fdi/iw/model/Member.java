@@ -65,6 +65,4 @@ public class Member implements Transferable<Member.Transfer> {
     public String toString() {
         return toTransfer().toString();
     }
-
 }
-

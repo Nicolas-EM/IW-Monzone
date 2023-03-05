@@ -72,7 +72,7 @@
         <div class="row row-cols-1 row-cols-lg-auto">
           <div th:each="type: ${types}">
             <div class="col">
-              <img th:src="@{/img/type/{icon}(icon=${type.getIcon()})}" src="/img/type/food.png" alt="Category Icon" width="auto" height="50">
+              <img th:src="@{/img/type/{id}.png(id=${type.getId()})}" src="/img/type/error.png" alt="Category Icon" width="auto" height="50">
               <p>Amount</p>
             </div>
           </div>

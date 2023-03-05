@@ -57,7 +57,7 @@
                                     <div class="row row-cols-2 row-cols-md-4 g-0">
                                         <!-- Icon -->
                                         <div class="col-5 col-md-2 text-center">
-                                            <img th:src="@{/img/type/{icon}(icon=${expense.getType().getIcon()})}" src="/img/type/food.png" alt="Category Icon" width="auto" height="50">
+                                            <img th:src="@{/img/type/{id}.png(id=${expense.getType().getId()})}" src="/img/type/error.png" alt="Category Icon" width="auto" height="50">
                                         </div>
                                         <!-- Text Info -->
                                         <div class="col-7 col-md-5">

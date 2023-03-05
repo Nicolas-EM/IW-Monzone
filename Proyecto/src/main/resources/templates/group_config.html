@@ -34,17 +34,20 @@
                 </div>
                 <div>
                     <!-- Dynamic member list with Thymeleaf -->
-                    <div th:each="user : ${groupMembers}">
+                    <div th:each="member : ${members}">
                         <div class="row pb-2">
                             <form th:if="${group.isGroupAdmin(session.u)}" method="post" th:action="@{/group/{groupId}/config(groupId=${group.getId()})}" class="col">
-                                <input type="hidden" name="removeId" th:value="${user.getId()}">
+                                <input type="hidden" name="removeId" th:value="${member.getUser().getId()}">
                                 <button type="submit" class="btn"><img th:src="@{/img/delete.png}" src="/img/delete.png"></button>
                             </form>
                             <div class="col d-flex align-items-center">
-                                [[${user.getName()}]]
+                                [[${member.getUser().getName()}]]
                             </div>
                             <div class="col d-flex align-items-center">
-                                [[${user.getBudget({group.getId()})}]]
+                                [[${member.getBudget()}]]
+                            </div>
+                            <div class="col d-flex align-items-center">
+                                [[${member.getBalance()}]]
                             </div>
                         </div>
                     </div>

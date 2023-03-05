@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.HashSet;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
@@ -90,11 +92,14 @@ public class GroupController {
 
         model.addAttribute("group", group);
 
-        List<User> members = new ArrayList<>();
+        Set<Member> members = new HashSet<>();
         for (Member m : group.getMembers()) {
-            members.add(m.getUser());
+            if (m.isEnabled() && m.getUser().isEnabled()) {
+                members.add(m);
+            }
+            
         }
-        model.addAttribute("groupMembers", members);
+        model.addAttribute("members", members);
         return "group_config";
     }
 
@@ -109,11 +114,12 @@ public class GroupController {
             throw new NoModeratorException();
         }
 
-        // FIXME: eliminar usuario de grupo
-
-        List<User> members = new ArrayList<>();
+        Set<User> members = new HashSet<>();
         for (Member m : group.getMembers()) {
-            if(!(m.getUser().getId() == removeId))
+            if(m.isEnabled() && m.getUser().getId() == removeId){
+                m.setEnabled(false);
+            }
+            else if(m.isEnabled() && m.getUser().isEnabled())
                 members.add(m.getUser());
         }
         model.addAttribute("groupMembers", members);
