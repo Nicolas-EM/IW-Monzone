@@ -101,12 +101,10 @@ public class GroupController {
 
         model.addAttribute("group", group);
 
-        Set<Member> members = new HashSet<>();
+        List<Member> members = new ArrayList<>();
         for (Member m : group.getMembers()) {
-            if (m.isEnabled() && m.getUser().isEnabled()) {
+            if (m.isEnabled() && m.getUser().isEnabled()) 
                 members.add(m);
-            }
-            
         }
         model.addAttribute("members", members);
 
@@ -115,6 +113,7 @@ public class GroupController {
             currencies.add(g.name());
         }
         model.addAttribute("currencies", currencies);
+
         
         return "group_config";
     }

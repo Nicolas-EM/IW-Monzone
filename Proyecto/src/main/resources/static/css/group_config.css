@@ -7,6 +7,10 @@
 
 /* ------------ COL-1 ------------ */
 
+#name {
+    height: 4vh;
+}
+
 #desc {
     resize: none;
 }
@@ -19,8 +23,76 @@
     color: black;
 }
 
+.btn-func {
+    border-style: none;
+    outline: none;
+    height: 10%;
+    background-color: #d19900;
+    float: left;
+    margin-left: 15px;
+}
+
+.btn-func:hover {
+    background-color: #b68500;
+}
+
+.btn-delete {
+    border-style: none;
+    outline: none;
+    height: 10%;
+    background-color: #610000;
+    margin-left: 40%;
+}
+
+.btn-delete:hover {
+    background-color: #490101;
+}
+
 /* ------------ COL-2 ------------ */
+
+#ini-row {
+    max-height: 10%;
+}
+
+#ini {    
+    max-width: 88%;
+}
+
+#people {
+    max-width: 10%;
+    padding-top: 7px;
+}
 
 .btn-remove {
     max-width: 10%;
+}
+
+#trash:hover {
+    fill: #adadad;
+}
+
+#name-col {
+    max-width: 25%;
+}
+
+#indicator {
+    display: flex;
+    align-items: center;
+    max-width: 7%;
+    float: right;
+}
+
+.dot {
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10%;
+}
+
+.balance {
+    float: right;
+    max-width: 16%;
+    justify-content: end;
+    padding-right: 5%;
 }
