@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import javax.persistence.EntityTransaction;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,6 +62,9 @@ public class GroupController {
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not the moderator of this group") // 403
     public static class NoModeratorException extends RuntimeException {}
+
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error with DB") // 500
+    public static class NoTransactionException extends RuntimeException {}
 
     @GetMapping("/new")
     public String newGroup(HttpSession session){
@@ -122,6 +126,7 @@ public class GroupController {
     /**
      * Remove member
      */
+    @Transactional
     @PostMapping("{id}/config")
     public String removeUser(@PathVariable long id, Model model, HttpSession session, @RequestParam(required = true) long removeId) {
         User user = (User) session.getAttribute("u");
@@ -139,7 +144,7 @@ public class GroupController {
                 members.add(m.getUser());
         }
         model.addAttribute("groupMembers", members);
-        return "group_config";
+        return config(id, model, session);
     }
 
     private void setExpenseAttributes(long groupId, long expenseId, Model model, Boolean newExpense) {
@@ -167,6 +172,48 @@ public class GroupController {
         return "expense";
     }
 
+    /*
+     * Edit group expense
+     */
+    @PostMapping("/{groupId}/{expenseId}")
+    @Transactional
+    public String postEditExpense(HttpServletResponse response, @PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc, @RequestParam String dateString, @RequestParam long amount, @RequestParam long paidById, @RequestParam long typeId) throws IOException {
+        // Start transaction
+        User user = (User) session.getAttribute("u");
+        Group group = entityManager.find(Group.class, groupId);
+        if (!group.isMember(user)) {
+            throw new NoMemberException();
+        }
+
+        Expense e = entityManager.find(Expense.class, expenseId);
+        if(e != null){
+            User paidBy = entityManager.find(User.class, paidById);
+            Type type = entityManager.find(Type.class, typeId);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");    
+            LocalDate date = LocalDate.parse(dateString, formatter);
+
+            if(paidBy != null && !e.getPaidBy().equals(paidBy)){
+                e.setPaidBy(paidBy);
+            }
+            if(type != null && !e.getType().equals(type)){
+                e.setType(type);
+            }
+            if(desc != null && !e.getDesc().equals(desc)){
+                e.setDesc(desc);
+            }
+            if(!e.getDate().equals(date)){
+                e.setDate(date);
+            }
+            if(e.getAmount() != amount){
+                e.setAmount(amount);
+            }
+        }
+
+        // Stop transaction
+        return "expense";
+    }
+
     /**
      * View: create group expense
      */
@@ -181,7 +228,6 @@ public class GroupController {
      */
     @PostMapping("/{groupId}/new")
     @Transactional
-    // public String postExpense(HttpServletResponse response, @PathVariable long groupId, @ModelAttribute User edited, @RequestParam(required = false) String pass2, Model model, HttpSession session) throws IOException {
     public String postExpense(HttpServletResponse response, @PathVariable long groupId, Model model, HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc, @RequestParam String dateString, @RequestParam long amount, @RequestParam long paidById, @RequestParam long typeId) throws IOException {
         // Start transaction
 

@@ -97,5 +97,16 @@ public class User implements Transferable<User.Transfer> {
 	public String toString() {
 		return toTransfer().toString();
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+
+        if (!(o instanceof User))
+            return false;
+
+        return id == ((User) o).getId();
+    }
 }
 
