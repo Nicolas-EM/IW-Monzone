@@ -22,13 +22,14 @@ FROM (
 ) AS t;
 
 -- Generate random group memberships for each user
-INSERT INTO IWMember (GROUP_ID, USER_ID, enabled, BUDGET, ROLE)
+INSERT INTO IWMember (GROUP_ID, USER_ID, enabled, BUDGET, ROLE, balance)
 SELECT
     FLOOR(RAND() * 3) + 1, -- choose a random group ID between 1 and 5
     IWUser.id,
     true,
     FLOOR(RAND() * 1000) + 1, -- choose a random budget between 1 and 1000
-    0 -- set role to 0
+    0, -- set role to 0
+    0
 FROM
     IWUser;
 -- Generate random group memberships for each empty group
