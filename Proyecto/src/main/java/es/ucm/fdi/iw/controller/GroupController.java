@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.HashSet;
 
+import javax.persistence.Embeddable;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -35,10 +36,13 @@ import es.ucm.fdi.iw.LocalData;
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
+import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Owns;
 import es.ucm.fdi.iw.model.OwnsID;
 import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
+import es.ucm.fdi.iw.model.Group.Currency;
+import es.ucm.fdi.iw.model.Debt;
 
 /**
  * Group (and expenses) management.
@@ -67,8 +71,33 @@ public class GroupController {
     public static class NoTransactionException extends RuntimeException {}
 
     @GetMapping("/new")
-    public String newGroup(HttpSession session){
+    public String newGroup(HttpSession sessionm, Model model){
+        List<String> currencies = new ArrayList<>();
+        for(Group.Currency g : Group.Currency.values()){
+            currencies.add(g.name());
+        }
+        model.addAttribute("currencies", currencies);
+
         return "group_config";
+    }
+
+    /**
+     * Creates group
+     */
+    @Transactional
+    @PostMapping("/new")
+    public String postGroup(Model model, HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc, @RequestParam Integer currId) {
+        Currency curr = Currency.values()[currId];
+        User u = (User) session.getAttribute("u");
+
+        if(curr != null){
+            Group g = new Group(0, true, desc, name, 1, 0, curr, new ArrayList<Member>(), new ArrayList<Owns>(), new ArrayList<Debt>());
+            entityManager.persist(g);
+
+            // TODO: añadir usuario a grupo (Crear member)
+        }
+
+        return "home";
     }
 
     /**
@@ -162,7 +191,7 @@ public class GroupController {
     }
 
     /**
-     * Edit Group expense
+     * View group expense
      */
     @GetMapping("{groupId}/{expenseId}")
     public String expense(@PathVariable long groupId, @PathVariable long expenseId, Model model) {
