@@ -1,0 +1,26 @@
+/* ------------ General ------------ */
+
+.rounded-corners {
+    border-radius: 8px;
+    padding-left: 10px;
+}
+
+/* ------------ COL-1 ------------ */
+
+#desc {
+    resize: none;
+}
+
+#budget {
+    max-width: 20%;
+    display: flex;
+    align-items: center;
+    height: 4vh;
+    color: black;
+}
+
+/* ------------ COL-2 ------------ */
+
+.btn-remove {
+    max-width: 10%;
+}

@@ -21,6 +21,9 @@ FROM (
   SELECT 1 AS ID UNION SELECT 2 UNION SELECT 3
 ) AS t;
 
+-- insert B into group 2 for Test
+INSERT INTO IWMember (GROUP_ID, USER_ID, enabled, BUDGET, ROLE, balance) VALUES (2, 2, true,100, 1, 0);
+
 -- Generate random group memberships for each user
 INSERT INTO IWMember (GROUP_ID, USER_ID, enabled, BUDGET, ROLE, balance)
 SELECT
@@ -57,6 +60,9 @@ VALUES
   (4, 'Housing'),
   (5, 'Shopping');
 
+-- Generate fixed expense for test
+INSERT INTO IWExpense (ID, enabled, AMOUNT, DATE, DESC, NAME, PAID_BY_ID, TYPE_ID) VALUES (99, true, 99, '2023-03-04 00:00:00', 'Expense desc', 'Expense name', 2, 1);
+
 -- Generate 10 random expenses
 INSERT INTO IWExpense (ID, enabled, AMOUNT, DATE, DESC, NAME, PAID_BY_ID, TYPE_ID)
 SELECT t.ID, true, FLOOR(RAND() * 100), DATEADD('DAY', -FLOOR(RAND() * 30), '2023-03-04 00:00:00'), CONCAT('Expense ', t.ID, ' description'), CONCAT('Expense ', t.ID, ' name'),
@@ -65,11 +71,14 @@ FROM (
   SELECT 1 AS ID UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
 ) AS t;
 
+-- Generate fixed
+INSERT INTO IWOwns (USER_ID, EXPENSE_ID, GROUP_ID, enabled) VALUES (2, 99, 2, true);
+
 -- Generate random owns relations
 INSERT INTO IWOwns (USER_ID, EXPENSE_ID, GROUP_ID, enabled)
 SELECT USER_ID, ID, GROUP_ID, true
 FROM IWExpense e
-INNER JOIN IWMember m ON e.PAID_BY_ID = m.USER_ID;
+INNER JOIN IWMember m ON e.PAID_BY_ID = m.USER_ID WHERE e.id <> 99;
 
 
 -- start id numbering from a value that is larger than any assigned above

@@ -1,6 +1,7 @@
 package es.ucm.fdi.iw.controller;
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -8,7 +9,9 @@ import java.util.Set;
 import java.util.HashSet;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +33,7 @@ import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.Owns;
+import es.ucm.fdi.iw.model.OwnsID;
 import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
 
@@ -55,6 +59,11 @@ public class GroupController {
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not the moderator of this group") // 403
     public static class NoModeratorException extends RuntimeException {}
+
+    @GetMapping("/new")
+    public String newGroup(HttpSession session){
+        return "group_config";
+    }
 
     /**
      * Group home page
@@ -100,6 +109,13 @@ public class GroupController {
             
         }
         model.addAttribute("members", members);
+
+        List<String> currencies = new ArrayList<>();
+        for(Group.Currency g : Group.Currency.values()){
+            currencies.add(g.name());
+        }
+        model.addAttribute("currencies", currencies);
+        
         return "group_config";
     }
 
@@ -152,11 +168,36 @@ public class GroupController {
     }
 
     /**
-     * Create Group expense
+     * View: create group expense
      */
     @GetMapping("{groupId}/new")
     public String createExpense(@PathVariable long groupId, Model model) {
         setExpenseAttributes(groupId, 0, model, true);
+        return "expense";
+    }
+
+    /*
+     * Add expense to group
+     */
+    @PostMapping("/{groupId}/new")
+    @Transactional
+    // public String postExpense(HttpServletResponse response, @PathVariable long groupId, @ModelAttribute User edited, @RequestParam(required = false) String pass2, Model model, HttpSession session) throws IOException {
+    public String postExpense(HttpServletResponse response, @PathVariable long groupId, Model model, HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc, @RequestParam String date, @RequestParam long paidById, @RequestParam long typeId) throws IOException {
+        // Start transaction
+
+        User paidBy = entityManager.find(User.class, paidById);
+        Group group = entityManager.find(Group.class, groupId);
+        Type type = entityManager.find(Type.class, typeId);
+
+        Expense e = new Expense(0, true, name, "desc", (long) 12.2, LocalDateTime.now(), type, paidBy, new ArrayList<Owns>());
+
+        entityManager.persist(e);
+
+        OwnsID ownsId = new OwnsID(e.getId(), paidById);
+        Owns owns = new Owns(ownsId, true, group, paidBy, e);
+        entityManager.persist(owns);
+
+        // Stop transaction
         return "expense";
     }
 

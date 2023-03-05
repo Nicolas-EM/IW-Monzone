@@ -3,6 +3,7 @@
 
 <head>
     <th:block th:replace="fragments/head :: header" />
+    <link rel="stylesheet" th:href="@{/css/group_config.css}" href="css/group_config.css" type="text/css" />
     <title>Monzone</title>
 </head>
 
@@ -10,36 +11,42 @@
     <header th:replace="fragments/nav.html :: nav"></header>
 
     <main class="container my-4">
-        <div class="row row-cols-1 row-cols-md-2">
-            <div class="col">
-                <div class="row">
-                    <h1>Group Settings</h1>
+        <div class="row">
+            <h1>Group Settings</h1>
+        </div>
+        <form method="post">
+            <div class="row row-cols-1 row-cols-md-2 mt-3">
+                <div class="col">
+                    <label for="name" class="form-label w-100">Name</label>
+                    <input id="name" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${group?.getName()}">
+                    <label for="desc" class="form-label w-100">Description (optional)</label>
+                    <textarea id="desc" class="rounded-corners form-control" rows="5">[[${group?.getDesc()}]]</textarea>
+                    <label for="currency" class="form-label mt-4 w-100">Currency</label>
+                    <select class="form-select rounded-corners" required>
+                        <option th:unless="${group != null}" selected disabled hidden value="">Select Currency</option>
+                        <div th:each="curr,i : ${currencies}">
+                            <option th:value="${i.index}" th:selected="${group?.getCurrency().toString().equals(curr)}? true : false">[[${curr}]]</option>
+                        </div>
+                      </select>
+                    <label for="budget" class="form-label mt-4 w-100">Group budget:</label>
+                    <label id="budget" class="rounded-corners w-100 bg-white">[[${group?.getCurrencyText()}]] [[${group?.getTotBudget()}]]</label>
                 </div>
-                <div class="row">
-                    Name
-                </div>
-                <div class="row">
-                    Description
-                </div>
-                <div class="row">
-                    Currency
-                </div>
-                <div class="row">
-                    Group Budget
-                </div>
-            </div>
-            <div class="col">
-                <div class="row">
-                    <h3>Members</h3>
-                </div>
-                <div>
-                    <!-- Dynamic member list with Thymeleaf -->
-                    <div th:each="member : ${members}">
-                        <div class="row pb-2">
-                            <form th:if="${group.isGroupAdmin(session.u)}" method="post" th:action="@{/group/{groupId}/config(groupId=${group.getId()})}" class="col">
-                                <input type="hidden" name="removeId" th:value="${member.getUser().getId()}">
-                                <button type="submit" class="btn"><img th:src="@{/img/delete.png}" src="/img/delete.png"></button>
-                            </form>
+                <div class="col">
+                    <h3 class="mb-3">Members</h3>
+                    <div class="rounded-corners border border-white">
+                        <!-- Dynamic member list with Thymeleaf -->
+                        <div class="row"></div>
+                        <div th:each="member : ${members}" class="row p-1">
+                            <div th:if="${group.isGroupAdmin(session.u)}"  class="col btn-remove">
+                                <form method="post" th:action="@{/group/{groupId}/config(groupId=${group.getId()})}">
+                                    <input type="hidden" name="removeId" th:value="${member.getUser().getId()}">
+                                    <button type="submit" class="btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" fill="white" class="bi bi-trash3" viewbox="0 0 16 16">
+                                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                             <div class="col d-flex align-items-center">
                                 [[${member.getUser().getName()}]]
                             </div>
@@ -50,10 +57,11 @@
                                 [[${member.getBalance()}]]
                             </div>
                         </div>
+                        <div class="row"></div>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>        
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />

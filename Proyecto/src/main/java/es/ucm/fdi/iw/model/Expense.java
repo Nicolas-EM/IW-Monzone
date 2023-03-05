@@ -81,7 +81,7 @@ public class Expense implements Transferable<Expense.Transfer> {
 	}
 
     public String getDate(){
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");  
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");  
         return date.format(format);  
     }
 

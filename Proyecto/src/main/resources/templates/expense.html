@@ -14,7 +14,7 @@
   <header th:replace="fragments/nav.html :: nav"></header>
 
   <div class="container justify-content-center my-4">
-    <form method="post">
+    <form method="post" th:action="@{/group/{groupId}/new(groupId=${groupId})}">
       <div class="row">
         <h1 th:if="${newExpense}">New Expense</h1>
         <h1 th:unless="${newExpense}">Edit Expense</h1>
@@ -24,31 +24,31 @@
         <div class="col">
           <div>
             <label for="name" class="form-label w-100">Name</label>
-            <input id="name" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getName()}">
+            <input name="name" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getName()}">
             <label for="desc" class="form-label w-100">Description (optional)</label>
-            <textarea id="desc" class="rounded-corners form-control" rows="5"></textarea>
+            <textarea id="desc" name="desc" class="rounded-corners form-control" rows="5">[[${expense?.getDesc()}]]</textarea>
             <label for="date" class="form-label mt-4 w-100">Date</label>
-            <input type="date" id="date" class="rounded-corners w-100" required="required">
+            <input type="date" name="date" class="rounded-corners w-100" required="required" th:value="${expense?.getDate()}">
             <label for="amount" class="form-label mt-4 w-100">Amount (€)</label>
-            <input id="amount" type="text" class="rounded-corners mb-4 w-100" required="required">
+            <input name="amount" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getAmount()}">
           </div>
         </div>
         <!-- Advanced info -->
         <div id="middle-col" class="col">
           <!-- Dropdown paidby -->
           <label for="paidby" class="form-label w-100">Paid by</label>
-          <select class="form-select rounded-corners" aria-label="Default select example">
-            <option selected disabled hidden>Select Payer</option>
+          <select class="form-select rounded-corners" name="paidById" required>
+            <option th:unless="${expense != null}" selected disabled hidden value="">Select Payer</option>
             <div th:each="user: ${groupMembers}">
-              <option th:value="${user.getId()}">[[${user.getName()}]]</option>
+              <option th:value="${user.getId()}" th:selected="${expense?.getPaidBy()?.getId() == user.getId()}? true : false">[[${user.getName()}]]</option>
             </div>
           </select>
           <!-- Dropdown type -->
           <label class="form-label mt-3 w-100">Type</label>
-          <select class="form-select rounded-corners" aria-label="Default select example">
-            <option selected disabled hidden>Select Type</option>
+          <select class="form-select rounded-corners" name="typeId" required>
+            <option th:unless="${expense != null}" selected disabled hidden value="">Select Type</option>
             <div th:each="type: ${types}">
-              <option th:value="${type.getId()}">[[${type.getName()}]]</option>
+              <option th:value="${type.getId()}" th:selected="${expense?.getType()?.getId() == type.getId()}? true : false">[[${type.getName()}]]</option>
             </div>
           </select>
           <!-- List "for whom" -->
@@ -60,7 +60,7 @@
                   <div class="form-check">
                     <input class="check-box form-check-input" type="checkbox" value="" checked>
                     <label class="form-check-label" for="flexCheckDefault">[[${user.getName()}]]</label>
-                    <label class="balance">14.50€</label>
+                    <label class="split">14.50€</label>
                   </div>
                 </li>
               </div>

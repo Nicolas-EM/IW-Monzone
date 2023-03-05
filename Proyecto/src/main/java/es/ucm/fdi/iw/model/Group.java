@@ -112,4 +112,16 @@ public class Group implements Transferable<Group.Transfer> {
         return false;
     }
 
+    public String getCurrencyText() {
+        switch(currency){
+            case EUR: 
+                return "€";
+            case USD:
+                return "$";
+            case GBP:
+                return "£";
+            default:
+                return "";
+        }
+    }
 }
