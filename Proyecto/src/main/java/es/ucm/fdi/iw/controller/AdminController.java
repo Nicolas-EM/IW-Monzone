@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
 
 import java.util.List;
-import java.util.ArrayList;
 
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.User;
@@ -41,4 +40,5 @@ public class AdminController {
         model.addAttribute("groups", groups);
         return "home";
     }
+
 }

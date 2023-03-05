@@ -38,13 +38,19 @@ public class User implements Transferable<User.Transfer> {
     @SequenceGenerator(name = "gen", sequenceName = "gen")
 	private long id;
 
+    @Column(nullable = false)
+    private boolean enabled;
+
+    @Column(nullable = false)
+    private String name;
+
     @Column(nullable = false, unique = true)
     private String username;
+    
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
-    private String name;
     private String roles; // split by ',' to separate roles
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
@@ -53,10 +59,19 @@ public class User implements Transferable<User.Transfer> {
     @OneToMany(mappedBy = "user")
     private List<Notification> notifications;
 
+    @OneToMany(mappedBy = "user")
+    private List<Owns> expenses;
+
+    @OneToMany(mappedBy = "debtor")
+    private List<Debt> debts;
+
+    @OneToMany(mappedBy = "debtOwner")
+    private List<Debt> debtsOwned;
+
     /**
      * Checks whether this user has a given role.
      * @param role to check
-     * @return true iff this user has that role.
+     * @return true if this user has that role.
      */
     public boolean hasRole(Role role) {
         String roleName = role.name();
@@ -68,13 +83,14 @@ public class User implements Transferable<User.Transfer> {
     @Data
     public static class Transfer {
 		private long id;
+        private boolean enabled;
         private String username;
         private String name;
     }
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(id,	username, name);
+		return new Transfer(id, enabled, username, name);
 	}
 	
 	@Override

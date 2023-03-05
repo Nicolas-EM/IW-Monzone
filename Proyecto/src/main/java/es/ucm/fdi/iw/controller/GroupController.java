@@ -32,7 +32,7 @@ import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
 
 /**
- * Site administration.
+ * Group (and expenses) management.
  *
  * Access to this end-point is authenticated - see SecurityConfig
  */
@@ -48,11 +48,11 @@ public class GroupController {
     @Autowired
     private LocalData localData;
 
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "No eres miembro de este grupo") // 403
-    public static class NoEresMiembro extends RuntimeException {}
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You don't belong to this group") // 403
+    public static class NoMember extends RuntimeException {}
 
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "No eres admin de este grupo") // 403
-    public static class NoEresAdmin extends RuntimeException {}
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not the moderator of this group") // 403
+    public static class NoModerator extends RuntimeException {}
 
     /**
      * Group home page
@@ -60,14 +60,17 @@ public class GroupController {
     @GetMapping("{id}")
     public String index(@PathVariable long id, Model model, HttpSession session) {
         User user = (User) session.getAttribute("u");
+        // check if user belongs to the group
         Group group = entityManager.find(Group.class, id);
         if (!group.isMember(user)) {
-            throw new NoEresMiembro();
+            throw new NoMember();
         }
 
-        List<Expense> expenses = new ArrayList<>();
+        List<Expense> expenses = new ArrayList<Expense>();
         for (Owns o : group.getOwns()) {
-            expenses.add(o.getExpense());
+            Expense e = o.getExpense();
+            if (true)
+                expenses.add(e);
         }
         model.addAttribute("expenses", expenses);
         model.addAttribute("groupId", id);
@@ -82,7 +85,7 @@ public class GroupController {
         User user = (User) session.getAttribute("u");
         Group group = entityManager.find(Group.class, id);
         if (!group.isMember(user)) {
-            throw new NoEresMiembro();
+            throw new NoMember();
         }
 
         model.addAttribute("group", group);
@@ -103,7 +106,7 @@ public class GroupController {
         User user = (User) session.getAttribute("u");
         Group group = entityManager.find(Group.class, id);
         if (!group.isGroupAdmin(user)) {
-            throw new NoEresAdmin();
+            throw new NoModerator();
         }
 
         // FIXME: eliminar usuario de grupo

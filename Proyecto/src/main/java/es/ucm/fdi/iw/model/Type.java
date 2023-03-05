@@ -30,9 +30,6 @@ public class Type implements Transferable<Type.Transfer> {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    private String icon;
-
     @OneToMany(mappedBy = "type")
     private List<Expense> expenses;
 
@@ -42,12 +39,11 @@ public class Type implements Transferable<Type.Transfer> {
     public static class Transfer {
 		private long id;
         private String name;
-        private String icon;
     }
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(id,	name, icon);
+		return new Transfer(id,	name);
 	}
 	
 	@Override

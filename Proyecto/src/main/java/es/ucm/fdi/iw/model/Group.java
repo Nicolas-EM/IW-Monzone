@@ -41,13 +41,20 @@ public class Group implements Transferable<Group.Transfer> {
     @SequenceGenerator(name = "gen", sequenceName = "gen")
     private long id;
 
+    @Column(nullable = false)
+    private boolean enabled;
+
     private String desc;
+    
     @Column(nullable = false, unique = true)
     private String name;
+    
     @Column(nullable = false)
-    private Integer numMembers;
+    private int numMembers;
+    
     @Column(nullable = false)
-    private Float totBudget;
+    private float totBudget;
+    
     @Column(nullable = false)
     private Currency currency;
 
@@ -57,21 +64,25 @@ public class Group implements Transferable<Group.Transfer> {
     @OneToMany(mappedBy = "group")
     private List<Owns> owns;
 
+    @OneToMany(mappedBy = "group")
+    private List<Debt> debts;
+
     @Getter
     @Data
     @AllArgsConstructor
     public static class Transfer {
         private long id;
+        private boolean enabled;
         private String name;
         private String desc;
-        private Integer numMembers;
-        private Float totBudget;
+        private int numMembers;
+        private float totBudget;
         private Currency currency;
     }
 
     @Override
     public Transfer toTransfer() {
-        return new Transfer(id, name, desc, numMembers, totBudget, currency);
+        return new Transfer(id, enabled, name, desc, numMembers, totBudget, currency);
     }
 
     @Override
@@ -83,9 +94,8 @@ public class Group implements Transferable<Group.Transfer> {
         if (isGroupAdmin(u))
             return true;
         for (Member m : members) {
-            if (m.getUser().getUsername().equals(u.getUsername())) {
+            if (m.getUser().getUsername().equals(u.getUsername()))
                 return true;
-            }
         }
         return false;
     }
@@ -94,13 +104,12 @@ public class Group implements Transferable<Group.Transfer> {
         if (u.hasRole(Role.ADMIN))
             return true;
         for (Member m : members) {
-            if (m.getUser().getId() == u.getId() && m.getRole().equals(GroupRole.GROUP_ADMIN)) {
+            if (m.getUser().getId() == u.getId() && m.getRole().equals(GroupRole.GROUP_MODERATOR))
                 return true;
-            }
-            else{
+            else
                 log.warn("User {}, Group {}, Role {}", u.getUsername(), id, m.getRole());
-            }
         }
         return false;
     }
+
 }

@@ -21,6 +21,9 @@ public class Debt implements Transferable<Debt.Transfer> {
     @Column(nullable = false)
     private float amount;
 
+    @Column(nullable = false)
+    private boolean paid;
+
 	@ManyToOne
     @MapsId("groupID") private Group group;
 
@@ -38,11 +41,12 @@ public class Debt implements Transferable<Debt.Transfer> {
         private long debtOwnerID;
         private long debtorID;
         private float amount;
+        private boolean paid;
     }
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(group.getId(), debtOwner.getId(), debtor.getId(), amount);
+		return new Transfer(group.getId(), debtOwner.getId(), debtor.getId(), amount, paid);
 	}
 	
 	@Override

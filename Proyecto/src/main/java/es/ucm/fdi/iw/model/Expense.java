@@ -9,7 +9,6 @@ import lombok.AccessLevel;
 import javax.persistence.*;
 
 import java.util.List;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;  
 
@@ -34,6 +33,9 @@ public class Expense implements Transferable<Expense.Transfer> {
 	private long id;
 
     @Column(nullable = false)
+    private boolean enabled;
+
+    @Column(nullable = false)
     private String name;
 
     private String desc;
@@ -44,9 +46,6 @@ public class Expense implements Transferable<Expense.Transfer> {
     @Getter(AccessLevel.NONE)
     @Column(nullable = false)
     private LocalDateTime date;
-
-    @Column(nullable = false)
-    private String picture;
 
     @ManyToOne
     private Type type;
@@ -62,18 +61,18 @@ public class Expense implements Transferable<Expense.Transfer> {
     @AllArgsConstructor
     public static class Transfer {
 		private long id;
+        private boolean enabled;
         private String name;
         private String desc;
         private long amount;
         private LocalDateTime date;
-        private String picture;
         private long typeID;
         private long paidByID;
     }
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(id,	name, desc, amount, date, picture, type.getId(), paidBy.getId());
+		return new Transfer(id,	enabled, name, desc, amount, date, type.getId(), paidBy.getId());
 	}
 	
 	@Override
@@ -85,4 +84,5 @@ public class Expense implements Transferable<Expense.Transfer> {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");  
         return date.format(format);  
     }
+
 }

@@ -18,6 +18,9 @@ public class Owns {
 
     @EmbeddedId private OwnsID bId;
 
+    @Column(nullable = false)
+    private boolean enabled;
+    
 	@ManyToOne
     private Group group;
 
