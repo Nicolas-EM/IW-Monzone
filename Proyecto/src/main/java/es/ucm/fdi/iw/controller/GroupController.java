@@ -49,10 +49,10 @@ public class GroupController {
     private LocalData localData;
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You don't belong to this group") // 403
-    public static class NoMember extends RuntimeException {}
+    public static class NoMemberException extends RuntimeException {}
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not the moderator of this group") // 403
-    public static class NoModerator extends RuntimeException {}
+    public static class NoModeratorException extends RuntimeException {}
 
     /**
      * Group home page
@@ -63,7 +63,7 @@ public class GroupController {
         // check if user belongs to the group
         Group group = entityManager.find(Group.class, id);
         if (!group.isMember(user)) {
-            throw new NoMember();
+            throw new NoMemberException();
         }
 
         List<Expense> expenses = new ArrayList<Expense>();
@@ -85,7 +85,7 @@ public class GroupController {
         User user = (User) session.getAttribute("u");
         Group group = entityManager.find(Group.class, id);
         if (!group.isMember(user)) {
-            throw new NoMember();
+            throw new NoMemberException();
         }
 
         model.addAttribute("group", group);
@@ -106,7 +106,7 @@ public class GroupController {
         User user = (User) session.getAttribute("u");
         Group group = entityManager.find(Group.class, id);
         if (!group.isGroupAdmin(user)) {
-            throw new NoModerator();
+            throw new NoModeratorException();
         }
 
         // FIXME: eliminar usuario de grupo
