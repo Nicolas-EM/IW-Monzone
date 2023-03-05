@@ -1,7 +1,9 @@
 package es.ucm.fdi.iw.controller;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -105,7 +107,7 @@ public class GroupController {
         for (Member m : group.getMembers()) {
             if (m.isEnabled() && m.getUser().isEnabled()) 
                 members.add(m);
-        }
+            }
         model.addAttribute("members", members);
 
         List<String> currencies = new ArrayList<>();
@@ -113,7 +115,6 @@ public class GroupController {
             currencies.add(g.name());
         }
         model.addAttribute("currencies", currencies);
-
         
         return "group_config";
     }
@@ -181,14 +182,19 @@ public class GroupController {
     @PostMapping("/{groupId}/new")
     @Transactional
     // public String postExpense(HttpServletResponse response, @PathVariable long groupId, @ModelAttribute User edited, @RequestParam(required = false) String pass2, Model model, HttpSession session) throws IOException {
-    public String postExpense(HttpServletResponse response, @PathVariable long groupId, Model model, HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc, @RequestParam String date, @RequestParam long paidById, @RequestParam long typeId) throws IOException {
+    public String postExpense(HttpServletResponse response, @PathVariable long groupId, Model model, HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc, @RequestParam String dateString, @RequestParam long amount, @RequestParam long paidById, @RequestParam long typeId) throws IOException {
         // Start transaction
 
         User paidBy = entityManager.find(User.class, paidById);
         Group group = entityManager.find(Group.class, groupId);
         Type type = entityManager.find(Type.class, typeId);
 
-        Expense e = new Expense(0, true, name, "desc", (long) 12.2, LocalDateTime.now(), type, paidBy, new ArrayList<Owns>());
+        if(desc == null){
+            desc = "";
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");    
+        LocalDate date = LocalDate.parse(dateString, formatter);
+        Expense e = new Expense(0, true, name, desc, amount, date, type, paidBy, new ArrayList<Owns>());
 
         entityManager.persist(e);
 

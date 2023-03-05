@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import javax.persistence.*;
 
 import java.util.List;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;  
 
@@ -45,7 +46,7 @@ public class Expense implements Transferable<Expense.Transfer> {
 
     @Getter(AccessLevel.NONE)
     @Column(nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
 
     @ManyToOne
     private Type type;
@@ -65,7 +66,7 @@ public class Expense implements Transferable<Expense.Transfer> {
         private String name;
         private String desc;
         private long amount;
-        private LocalDateTime date;
+        private LocalDate date;
         private long typeID;
         private long paidByID;
     }

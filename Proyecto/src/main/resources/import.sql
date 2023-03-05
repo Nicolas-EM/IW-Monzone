@@ -61,11 +61,11 @@ VALUES
   (5, 'Shopping');
 
 -- Generate fixed expense for test
-INSERT INTO IWExpense (ID, enabled, AMOUNT, DATE, DESC, NAME, PAID_BY_ID, TYPE_ID) VALUES (99, true, 99, '2023-03-04 00:00:00', 'Expense desc', 'Expense name', 2, 1);
+INSERT INTO IWExpense (ID, enabled, AMOUNT, DATE, DESC, NAME, PAID_BY_ID, TYPE_ID) VALUES (99, true, 99, '2023-03-04', 'Expense desc', 'Expense name', 2, 1);
 
 -- Generate 10 random expenses
 INSERT INTO IWExpense (ID, enabled, AMOUNT, DATE, DESC, NAME, PAID_BY_ID, TYPE_ID)
-SELECT t.ID, true, FLOOR(RAND() * 100), DATEADD('DAY', -FLOOR(RAND() * 30), '2023-03-04 00:00:00'), CONCAT('Expense ', t.ID, ' description'), CONCAT('Expense ', t.ID, ' name'),
+SELECT t.ID, true, FLOOR(RAND() * 100), DATEADD('DAY', -FLOOR(RAND() * 30), '2023-03-04'), CONCAT('Expense ', t.ID, ' description'), CONCAT('Expense ', t.ID, ' name'),
   (SELECT id FROM IWUser ORDER BY RAND() LIMIT 1), FLOOR(RAND() * 5) + 1
 FROM (
   SELECT 1 AS ID UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
