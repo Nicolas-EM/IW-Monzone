@@ -4,7 +4,7 @@ Feature: flujo de la app
   Scenario: Entrar a grupo
     Given call read('login.feature@login_b')
     And driver baseUrl + '/user/'
-    And delay(250)
+    And delay(350)
     When submit().click(".card")
     Then waitForUrl(baseUrl + '/group/2')
 
@@ -12,7 +12,7 @@ Feature: flujo de la app
   Scenario: Configuracion grupo
     Given call read('principal.feature@group')
     And driver baseUrl + '/group/2'
-    And delay(250)
+    And delay(350)
     When submit().click("#groupConfigBtn")
     Then waitForUrl(baseUrl + '/group/2/config')
 
@@ -20,7 +20,7 @@ Feature: flujo de la app
   Scenario: View expense in group
     Given call read('principal.feature@group')
     And driver baseUrl + '/group/2'
-    And delay(250)
+    And delay(350)
     When submit().click(".card")
     Then waitForUrl(baseUrl + '/group/2/99')
 
@@ -28,7 +28,7 @@ Feature: flujo de la app
   Scenario: Add expense to group
     Given call read('principal.feature@group')
     And driver baseUrl + '/group/2'
-    And delay(250)
+    And delay(350)
     When submit().click("#addExpense")
     Then waitForUrl(baseUrl + '/group/2/new')
     And input('#name', 'Karate Expense')
@@ -42,6 +42,6 @@ Feature: flujo de la app
   Scenario: View profile
     Given call read('login.feature@login_b')
     And driver baseUrl + '/user/'
-    And delay(250)
+    And delay(350)
     When submit().click("#profile")
     Then waitForUrl(baseUrl + '/user/config')
