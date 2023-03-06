@@ -28,13 +28,13 @@ INSERT INTO IWMember (GROUP_ID, USER_ID, enabled, BUDGET, ROLE, balance) VALUES 
 INSERT INTO IWMember (GROUP_ID, USER_ID, enabled, BUDGET, ROLE, balance)
 SELECT
     FLOOR(RAND() * 3) + 1, -- choose a random group ID between 1 and 3
-    IWUser.id,
+    u.id,
     true,
     FLOOR(RAND() * 1000) + 1, -- choose a random budget between 1 and 1000
     FLOOR(RAND() * 1), -- set role to 0 or 1
     99
 FROM
-    IWUser;
+    IWUser u WHERE u.id <> 2;
 -- Generate random group memberships for each empty group
 /*
 INSERT INTO IWMember (GROUP_ID, USER_ID, BUDGET, ROLE)

@@ -44,6 +44,11 @@ img.preview {
     background-color: #565e69;
 }
 
+.dropdown-item a {
+    display: inline-block;
+    min-width: 100%;
+}
+
 .nav-link {
     color: #f5a302;
 }
