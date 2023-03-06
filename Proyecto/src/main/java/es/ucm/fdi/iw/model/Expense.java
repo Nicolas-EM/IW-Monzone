@@ -9,7 +9,7 @@ import lombok.AccessLevel;
 import javax.persistence.*;
 
 import java.util.Comparator;
-import java.util.Set;
+import java.util.List;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;  
 
@@ -55,7 +55,7 @@ public class Expense implements Transferable<Expense.Transfer>, Comparator<Expen
     private User paidBy;
 
     @OneToMany(mappedBy = "expense")
-    private Set<Owns> belong;
+    private List<Owns> belong;
 
     @Data
     @NoArgsConstructor

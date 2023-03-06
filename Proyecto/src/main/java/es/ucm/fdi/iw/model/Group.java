@@ -11,7 +11,7 @@ import es.ucm.fdi.iw.model.Member.GroupRole;
 import es.ucm.fdi.iw.model.User.Role;
 
 import java.util.Comparator;
-import java.util.Set;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,13 +60,13 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
     private Currency currency;
 
     @OneToMany(mappedBy = "group")
-    private Set<Member> members;
+    private List<Member> members;
 
     @OneToMany(mappedBy = "group")
-    private Set<Owns> owns;
+    private List<Owns> owns;
 
     @OneToMany(mappedBy = "group")
-    private Set<Debt> debts;
+    private List<Debt> debts;
 
     @Getter
     @Data

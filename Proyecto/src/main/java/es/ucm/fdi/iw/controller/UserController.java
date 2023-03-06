@@ -101,7 +101,7 @@ public class UserController {
     @GetMapping("/")
     public String index(Model model, HttpSession session) {
         User user = (User) session.getAttribute("u");
-        Set<Member> memberOf = user.getMemberOf();
+        List<Member> memberOf = user.getMemberOf();
         List<Group> groups = new ArrayList<>();
         for (Member m : memberOf) {
             groups.add(m.getGroup());
@@ -117,7 +117,7 @@ public class UserController {
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
         model.addAttribute("types", types);
 
-        Set<Member> memberOf = user.getMemberOf();
+        List<Member> memberOf = user.getMemberOf();
         List<Group> groups = new ArrayList<>();
         for (Member m : memberOf) {
             groups.add(m.getGroup());

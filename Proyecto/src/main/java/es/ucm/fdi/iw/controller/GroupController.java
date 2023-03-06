@@ -7,9 +7,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.HashSet;
 import java.util.Comparator;
 
 import javax.persistence.Embeddable;
@@ -102,7 +99,7 @@ public class GroupController {
         User u = (User) session.getAttribute("u");
 
         if (curr != null) {
-            Group g = new Group(0, true, desc, name, 1, 0, curr, new TreeSet<Member>(), new HashSet<Owns>(), new TreeSet<Debt>());
+            Group g = new Group(0, true, desc, name, 1, 0, curr, new ArrayList<Member>(), new ArrayList<Owns>(), new ArrayList<Debt>());
             entityManager.persist(g);
 
             // TODO: añadir usuario a grupo (Crear member)
@@ -128,7 +125,7 @@ public class GroupController {
             throw new NoMemberException();
         }
 
-        Set<Expense> expenses = new TreeSet<>();
+        List<Expense> expenses = new ArrayList<>();
         for (Owns o : group.getOwns()) {
             Expense e = o.getExpense();
             if (true)
@@ -158,7 +155,7 @@ public class GroupController {
 
         model.addAttribute("group", group);
 
-        Set<Member> members = new TreeSet<>();
+        List<Member> members = new ArrayList<>();
         for (Member m : group.getMembers()) {
             if (m.isEnabled() && m.getUser().isEnabled()) 
                 members.add(m);
@@ -178,7 +175,7 @@ public class GroupController {
      * Remove member
      */
     @Transactional
-    @PostMapping("{id}/delUser")
+    @PostMapping("{id}/config")
     public String removeUser(@PathVariable long id, Model model, HttpSession session, @RequestParam(required = true) long removeId) {
         User user = (User) session.getAttribute("u");
         
@@ -197,7 +194,7 @@ public class GroupController {
             throw new NoModeratorException();
         }
 
-        Set<User> members = new TreeSet<>();
+        List<User> members = new ArrayList<>();
         for (Member m : group.getMembers()) {
             if (m.isEnabled() && m.getUser().getId() == removeId){
                 m.setEnabled(false);
@@ -210,7 +207,7 @@ public class GroupController {
     }
 
     private void setExpenseAttributes(Group group, long expenseId, Model model, boolean newExpense) {
-        Set<User> members = new TreeSet<>();
+        List<User> members = new ArrayList<>();
         for (Member m : group.getMembers()) {
             members.add(m.getUser());
         }
@@ -335,7 +332,7 @@ public class GroupController {
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");    
         LocalDate date = LocalDate.parse(dateString, formatter);
-        Expense e = new Expense(0, true, name, desc, amount, date, type, paidBy, new TreeSet<Owns>());
+        Expense e = new Expense(0, true, name, desc, amount, date, type, paidBy, new ArrayList<Owns>());
 
         entityManager.persist(e);
 
