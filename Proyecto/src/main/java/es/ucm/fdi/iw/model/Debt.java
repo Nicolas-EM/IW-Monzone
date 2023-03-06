@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.util.Comparator;
+
 import javax.persistence.*;
 
 /**
@@ -14,7 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Table(name="IWDebt")
-public class Debt implements Transferable<Debt.Transfer> {
+public class Debt implements Transferable<Debt.Transfer>, Comparator<Debt> {
 
     @EmbeddedId private DebtID dId;
     
@@ -54,5 +56,9 @@ public class Debt implements Transferable<Debt.Transfer> {
 		return toTransfer().toString();
 	}
 
+    @Override
+    public int compare(Debt d1, Debt d2) {
+        return d1.getDebtor().getName().compareTo(d2.getDebtor().getName());
+    }
 }
 

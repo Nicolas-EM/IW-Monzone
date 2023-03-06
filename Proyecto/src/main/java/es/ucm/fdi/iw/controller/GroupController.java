@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.HashSet;
+import java.util.Comparator;
 
 import javax.persistence.Embeddable;
 import javax.persistence.EntityManager;
@@ -61,11 +63,20 @@ public class GroupController {
     @Autowired
     private LocalData localData;
 
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The group doesn't exist or has been removed") // 403
+    public static class GroupNotExistException extends RuntimeException {}
+
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You don't belong to this group") // 403
     public static class NoMemberException extends RuntimeException {}
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not the moderator of this group") // 403
     public static class NoModeratorException extends RuntimeException {}
+
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The expense does not exist or has been removed") // 403
+    public static class ExpenseNotExistException extends RuntimeException {}
+
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The expense does not belong to this group") // 403
+    public static class ExpenseNotBelongException extends RuntimeException {}
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error with DB") // 500
     public static class NoTransactionException extends RuntimeException {}
@@ -90,8 +101,8 @@ public class GroupController {
         Currency curr = Currency.values()[currId];
         User u = (User) session.getAttribute("u");
 
-        if(curr != null){
-            Group g = new Group(0, true, desc, name, 1, 0, curr, new ArrayList<Member>(), new ArrayList<Owns>(), new ArrayList<Debt>());
+        if (curr != null) {
+            Group g = new Group(0, true, desc, name, 1, 0, curr, new TreeSet<Member>(), new HashSet<Owns>(), new TreeSet<Debt>());
             entityManager.persist(g);
 
             // TODO: añadir usuario a grupo (Crear member)
@@ -106,13 +117,18 @@ public class GroupController {
     @GetMapping("{id}")
     public String index(@PathVariable long id, Model model, HttpSession session) {
         User user = (User) session.getAttribute("u");
-        // check if user belongs to the group
+
+        // check if group exists
         Group group = entityManager.find(Group.class, id);
+        if (group == null || !group.isEnabled())
+            throw new GroupNotExistException();
+
+        // check if user belongs to the group        
         if (!group.isMember(user)) {
             throw new NoMemberException();
         }
 
-        List<Expense> expenses = new ArrayList<Expense>();
+        Set<Expense> expenses = new TreeSet<>();
         for (Owns o : group.getOwns()) {
             Expense e = o.getExpense();
             if (true)
@@ -129,14 +145,20 @@ public class GroupController {
     @GetMapping("{id}/config")
     public String config(@PathVariable long id, Model model, HttpSession session) {
         User user = (User) session.getAttribute("u");
+        
+        // check if group exists
         Group group = entityManager.find(Group.class, id);
+        if (group == null || !group.isEnabled())
+            throw new GroupNotExistException();
+
+        // check if user belongs to the group        
         if (!group.isMember(user)) {
             throw new NoMemberException();
         }
 
         model.addAttribute("group", group);
 
-        List<Member> members = new ArrayList<>();
+        Set<Member> members = new TreeSet<>();
         for (Member m : group.getMembers()) {
             if (m.isEnabled() && m.getUser().isEnabled()) 
                 members.add(m);
@@ -156,17 +178,28 @@ public class GroupController {
      * Remove member
      */
     @Transactional
-    @PostMapping("{id}/config")
+    @PostMapping("{id}/delUser")
     public String removeUser(@PathVariable long id, Model model, HttpSession session, @RequestParam(required = true) long removeId) {
         User user = (User) session.getAttribute("u");
+        
+        // check if group exists
         Group group = entityManager.find(Group.class, id);
-        if (!group.isGroupAdmin(user)) {
+        if (group == null || !group.isEnabled())
+            throw new GroupNotExistException();
+
+        // check if user belongs to the group        
+        if (!group.isMember(user)) {
+            throw new NoMemberException();
+        }
+
+        // only moderators can remove other members
+        if (user.getId() != removeId && !group.isGroupAdmin(user)) {
             throw new NoModeratorException();
         }
 
-        Set<User> members = new HashSet<>();
+        Set<User> members = new TreeSet<>();
         for (Member m : group.getMembers()) {
-            if(m.isEnabled() && m.getUser().getId() == removeId){
+            if (m.isEnabled() && m.getUser().getId() == removeId){
                 m.setEnabled(false);
             }
             else if(m.isEnabled() && m.getUser().isEnabled())
@@ -176,9 +209,8 @@ public class GroupController {
         return config(id, model, session);
     }
 
-    private void setExpenseAttributes(long groupId, long expenseId, Model model, Boolean newExpense) {
-        Group group = entityManager.find(Group.class, groupId);
-        List<User> members = new ArrayList<>();
+    private void setExpenseAttributes(Group group, long expenseId, Model model, boolean newExpense) {
+        Set<User> members = new TreeSet<>();
         for (Member m : group.getMembers()) {
             members.add(m.getUser());
         }
@@ -186,7 +218,7 @@ public class GroupController {
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
         model.addAttribute("types", types);
-        model.addAttribute("groupId", groupId);
+        model.addAttribute("groupId", group.getId());
         model.addAttribute("newExpense", newExpense);
     }
 
@@ -194,9 +226,29 @@ public class GroupController {
      * View group expense
      */
     @GetMapping("{groupId}/{expenseId}")
-    public String expense(@PathVariable long groupId, @PathVariable long expenseId, Model model) {
-        setExpenseAttributes(groupId, expenseId, model, false);
+    public String expense(@PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session) {
+        User user = (User) session.getAttribute("u");
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new GroupNotExistException();
+
+        // check if user belongs to the group        
+        if (!group.isMember(user)) {
+            throw new NoMemberException();
+        }
+
+        // check if expense exists
         Expense expense = entityManager.find(Expense.class, expenseId);
+        if (expense == null || !expense.isEnabled())
+            throw new ExpenseNotExistException();
+
+        // check if expense belongs to the group
+        if (!group.hasExpense(expense))
+            throw new ExpenseNotBelongException();
+
+        setExpenseAttributes(group, expenseId, model, false);
         model.addAttribute("expense", expense);
         return "expense";
     }
@@ -204,6 +256,7 @@ public class GroupController {
     /*
      * Edit group expense
      */
+    // TODO: Review
     @PostMapping("/{groupId}/{expenseId}")
     @Transactional
     public String postEditExpense(HttpServletResponse response, @PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc, @RequestParam String dateString, @RequestParam long amount, @RequestParam long paidById, @RequestParam long typeId) throws IOException {
@@ -247,14 +300,27 @@ public class GroupController {
      * View: create group expense
      */
     @GetMapping("{groupId}/new")
-    public String createExpense(@PathVariable long groupId, Model model) {
-        setExpenseAttributes(groupId, 0, model, true);
+    public String createExpense(@PathVariable long groupId, Model model, HttpSession session) {
+        User user = (User) session.getAttribute("u");
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new GroupNotExistException();
+
+        // check if user belongs to the group        
+        if (!group.isMember(user)) {
+            throw new NoMemberException();
+        }
+
+        setExpenseAttributes(group, 0, model, true);
         return "expense";
     }
 
     /*
      * Add expense to group
      */
+    // TODO: Review
     @PostMapping("/{groupId}/new")
     @Transactional
     public String postExpense(HttpServletResponse response, @PathVariable long groupId, Model model, HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc, @RequestParam String dateString, @RequestParam long amount, @RequestParam long paidById, @RequestParam long typeId) throws IOException {
@@ -269,7 +335,7 @@ public class GroupController {
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");    
         LocalDate date = LocalDate.parse(dateString, formatter);
-        Expense e = new Expense(0, true, name, desc, amount, date, type, paidBy, new ArrayList<Owns>());
+        Expense e = new Expense(0, true, name, desc, amount, date, type, paidBy, new TreeSet<Owns>());
 
         entityManager.persist(e);
 

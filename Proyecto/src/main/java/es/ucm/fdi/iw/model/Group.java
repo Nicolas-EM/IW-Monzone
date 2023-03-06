@@ -10,7 +10,8 @@ import javax.persistence.*;
 import es.ucm.fdi.iw.model.Member.GroupRole;
 import es.ucm.fdi.iw.model.User.Role;
 
-import java.util.List;
+import java.util.Comparator;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +27,7 @@ import org.apache.logging.log4j.Logger;
         @NamedQuery(name = "Group.getAllGroups", query = "SELECT obj FROM Group obj")
 })
 @Table(name = "IWGroup")
-public class Group implements Transferable<Group.Transfer> {
+public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
     
     private static final Logger log = LogManager.getLogger(Group.class);
 
@@ -59,13 +60,13 @@ public class Group implements Transferable<Group.Transfer> {
     private Currency currency;
 
     @OneToMany(mappedBy = "group")
-    private List<Member> members;
+    private Set<Member> members;
 
     @OneToMany(mappedBy = "group")
-    private List<Owns> owns;
+    private Set<Owns> owns;
 
     @OneToMany(mappedBy = "group")
-    private List<Debt> debts;
+    private Set<Debt> debts;
 
     @Getter
     @Data
@@ -94,13 +95,13 @@ public class Group implements Transferable<Group.Transfer> {
         if (isGroupAdmin(u))
             return true;
         for (Member m : members) {
-            if (m.getUser().getUsername().equals(u.getUsername()))
+            if (m.isEnabled() && m.getUser().getUsername().equals(u.getUsername()))
                 return true;
         }
         return false;
     }
 
-    public Boolean isGroupAdmin(User u) {
+    public boolean isGroupAdmin(User u) {
         if (u.hasRole(Role.ADMIN))
             return true;
         for (Member m : members) {
@@ -109,6 +110,13 @@ public class Group implements Transferable<Group.Transfer> {
             else
                 log.warn("User {}, Group {}, Role {}", u.getUsername(), id, m.getRole());
         }
+        return false;
+    }
+
+    public boolean hasExpense(Expense e) {
+        for (Owns o : owns)
+            if (o.isEnabled() && o.getExpense().getId() == e.getId())
+                return true;
         return false;
     }
 
@@ -123,5 +131,10 @@ public class Group implements Transferable<Group.Transfer> {
             default:
                 return "";
         }
+    }
+
+    @Override
+    public int compare(Group g1, Group g2) {
+        return g1.getName().compareTo(g2.getName());
     }
 }

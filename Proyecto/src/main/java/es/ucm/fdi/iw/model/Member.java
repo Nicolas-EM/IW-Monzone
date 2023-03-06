@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Comparator;
+
 import javax.persistence.*;
 
 /**
@@ -15,7 +17,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name="IWMember")
-public class Member implements Transferable<Member.Transfer> {
+public class Member implements Transferable<Member.Transfer>, Comparator<Member> {
 
     public enum GroupRole {
         GROUP_USER,			    // normal users 
@@ -64,5 +66,10 @@ public class Member implements Transferable<Member.Transfer> {
     @Override
     public String toString() {
         return toTransfer().toString();
+    }
+
+    @Override
+    public int compare(Member m1, Member m2) {
+        return m1.getUser().getName().compareTo(m2.getUser().getName());
     }
 }

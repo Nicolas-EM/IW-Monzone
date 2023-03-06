@@ -8,9 +8,9 @@ import lombok.AccessLevel;
 
 import javax.persistence.*;
 
-import java.util.List;
+import java.util.Comparator;
+import java.util.Set;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;  
 
 /**
@@ -26,7 +26,7 @@ import java.time.format.DateTimeFormatter;
                         + "WHERE u.id = :id")
 })
 @Table(name="IWExpense")
-public class Expense implements Transferable<Expense.Transfer> {
+public class Expense implements Transferable<Expense.Transfer>, Comparator<Expense> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen")
@@ -55,7 +55,7 @@ public class Expense implements Transferable<Expense.Transfer> {
     private User paidBy;
 
     @OneToMany(mappedBy = "expense")
-    private List<Owns> belong;
+    private Set<Owns> belong;
 
     @Data
     @NoArgsConstructor
@@ -84,6 +84,11 @@ public class Expense implements Transferable<Expense.Transfer> {
     public String getDate(){
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");  
         return date.format(format);  
+    }
+
+    @Override
+    public int compare(Expense e1, Expense e2) {
+        return e2.getDate().compareTo(e1.getDate());
     }
 
 }

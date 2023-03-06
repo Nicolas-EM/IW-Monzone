@@ -36,6 +36,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.ArrayList;
 
 /**
@@ -100,7 +101,7 @@ public class UserController {
     @GetMapping("/")
     public String index(Model model, HttpSession session) {
         User user = (User) session.getAttribute("u");
-        List<Member> memberOf = user.getMemberOf();
+        Set<Member> memberOf = user.getMemberOf();
         List<Group> groups = new ArrayList<>();
         for (Member m : memberOf) {
             groups.add(m.getGroup());
@@ -116,7 +117,7 @@ public class UserController {
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
         model.addAttribute("types", types);
 
-        List<Member> memberOf = user.getMemberOf();
+        Set<Member> memberOf = user.getMemberOf();
         List<Group> groups = new ArrayList<>();
         for (Member m : memberOf) {
             groups.add(m.getGroup());

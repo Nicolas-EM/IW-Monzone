@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * An authorized user of the system.
@@ -54,19 +55,19 @@ public class User implements Transferable<User.Transfer> {
     private String roles; // split by ',' to separate roles
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-    private List<Member> memberOf;
+    private Set<Member> memberOf;
 
     @OneToMany(mappedBy = "user")
     private List<Notification> notifications;
 
     @OneToMany(mappedBy = "user")
-    private List<Owns> expenses;
+    private Set<Owns> expenses;
 
     @OneToMany(mappedBy = "debtor")
-    private List<Debt> debts;
+    private Set<Debt> debts;
 
     @OneToMany(mappedBy = "debtOwner")
-    private List<Debt> debtsOwned;
+    private Set<Debt> debtsOwned;
 
     /**
      * Checks whether this user has a given role.
