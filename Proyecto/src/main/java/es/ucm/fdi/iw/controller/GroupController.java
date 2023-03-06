@@ -75,6 +75,9 @@ public class GroupController {
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The expense does not belong to this group") // 403
     public static class ExpenseNotBelongException extends RuntimeException {}
 
+    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You cannot leave a group if your balance is not 0.") // 403
+    public static class BalanceNotZero extends RuntimeException {}
+
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error with DB") // 500
     public static class NoTransactionException extends RuntimeException {}
 
@@ -175,8 +178,8 @@ public class GroupController {
      * Remove member
      */
     @Transactional
-    @PostMapping("{id}/config")
-    public String removeUser(@PathVariable long id, Model model, HttpSession session, @RequestParam(required = true) long removeId) {
+    @PostMapping("{id}/removeMember")
+    public String removeMember(@PathVariable long id, Model model, HttpSession session, @RequestParam(required = true) long removeId) {
         User user = (User) session.getAttribute("u");
         
         // check if group exists
@@ -203,6 +206,39 @@ public class GroupController {
                 members.add(m.getUser());
         }
         model.addAttribute("groupMembers", members);
+        return config(id, model, session);
+    }
+
+    /**
+     * Remove member
+     */
+    @Transactional
+    @PostMapping("{id}/leave")
+    public String leaveGroup(@PathVariable long id, Model model, HttpSession session) {
+        User user = (User) session.getAttribute("u");
+        
+        // check if group exists
+        Group group = entityManager.find(Group.class, id);
+        if (group == null || !group.isEnabled())
+            throw new GroupNotExistException();
+
+        // check if user belongs to the group        
+        if (!group.isMember(user)) {
+            throw new NoMemberException();
+        }
+
+        // check if balance is 0
+        if(group.getUserBalance(user) != 0) {
+            throw new BalanceNotZero();
+        }
+
+        for (Member m : group.getMembers()) {
+            if (m.isEnabled() && m.getUser().getId() == user.getId()){
+                m.setEnabled(false);
+                return "redirect:/user/";
+            }
+        }
+
         return config(id, model, session);
     }
 

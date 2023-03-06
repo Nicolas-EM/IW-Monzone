@@ -104,7 +104,8 @@ public class UserController {
         List<Member> memberOf = user.getMemberOf();
         List<Group> groups = new ArrayList<>();
         for (Member m : memberOf) {
-            groups.add(m.getGroup());
+            if(m.isEnabled())
+                groups.add(m.getGroup());
         }
         model.addAttribute("groups", groups);
         return "home";
@@ -138,7 +139,6 @@ public class UserController {
     @PostMapping("/{id}")
     @Transactional
     public String postUser(HttpServletResponse response, @PathVariable long id, @ModelAttribute User edited, @RequestParam(required = false) String pass2, Model model, HttpSession session) throws IOException {
-
         User requester = (User) session.getAttribute("u");
         User target = null;
         if (id == -1 && requester.hasRole(Role.ADMIN)) {

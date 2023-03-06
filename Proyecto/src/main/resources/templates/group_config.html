@@ -14,9 +14,9 @@
         <div class="row">
             <h1>Group Settings</h1>
         </div>
-        <div class="row row-cols-1 row-cols-md-2 mt-3">
-            <div class="col">
-                <form method="post" th:action="@{/group/new}">
+        <form id="groupForm" method="post">
+            <div class="row row-cols-1 row-cols-md-2 mt-3">
+                <div class="col">
                     <label for="name" class="form-label w-100">Name</label>
                     <input id="name" name="name" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${group?.getName()}">
                     <label for="desc" class="form-label w-100">Description (optional)</label>
@@ -34,55 +34,56 @@
                     </div>
                     <div class="row mt-5 w-100">
                         <button th:if="${group == null} or ${group?.isGroupAdmin(session.u)}" type="submit" class="btn btn-func btn-primary rounded-pill fw-bold w-25">Save</button>
-                        <button th:if="${group == null} or ${group?.isGroupAdmin(session.u)}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">[[${group} == null? 'Cancel':'Delete Group']]</button>
+                        <button th:if="${group == null}" th:onclick="|location.href='/user/'|" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Cancel</button>
+                        <button th:if="${group != null} and ${group?.isGroupAdmin(session.u)}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Delete Group</button>
                     </div>
                 </form>
-            </div>
-            <div class="col">
-                <div id="ini-row" class="row">
-                    <div id="ini">
-                        <h3 class="mb-3">Members</h3>
+                </div>
+                <div class="col">
+                    <div id="ini-row" class="row">
+                        <div id="ini">
+                            <h3 class="mb-3">Members</h3>
+                        </div>
+                        <div th:if="${group} != null" id="people">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" class="bi bi-people-fill me-1" viewBox="0 0 16 16">
+                                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                            </svg>
+                            [[${group.getNumMembers()}]]
+                        </div>
                     </div>
-                    <div th:if="${group} != null" id="people">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" class="bi bi-people-fill me-1" viewBox="0 0 16 16">
-                            <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
-                        </svg>
-                        [[${group.getNumMembers()}]]
+                    <div class="rounded-corners border border-white">
+                        <!-- Dynamic member list with Thymeleaf -->
+                        <div class="row"></div>
+                        <div th:each="member : ${members}" class="row p-2 member">
+                            <div th:if="${group.isGroupAdmin(session.u)}" class="col btn-remove">
+                                <form method="post" th:action="@{/group/{groupId}/removeMember(groupId=${group.getId()})}">
+                                    <input type="hidden" name="removeId" th:value="${member.getUser().getId()}">
+                                    <button type="submit" class="btn">
+                                        <svg id="trash" xmlns="http://www.w3.org/2000/svg" width="25" fill="white" class="bi bi-trash3" viewbox="0 0 16 16">
+                                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                            <div id="name-col" class="col d-flex align-items-center border-end border-light-subtle">
+                                [[${member.getUser().getName()}]]
+                            </div>
+                            <div class="col d-flex align-items-center ps-4">
+                                Budget: [[${member.getBudget()}]]
+                            </div>
+                            <div id="indicator">
+                                <span class="dot" th:style="${member.getBalance()} >= 0 ? 'background: green' : 'background: red'"></span>
+                            </div>
+                            <div class="balance col d-flex align-items-center">
+                                [[${member.getBalance()}]] [[${group?.getCurrencyText()}]]
+                            </div>
+                        </div>
+                        <div class="row pt-4 pb-4">
+                            <button th:if="${group == null} or ${group?.isGroupAdmin(session.u)}" class="btn btn-func btn-primary rounded-pill fw-bold w-25" th:formaction="@{/group/{action}(action=${group != null} ? ${group?.getId()} + '/newMember' : 'newMember')}">Add Member</button>
+                            <button th:if="${group} != null" th:formaction="@{/group/{groupId}/leave(groupId=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Leave Group</button>
+                        </div>
                     </div>
                 </div>
-                <div class="rounded-corners border border-white">
-                    <!-- Dynamic member list with Thymeleaf -->
-                    <div class="row"></div>
-                    <div th:each="member : ${members}" class="row p-2 member">
-                        <div th:if="${group.isGroupAdmin(session.u)}" class="col btn-remove">
-                            <form method="post" th:action="@{/group/{groupId}/config(groupId=${group.getId()})}">
-                                <input type="hidden" name="removeId" th:value="${member.getUser().getId()}">
-                                <button type="submit" class="btn">
-                                    <svg id="trash" xmlns="http://www.w3.org/2000/svg" width="25" fill="white" class="bi bi-trash3" viewbox="0 0 16 16">
-                                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                        <div id="name-col" class="col d-flex align-items-center border-end border-light-subtle">
-                            [[${member.getUser().getName()}]]
-                        </div>
-                        <div class="col d-flex align-items-center ps-4">
-                            Budget: [[${member.getBudget()}]]
-                        </div>
-                        <div id="indicator">
-                            <span class="dot" th:style="${member.getBalance()} >= 0 ? 'background: green' : 'background: red'"></span>
-                        </div>
-                        <div class="balance col d-flex align-items-center">
-                            [[${member.getBalance()}]] [[${group?.getCurrencyText()}]]
-                        </div>
-                    </div>
-                    <div class="row pt-4 pb-4">
-                        <button th:if="${group == null} or ${group?.isGroupAdmin(session.u)}" class="btn btn-func btn-primary rounded-pill fw-bold w-25">Add Member</button>
-                        <button th:if="${group} != null" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Leave Group</button>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 

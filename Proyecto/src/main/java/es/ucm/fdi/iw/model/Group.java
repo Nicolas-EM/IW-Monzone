@@ -133,6 +133,19 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
         }
     }
 
+    public float getUserBalance(User u){
+        if(!isMember(u)){
+            return 0;
+        } else {
+            for(Member m : members){
+                if(m.getUser().getId() == u.getId()){
+                    return m.getBalance();
+                }
+            }
+        }
+        return 0;
+    }
+
     @Override
     public int compare(Group g1, Group g2) {
         return g1.getName().compareTo(g2.getName());
