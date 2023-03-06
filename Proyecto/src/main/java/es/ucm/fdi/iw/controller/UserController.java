@@ -123,6 +123,12 @@ public class UserController {
             groups.add(m.getGroup());
         }
         model.addAttribute("groups", groups);
+
+        List<String> currencies = new ArrayList<>();
+        for(Group.Currency g : Group.Currency.values()){
+            currencies.add(g.name());
+        }
+        model.addAttribute("currencies", currencies);
         return "user";
     }
 
@@ -167,7 +173,7 @@ public class UserController {
         // update user session so that changes are persisted in the session, too
         if (requester.getId() == target.getId()) {
             session.setAttribute("u", target);
-        }
+        }   
 
         return "user";
     }

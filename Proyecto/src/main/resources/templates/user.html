@@ -20,8 +20,8 @@
             <h2>Your Profile</h2>
           </div>
           <!-- Profile Pic -->
-          <div class="col-3">
-            <img th:src="@{/user/{id}/pic(id=${session.u.id})}" style="min-width: 60%;" class="rounded-circle border border-secondary">
+          <div class="col-3 d-flex align-items-center justify-content-center">
+            <img id="img-profile" th:src="@{/user/{id}/pic(id=${session.u.id})}" class="rounded-circle border border-secondary">
           </div>
           <!-- Displayname + username -->
           <div class="col-9">
@@ -39,6 +39,7 @@
             <div class="row">
               Do you want to change your password?
             </div>
+            <hr>
             <div class="row">
               <label for="oldPwd" class="form-label w-100">Old Password</label>
               <input id="oldPwd" type="text" class="rounded-corners mb-4 w-100">
@@ -49,8 +50,8 @@
             </div>
           </div>
           <!-- Save Btn -->
-          <div class="col-12">
-            <button type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Save</button>
+          <div class="col-12 d-flex align-items-center justify-content-center">
+            <button type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Change Password</button>
           </div>
         </div>
       </form>
@@ -58,44 +59,82 @@
       <!-- Stats -->
       <div class="col">
         <div class="row gy-2">
-          <h3>Your Stats</h3>
+          <h2>Your Stats</h2>
         </div>
         <!-- Monthly Expenses -->
         <div class="row">
           <h4>Monthly Expenses</h4>
+          <div class="col-3">
+            <select id="form" class="form-select rounded-corners" required name="currId">
+              <option th:unless="${group != null}" selected disabled hidden value="">Month</option>
+              <div th:each="curr,i : ${currencies}">
+                <option th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
+              </div>
+            </select>
+          </div>
+          <div class="col-3">
+            <select id="form" class="form-select rounded-corners" required name="currId">
+              <option th:unless="${group != null}" selected disabled hidden value="">Year</option>
+              <div th:each="curr,i : ${currencies}">
+                <option th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
+              </div>
+            </select>
+          </div>
+          <div class="col-3">
+            <select id="form" class="form-select rounded-corners" required name="currId">
+              <option th:unless="${group != null}" selected disabled hidden value="">Currency</option>
+              <div th:each="curr,i : ${currencies}">
+                <option th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
+              </div>
+            </select>
+          </div>
+          <div class="col-3">
+            <label id="total-exp" class="rounded-corners align-items-center w-100 bg-white">100€</label>
+          </div>
         </div>
         <!-- Categories -->
         <div class="row">
-          <h4>Categories</h4>
+          <div class="col-8">
+            <h4>Categories</h4>
+          </div>
+          <div class="col-4">
+            <select class="form-select rounded-corners" required name="currId">
+              <option th:unless="${group != null}" selected disabled hidden value="">Currency</option>
+              <div th:each="curr,i : ${currencies}">
+                <option th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
+              </div>
+            </select>
+          </div>
+
         </div>
         <!-- Thymeleaf categories -->
-        <div class="row row-cols-1 row-cols-lg-auto">
+        <div class="row row-cols-1 row-cols-lg-auto justify-content-center">
           <div th:each="type: ${types}">
-            <div class="col">
-              <img th:src="@{/img/type/{id}.png(id=${type.getId()})}" src="/img/type/error.png" alt="Category Icon" width="auto" height="50">
-              <p>Amount</p>
+            <div class="col align-items-center justify-content-center">
+              <img class="separator" th:src="@{/img/type/{id}.png(id=${type.getId()})}" src="/img/type/error.png" alt="Category Icon" width="auto" height="50">
+              <p id="amount">10€</p>
             </div>
           </div>
         </div>
         <!-- Groups -->
         <div class="row">
           <h4>Your Groups</h4>
-          </div>
-          <div class="groups p-2">
-            <div th:each="group: ${groups}">
-              <div class="row mb-3">
-                <div class="card text-white bg-warning h-100 mx-auto">
-                  <div class="card-header">
-                    <h5>[[${group.getName()}]]</h5>
-                  </div>
-                  <div class="card-body">
-                    <td th:text="${group.getDesc()}" class="card-title">Grupo para los gastos del finde</td>
-                  </div>
+        </div>
+        <div class="groups p-2">
+          <div th:each="group: ${groups}">
+            <div class="row mb-3">
+              <div class="card text-white bg-warning h-100 mx-auto">
+                <div class="card-header">
+                  <h5>[[${group.getName()}]]</h5>
+                </div>
+                <div class="card-body">
+                  <td th:text="${group.getDesc()}" class="card-title">Grupo para los gastos del finde</td>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
     </div>
   </main>
 
