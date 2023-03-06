@@ -1,37 +1,47 @@
 Feature: flujo de la app
-  @login
-  Scenario: Flujo
-  # Login b
-    Given driver baseUrl + '/login'
-    Then waitForUrl(baseUrl + '/login')
-    And input('#username', 'b')
-    And input('#password', 'aa')
-    When submit().click(".form-signin button")
-    Then waitForUrl(baseUrl + '/user/')
-  # Entrar a grupo
+  
+  @group
+  Scenario: Entrar a grupo
+    Given call read('login.feature@login_b')
+    And driver baseUrl + '/user/'
+    And delay(250)
     When submit().click(".card")
     Then waitForUrl(baseUrl + '/group/2')
-  # Entrar a gasto
-    When submit().click(".card")
-    Then waitForUrl(baseUrl + '/group/2/99')
-  # Añadir gasto
-    #Given driver baseUrl + '/group/2'
-    #When submit().click(".button-add-expense button")
-    #Then waitForUrl(baseUrl + '/group/2/new')
-    # mas cosas
-  # Entrar configuración de grupo
-    When submit().click(".navbar-brand")
-    Then waitForUrl(baseUrl + '/user/')
-    When submit().click(".card")
-    Then waitForUrl(baseUrl + '/group/2')
+
+  @group_config
+  Scenario: Configuracion grupo
+    Given call read('principal.feature@group')
+    And driver baseUrl + '/group/2'
+    And delay(250)
     When submit().click("#groupConfigBtn")
     Then waitForUrl(baseUrl + '/group/2/config')
-  # Eliminar usuario si eres moderador
 
-  # Acceder a perfil de usuario
+  @group_viewExpense
+  Scenario: View expense in group
+    Given call read('principal.feature@group')
+    And driver baseUrl + '/group/2'
+    And delay(250)
+    When submit().click(".card")
+    Then waitForUrl(baseUrl + '/group/2/99')
+
+  @group_addExpense
+  Scenario: Add expense to group
+    Given call read('principal.feature@group')
+    And driver baseUrl + '/group/2'
+    And delay(250)
+    When submit().click("#addExpense")
+    Then waitForUrl(baseUrl + '/group/2/new')
+    And input('#name', 'Karate Expense')
+    And input('#desc', 'Auto generated description')
+    And input('#date', '01-01-2023')
+    And input('#amount', '42')
+    # TODO seleccionar paidby y type --> hacer submit
+    Then delay(100)
+
+  @profile
+  Scenario: View profile
+    Given call read('login.feature@login_b')
+    And driver baseUrl + '/user/'
+    And delay(250)
     When submit().click("#profile")
     Then waitForUrl(baseUrl + '/user/config')
-
-  # Log out
-    When submit().click("#logoutForm a")
-    Then waitForUrl(baseUrl + '/login')

@@ -24,13 +24,13 @@
         <div class="col">
           <div>
             <label for="name" class="form-label w-100">Name</label>
-            <input name="name" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getName()}">
+            <input id="name" name="name" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getName()}">
             <label for="desc" class="form-label w-100">Description (optional)</label>
             <textarea id="desc" name="desc" class="rounded-corners form-control" rows="5">[[${expense?.getDesc()}]]</textarea>
             <label for="date" class="form-label mt-4 w-100">Date</label>
-            <input type="date" name="dateString" class="rounded-corners w-100" required="required" th:value="${expense?.getDate()}">
+            <input id="date" type="date" name="dateString" class="rounded-corners w-100" required="required" th:value="${expense?.getDate()}">
             <label for="amount" class="form-label mt-4 w-100">Amount (€)</label>
-            <input name="amount" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getAmount()}">
+            <input id="amount" name="amount" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getAmount()}">
           </div>
         </div>
         <!-- Advanced info -->
