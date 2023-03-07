@@ -2,19 +2,15 @@ package es.ucm.fdi.iw.controller;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Comparator;
 
-import javax.persistence.Embeddable;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import javax.persistence.EntityTransaction;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,6 +37,7 @@ import es.ucm.fdi.iw.model.OwnsID;
 import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.Group.Currency;
+import es.ucm.fdi.iw.model.Member.GroupRole;
 import es.ucm.fdi.iw.model.Debt;
 
 /**
@@ -59,6 +56,9 @@ public class GroupController {
 
     @Autowired
     private LocalData localData;
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request") // 400
+    public static class BadRequestExpection extends RuntimeException {}
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The group doesn't exist or has been removed") // 403
     public static class GroupNotExistException extends RuntimeException {}
@@ -130,9 +130,10 @@ public class GroupController {
 
         List<Expense> expenses = new ArrayList<>();
         for (Owns o : group.getOwns()) {
-            Expense e = o.getExpense();
-            if (true)
+            if (o.isEnabled()){
+                Expense e = o.getExpense();
                 expenses.add(e);
+            }
         }
         model.addAttribute("expenses", expenses);
         model.addAttribute("groupId", id);
@@ -158,11 +159,7 @@ public class GroupController {
 
         model.addAttribute("group", group);
 
-        List<Member> members = new ArrayList<>();
-        for (Member m : group.getMembers()) {
-            if (m.isEnabled() && m.getUser().isEnabled()) 
-                members.add(m);
-            }
+        List<Member> members = entityManager.createNamedQuery("Member.getByGroupId", Member.class).setParameter("groupId", id).getResultList();
         model.addAttribute("members", members);
 
         List<String> currencies = new ArrayList<>();
@@ -197,20 +194,55 @@ public class GroupController {
             throw new NoModeratorException();
         }
 
-        List<User> members = new ArrayList<>();
-        for (Member m : group.getMembers()) {
-            if (m.isEnabled() && m.getUser().getId() == removeId){
-                m.setEnabled(false);
-            }
-            else if(m.isEnabled() && m.getUser().isEnabled())
-                members.add(m.getUser());
-        }
-        model.addAttribute("groupMembers", members);
         return config(id, model, session);
     }
 
     /**
-     * Remove member
+     * Add member
+     */
+    @Transactional
+    @PostMapping("{id}/addMember")
+    public String addMember(@PathVariable long id, Model model, HttpSession session, @RequestParam(required = true) long userId) {
+        User requestingUser = (User) session.getAttribute("u");
+        
+        // check if group exists
+        Group group = entityManager.find(Group.class, id);
+        if (group == null || !group.isEnabled())
+            throw new GroupNotExistException();
+
+        // check if user belongs to the group        
+        if (!group.isMember(requestingUser)) {
+            throw new NoMemberException();
+        }
+
+        // only moderators can add other members
+        if (!group.isGroupAdmin(requestingUser)) {
+            throw new NoModeratorException();
+        }
+
+        // check if user to add exists
+        User u = entityManager.find(User.class, userId);
+        if(u == null){
+            throw new BadRequestExpection();
+        }
+
+        Member m = entityManager.createNamedQuery("Member.getById", Member.class).setParameter("groupId", id).setParameter("userId", userId).getSingleResult();
+
+        if(m != null && !m.isEnabled()){
+            m.setEnabled(true);
+        }
+        else{
+            m = new Member(new MemberID(group.getId(), userId), true, GroupRole.GROUP_USER, 0, userId, group, u);
+            entityManager.persist(m);
+        }
+
+        List<Member> members = entityManager.createNamedQuery("Member.getByGroupId", Member.class).setParameter("groupId", id).getResultList();
+        model.addAttribute("members", members);
+        return config(id, model, session);
+    }
+
+    /**
+     * Leave group
      */
     @Transactional
     @PostMapping("{id}/leave")
@@ -243,11 +275,11 @@ public class GroupController {
     }
 
     private void setExpenseAttributes(Group group, long expenseId, Model model, boolean newExpense) {
-        List<User> members = new ArrayList<>();
+        List<User> users = new ArrayList<>();
         for (Member m : group.getMembers()) {
-            members.add(m.getUser());
+            users.add(m.getUser());
         }
-        model.addAttribute("groupMembers", members);
+        model.addAttribute("groupUsers", users);
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
         model.addAttribute("types", types);
