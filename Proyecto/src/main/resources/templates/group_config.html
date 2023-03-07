@@ -54,8 +54,8 @@
                     <div class="rounded-corners border border-white">
                         <!-- Dynamic member list with Thymeleaf -->
                         <div class="row">
-                            <div th:each="member : ${members}" class="row p-2 member">
-                                <th:block th:if="${member.isEnabled()}">
+                            <th:block th:each="member : ${members}">
+                                <div th:if="${member.isEnabled()}" class="row p-2 member">
                                     <div th:if="${group.isGroupAdmin(session.u)}" class="col btn-remove">
                                         <form method="post" th:action="@{/group/{groupId}/removeMember(groupId=${group.getId()})}">
                                             <input type="hidden" name="removeId" th:value="${member.getUser().getId()}">
@@ -78,11 +78,8 @@
                                     <div class="balance col d-flex align-items-center">
                                         [[${member.getBalance()}]] [[${group?.getCurrencyText()}]]
                                     </div>
-                                </th:block>
-                                <th:block th:unless="${member.isEnabled()}">
-                                    <button>AAAAAAAAAAAAA</button>
-                                </th:block>
-                            </div>
+                                </div>
+                            </th:block>
                         </div>
                         <div class="row pt-4 pb-4">
                             <button th:if="${group == null} or ${group?.isGroupAdmin(session.u)}" class="btn btn-func btn-primary rounded-pill fw-bold w-25" th:formaction="@{/group/{action}(action=${group != null} ? ${group?.getId()} + '/newMember' : 'newMember')}">Add Member</button>

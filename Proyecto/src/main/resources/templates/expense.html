@@ -39,8 +39,10 @@
           <label for="paidby" class="form-label w-100">Paid by</label>
           <select class="form-select rounded-corners" name="paidById" required>
             <option th:unless="${expense != null}" selected disabled hidden value="">Select Payer</option>
-            <div th:each="user: ${groupUsers}">
-              <option th:value="${user.getId()}" th:selected="${expense?.getPaidBy()?.getId() == user.getId()}? true : false">[[${user.getName()}]]</option>
+            <div th:each="member: ${members}">
+              <th:block th:if="${member.isEnabled()}" th:with="user=${member.getUser()}">
+                <option th:value="${user.getId()}" th:selected="${expense?.getPaidBy()?.getId() == user.getId()}? true : false">[[${user.getName()}]]</option>
+              </th:block>
             </div>
           </select>
           <!-- Dropdown type -->
@@ -55,14 +57,16 @@
           <label for="for-whom" class="form-label mt-3 w-100">For whom</label>
           <div id="for-whom" class="border border-white rounded-corners">
             <ul class="mt-3 mb-3">
-              <div th:each="user: ${groupUsers}">
-                <li>
-                  <div class="form-check">
-                    <input class="check-box form-check-input" type="checkbox" value="" checked>
-                    <label class="form-check-label" for="flexCheckDefault">[[${user.getName()}]]</label>
-                    <label class="split">14.50€</label>
-                  </div>
-                </li>
+              <div th:each="member: ${members}">
+                <th:block th:if="${member.isEnabled()}">
+                  <li>
+                    <div class="form-check">
+                      <input class="check-box form-check-input" type="checkbox" value="" checked>
+                      <label class="form-check-label" for="flexCheckDefault">[[${member.getUser().getName()}]]</label>
+                      <label class="split">14.50€</label>
+                    </div>
+                  </li>
+                </th:block>
               </div>
             </ul>
           </div>

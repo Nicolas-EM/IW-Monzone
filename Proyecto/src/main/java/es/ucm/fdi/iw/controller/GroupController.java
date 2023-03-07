@@ -275,11 +275,8 @@ public class GroupController {
     }
 
     private void setExpenseAttributes(Group group, long expenseId, Model model, boolean newExpense) {
-        List<User> users = new ArrayList<>();
-        for (Member m : group.getMembers()) {
-            users.add(m.getUser());
-        }
-        model.addAttribute("groupUsers", users);
+        List<Member> members = entityManager.createNamedQuery("Member.getByGroupId", Member.class).setParameter("groupId", group.getId()).getResultList();
+        model.addAttribute("members", members);
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
         model.addAttribute("types", types);
