@@ -13,15 +13,12 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name="IWOwns")
-public class Owns {
+@Table(name="IWParticipates")
+public class Participates {
 
-    @EmbeddedId private OwnsID bId;
+    @EmbeddedId private ParticipatesID pId;
 
-    @Column(nullable = false)
-    private boolean enabled;
-    
-	@ManyToOne
+    @ManyToOne
     private Group group;
 
     @ManyToOne

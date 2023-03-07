@@ -2,3 +2,7 @@
     max-width: 20rem;
     max-height: 10rem;
 }
+
+.colscroll{
+    overflow-y: scroll;
+}

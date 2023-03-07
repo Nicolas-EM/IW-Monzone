@@ -14,23 +14,23 @@
 
     <!-- Body - Group cards -->
     <main class="container-fluid my-4">
-        <!-- Dynamic groups with Thymeleaf -->
-        <div id="home_groups" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 g-4 gy-4 align-items-center">
-            <div th:each="group: ${groups}">
-                <div class="col">
-                    <div class="card text-white bg-warning h-100 mx-auto" role="button" th:onclick="|location.href='/group/${group.getId()}'|" tabindex="0">
-                        <div class="card-header"><h5>[[${group.getName()}]]</h5></div>
-                        <div class="card-body">
-                            <td th:text="${group.getDesc()}" class="card-title">Grupo para los gastos del finde</td>
+            <!-- Dynamic groups with Thymeleaf -->
+            <div id="home_groups" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 g-4 gy-4 align-items-center">
+                <div th:each="group: ${groups}">
+                    <div class="col">
+                        <div class="card text-white bg-warning h-100 mx-auto" role="button" th:onclick="|location.href='/group/${group.getId()}'|" tabindex="0">
+                            <div class="card-header"><h5>[[${group.getName()}]]</h5></div>
+                            <div class="card-body">
+                                <td th:text="${group.getDesc()}" class="card-title">[[${group.getDesc()}]]</td>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- newGroupBtn -->
-            <div class="col text-center">
-                <button class="btn-lg btn-warning" th:onclick="|location.href='/group/new'|"><i class="fa fa-plus"></i></button></h3>
-            </div>
-        </div>        
+                <!-- newGroupBtn -->
+                <div class="col text-center">
+                    <button class="btn-lg btn-warning" th:onclick="|location.href='/group/new'|"><i class="fa fa-plus"></i></button></h3>
+                </div>
+            </div> 
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />

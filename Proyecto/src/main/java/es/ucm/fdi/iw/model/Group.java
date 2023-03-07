@@ -10,6 +10,7 @@ import javax.persistence.*;
 import es.ucm.fdi.iw.model.Member.GroupRole;
 import es.ucm.fdi.iw.model.User.Role;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -60,13 +61,22 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
     private Currency currency;
 
     @OneToMany(mappedBy = "group")
-    private List<Member> members;
+    private List<Member> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "group")
-    private List<Owns> owns;
+    private List<Participates> owns = new ArrayList<>();
 
     @OneToMany(mappedBy = "group")
-    private List<Debt> debts;
+    private List<Debt> debts = new ArrayList<>();
+
+    public Group(String name, String desc, Currency currency){
+        this.enabled = true;
+        this.name = name;
+        this.desc = desc;
+        this.currency = currency;
+        this.totBudget = 0;
+        this.numMembers = 0;
+    }
 
     @Getter
     @Data
@@ -91,31 +101,9 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
         return toTransfer().toString();
     }
 
-    public Boolean isMember(User u) {
-        if (isGroupAdmin(u))
-            return true;
-        for (Member m : members) {
-            if (m.isEnabled() && m.getUser().getUsername().equals(u.getUsername()))
-                return true;
-        }
-        return false;
-    }
-
-    public boolean isGroupAdmin(User u) {
-        if (u.hasRole(Role.ADMIN))
-            return true;
-        for (Member m : members) {
-            if (m.getUser().getId() == u.getId() && m.getRole().equals(GroupRole.GROUP_MODERATOR))
-                return true;
-            else
-                log.warn("User {}, Group {}, Role {}", u.getUsername(), id, m.getRole());
-        }
-        return false;
-    }
-
     public boolean hasExpense(Expense e) {
-        for (Owns o : owns)
-            if (o.isEnabled() && o.getExpense().getId() == e.getId())
+        for (Participates p : owns)
+            if (p.getExpense().getId() == e.getId())
                 return true;
         return false;
     }
@@ -133,21 +121,12 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
         }
     }
 
-    public float getUserBalance(User u){
-        if(!isMember(u)){
-            return 0;
-        } else {
-            for(Member m : members){
-                if(m.getUser().getId() == u.getId()){
-                    return m.getBalance();
-                }
-            }
-        }
-        return 0;
-    }
-
     @Override
     public int compare(Group g1, Group g2) {
         return g1.getName().compareTo(g2.getName());
+    }
+
+    public void addMember(Member m){
+        this.members.add(m);
     }
 }

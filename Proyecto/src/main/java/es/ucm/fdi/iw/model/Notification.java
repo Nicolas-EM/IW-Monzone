@@ -29,8 +29,7 @@ public class Notification implements Transferable<Notification.Transfer> {
     @Column(nullable = false)
     private String desc;
     
-    @Column(nullable = false)
-    private boolean read;
+    private LocalDateTime read;
     
     @Column(nullable = false)
     private boolean actionRequired;
@@ -47,7 +46,7 @@ public class Notification implements Transferable<Notification.Transfer> {
     public static class Transfer {
         private long id;
         private String desc;
-        private boolean read;
+        private LocalDateTime read;
         private boolean actionRequired;
         private LocalDateTime date;
         private long idUser;

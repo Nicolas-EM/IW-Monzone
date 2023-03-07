@@ -64,21 +64,8 @@
         <!-- Monthly Expenses -->
         <div class="row">
           <h4>Monthly Expenses</h4>
-          <div class="col-3">
-            <select id="form" class="form-select rounded-corners" required name="currId">
-              <option th:unless="${group != null}" selected disabled hidden value="">Month</option>
-              <div th:each="curr,i : ${currencies}">
-                <option th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
-              </div>
-            </select>
-          </div>
-          <div class="col-3">
-            <select id="form" class="form-select rounded-corners" required name="currId">
-              <option th:unless="${group != null}" selected disabled hidden value="">Year</option>
-              <div th:each="curr,i : ${currencies}">
-                <option th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
-              </div>
-            </select>
+          <div class="col-6">
+            <input id="date" type="month" name="dateString" class="rounded-corners w-100">
           </div>
           <div class="col-3">
             <select id="form" class="form-select rounded-corners" required name="currId">
@@ -121,17 +108,27 @@
           <h4>Your Groups</h4>
         </div>
         <div class="groups p-2">
-          <div th:each="group: ${groups}">
-            <div class="row mb-3">
+          <div th:each="member: ${memberOf}">
+            <th:block th:with="groupName=${member.getGroup().getName()}">
               <div class="card text-white bg-warning h-100 mx-auto">
-                <div class="card-header">
-                  <h5>[[${group.getName()}]]</h5>
-                </div>
-                <div class="card-body">
-                  <td th:text="${group.getDesc()}" class="card-title">Grupo para los gastos del finde</td>
-                </div>
+                <label class="rounded-corners align-items-center w-100">
+                  <div class="row">
+                    <div class="col-3">
+                      [[${groupName}]]
+                    </div>
+                    <div class="col-4">
+                      Your budget: [[${member.getBudget()}]][[${member.getGroup().getCurrencyText()}]]
+                    </div>
+                    <div id="indicator" class="col-2">
+                      <span class="dot" th:style="${member.getBalance()} >= 0 ? 'background: green' : 'background: red'"></span>
+                     
+                      [[${member.getBalance()}]][[${member.getGroup().getCurrencyText()}]]
+
+                    </div>
+                  </div>
+                </label>
               </div>
-            </div>
+            </th:block>
           </div>
         </div>
       </div>

@@ -72,11 +72,11 @@ FROM (
 ) AS t;
 
 -- Generate fixed
-INSERT INTO IWOwns (USER_ID, EXPENSE_ID, GROUP_ID, enabled) VALUES (2, 99, 2, true);
+INSERT INTO IWParticipates (USER_ID, EXPENSE_ID, GROUP_ID) VALUES (2, 99, 2);
 
--- Generate random owns relations
-INSERT INTO IWOwns (USER_ID, EXPENSE_ID, GROUP_ID, enabled)
-SELECT USER_ID, ID, GROUP_ID, true
+-- Generate random participates relations
+INSERT INTO IWParticipates (USER_ID, EXPENSE_ID, GROUP_ID)
+SELECT USER_ID, ID, GROUP_ID
 FROM IWExpense e
 INNER JOIN IWMember m ON e.PAID_BY_ID = m.USER_ID WHERE e.id <> 99;
 

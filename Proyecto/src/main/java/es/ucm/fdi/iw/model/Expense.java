@@ -55,7 +55,7 @@ public class Expense implements Transferable<Expense.Transfer>, Comparator<Expen
     private User paidBy;
 
     @OneToMany(mappedBy = "expense")
-    private List<Owns> belong;
+    private List<Participates> belong;
 
     @Data
     @NoArgsConstructor

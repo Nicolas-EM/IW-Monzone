@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,20 +54,20 @@ public class User implements Transferable<User.Transfer> {
     @Column(nullable = false)
     private String roles; // split by ',' to separate roles
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-    private List<Member> memberOf;
+    @OneToMany(fetch= FetchType.EAGER, mappedBy = "user")
+    private List<Member> memberOf = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Notification> notifications;
+    private List<Notification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Owns> expenses;
+    private List<Participates> expenses = new ArrayList<>();
 
     @OneToMany(mappedBy = "debtor")
-    private List<Debt> debts;
+    private List<Debt> debts = new ArrayList<>();
 
     @OneToMany(mappedBy = "debtOwner")
-    private List<Debt> debtsOwned;
+    private List<Debt> debtsOwned = new ArrayList<>();
 
     /**
      * Checks whether this user has a given role.
@@ -107,6 +108,10 @@ public class User implements Transferable<User.Transfer> {
             return false;
 
         return id == ((User) o).getId();
+    }
+
+    public void addMemberOf(Member m){
+        this.memberOf.add(m);
     }
 }
 
