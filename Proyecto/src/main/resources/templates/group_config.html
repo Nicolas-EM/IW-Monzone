@@ -35,9 +35,9 @@
                         <label id="budget" class="rounded-corners w-100 bg-white">[[${group?.getCurrencyText()}]] [[${group?.getTotBudget()}]]</label>
                     </div>
                     <div class="row mt-5 w-100">
-                        <button th:if="${group == null} or ${isGroupAdmin}" th:formmethod="post" th:form="groupForm" type="submit" class="btn btn-func btn-primary rounded-pill fw-bold w-25">Save</button>
+                        <button th:if="${group == null} or ${isGroupAdmin}" th:formaction="@{/group/{action}(action=${group == null} ? 'newGroup' : ${group?.getId()} + '/updateGroup')}" type="submit" class="btn btn-func btn-primary rounded-pill fw-bold w-25">Save</button>
                         <button th:if="${group == null}" th:onclick="|location.href='/user/'|" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Cancel</button>
-                        <button th:if="${group != null} and ${isGroupAdmin}" th:formaction="@{/group/{id}/delete(id=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Delete Group</button>
+                        <button th:if="${group != null} and ${isGroupAdmin}" th:formaction="@{/group/{id}/delGroup(id=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Delete Group</button>
                     </div>
                 </div>
                 <!-- Col members -->
