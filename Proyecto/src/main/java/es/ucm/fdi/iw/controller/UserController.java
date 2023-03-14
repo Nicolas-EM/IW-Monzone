@@ -6,6 +6,8 @@ import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Type;
+import es.ucm.fdi.iw.model.Notification;
+import es.ucm.fdi.iw.model.Transferable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,6 +38,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 
 /**
@@ -94,6 +97,12 @@ public class UserController {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(token); // base64 encoding
     }
 
+    /*
+     * 
+     *  GET MAPPINGS
+     * 
+    */
+
     /**
      * Landing page for a user profile
      */
@@ -101,13 +110,18 @@ public class UserController {
     public String index(Model model, HttpSession session) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
+
         List<Member> memberOf = user.getMemberOf();
+
         List<Group> groups = new ArrayList<>();
         for (Member m : memberOf) {
             if(m.isEnabled())
                 groups.add(m.getGroup());
         }
+
+        model.addAttribute("memberOf", memberOf);
         model.addAttribute("groups", groups);
+
         return "home";
     }
 
@@ -134,6 +148,65 @@ public class UserController {
         model.addAttribute("currencies", currencies);
         return "user";
     }
+
+    /**
+     * Returns JSON with all received messages
+     */
+    @GetMapping(path = "receivedNotifs", produces = "application/json")
+	@Transactional // para no recibir resultados inconsistentes
+	@ResponseBody  // para indicar que no devuelve vista, sino un objeto (jsonizado)
+	public List<Notification.Transfer> retrieveMessages(HttpSession session) {
+		long userId = ((User)session.getAttribute("u")).getId();		
+		User u = entityManager.find(User.class, userId);
+		log.info("Generating notification list for user {} ({} notifications)",  u.getUsername(), u.getNotifications().size());
+		return u.getNotifications().stream().map(Transferable::toTransfer).collect(Collectors.toList());
+	}
+
+    /**
+     * Returns JSON with count of unread messages 
+     */
+	@GetMapping(path = "unread", produces = "application/json")
+	@ResponseBody
+	public String checkUnread(HttpSession session) {
+		long userId = ((User)session.getAttribute("u")).getId();		
+		long unread = entityManager.createNamedQuery("Notification.countUnread", Long.class)
+			.setParameter("userId", userId)
+			.getSingleResult();
+		session.setAttribute("unread", unread);
+		return "{\"unread\": " + unread + "}";
+    }
+
+    /**
+     * Returns the default profile pic
+     * 
+     * @return
+     */
+    private static InputStream defaultPic() {
+        return new BufferedInputStream(Objects.requireNonNull(
+                UserController.class.getClassLoader().getResourceAsStream(
+                        "static/img/profile/default-profile.png")));
+    }
+
+    /**
+     * Downloads a profile pic for a user id
+     * 
+     * @param id
+     * @return
+     * @throws IOException
+     */
+    @GetMapping("{id}/pic")
+    public StreamingResponseBody getPic(@PathVariable long id) throws IOException {
+        File f = localData.getFile("user", "" + id + ".jpg");
+        InputStream in = new BufferedInputStream(f.exists() ? new FileInputStream(f) : UserController.defaultPic());
+        return os -> FileCopyUtils.copy(in, os);
+    }
+
+
+    /*
+     * 
+     *  POST MAPPINGS
+     * 
+    */
 
     /**
      * Alter or create a user
@@ -178,31 +251,6 @@ public class UserController {
         }   
 
         return "user";
-    }
-
-    /**
-     * Returns the default profile pic
-     * 
-     * @return
-     */
-    private static InputStream defaultPic() {
-        return new BufferedInputStream(Objects.requireNonNull(
-                UserController.class.getClassLoader().getResourceAsStream(
-                        "static/img/profile/default-profile.png")));
-    }
-
-    /**
-     * Downloads a profile pic for a user id
-     * 
-     * @param id
-     * @return
-     * @throws IOException
-     */
-    @GetMapping("{id}/pic")
-    public StreamingResponseBody getPic(@PathVariable long id) throws IOException {
-        File f = localData.getFile("user", "" + id + ".jpg");
-        InputStream in = new BufferedInputStream(f.exists() ? new FileInputStream(f) : UserController.defaultPic());
-        return os -> FileCopyUtils.copy(in, os);
     }
 
     /**

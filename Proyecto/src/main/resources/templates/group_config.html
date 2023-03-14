@@ -41,7 +41,7 @@
                     </div>
                 </div>
                 <!-- Col members -->
-                <div class="col">
+                <div th:if="${group != null}" class="col">
                     <div id="ini-row" class="row">
                         <div id="ini">
                             <h3 class="mb-3">Members</h3>
@@ -84,8 +84,8 @@
                             </th:block>
                         </div>
                         <div class="row pt-4 pb-4">
-                            <button th:if="${group == null} or ${isGroupAdmin}" class="btn btn-func btn-primary rounded-pill fw-bold w-25" th:formaction="@{/group/{action}(action=${group != null} ? ${group?.getId()} + '/newMember' : 'newMember')}">Add Member</button>
-                            <button th:if="${group} != null" th:formaction="@{/group/{groupId}/leave(groupId=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Leave Group</button>
+                            <button id="inviteBtn" th:if="${isGroupAdmin}" class="btn btn-func btn-primary rounded-pill fw-bold w-25" th:formaction="@{/group/{action}(action=${group?.getId()} + '/inviteMember')}">Invite a Friend</button>
+                            <button th:formaction="@{/group/{groupId}/leave(groupId=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Leave Group</button>
                         </div>
                     </div>
                 </div>
@@ -94,6 +94,7 @@
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />
+    <script th:src="@{/js/group.js}"></script>
 </body>
 
 </html>

@@ -6,3 +6,18 @@
 .colscroll{
     overflow-y: scroll;
 }
+
+.height{
+    height: 7vh;
+}
+
+.rounded-corners {
+    height: 4vh;
+    border-radius: 8px;
+    padding-top:2px;
+}
+
+.numPersons{
+    margin-left: 4px;
+    float : right;
+}

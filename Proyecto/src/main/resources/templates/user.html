@@ -65,7 +65,7 @@
         <div class="row">
           <h4>Monthly Expenses</h4>
           <div class="col-6">
-            <input id="date" type="month" name="dateString" class="rounded-corners w-100">
+            <input id="date" type="month" name="dateString" class="rounded-corners w-100" value="2023-03">
           </div>
           <div class="col-3">
             <select id="form" class="form-select rounded-corners" required name="currId">
@@ -76,19 +76,20 @@
             </select>
           </div>
           <div class="col-3">
+            <!--esto tiene que ser el resultado de la query que te da lo que se ha gastado en todo ese mes-->
             <label id="total-exp" class="rounded-corners align-items-center w-100 bg-white">100€</label>
           </div>
         </div>
         <!-- Categories -->
         <div class="row">
           <div class="col-8">
-            <h4>Categories</h4>
+            <h4>How much do you spend in each category?</h4>
           </div>
           <div class="col-4">
-            <select class="form-select rounded-corners" required name="currId">
-              <option th:unless="${group != null}" selected disabled hidden value="">Currency</option>
+            <select id="cur2" class="form-select rounded-corners" required name="currId">
+              <option  th:unless="${group != null}" selected disabled hidden value="">Currency</option>
               <div th:each="curr,i : ${currencies}">
-                <option th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
+                <option id="curValue2"  th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
               </div>
             </select>
           </div>
@@ -99,7 +100,8 @@
           <div th:each="type: ${types}">
             <div class="col align-items-center justify-content-center">
               <img class="separator" th:src="@{/img/type/{id}.png(id=${type.getId()})}" src="/img/type/error.png" alt="Category Icon" width="auto" height="50">
-              <p id="amount">10€</p>
+              <!--eso cambiarlo por el valor que calcules para cada categoria-->
+              <p class="amount">10 <span class="curr">€</span></p>
             </div>
           </div>
         </div>
@@ -136,6 +138,8 @@
   </main>
 
   <th:block th:replace="fragments/footer.html :: footer" />
+  <!-- Ajax para cambio de campos-->
+  <script th:src="@{/js/ajax-userQueries.js}"></script>
 </body>
 
 </html>

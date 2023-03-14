@@ -80,6 +80,10 @@ SELECT USER_ID, ID, GROUP_ID
 FROM IWExpense e
 INNER JOIN IWMember m ON e.PAID_BY_ID = m.USER_ID WHERE e.id <> 99;
 
+-- Generate notifications fixed
+INSERT INTO IWNotification (ID, DATE_READ, DATE_SENT, MSG, TYPE, USER_ID)
+VALUES (1, null, DATEADD('DAY', -FLOOR(RAND() * 30), '2023-03-04'), 'Notif 1', 0, 2),
+        (2, null, DATEADD('DAY', -FLOOR(RAND() * 30), '2023-03-04'), 'Notif 2', 1, 2);
 
 -- start id numbering from a value that is larger than any assigned above
 ALTER SEQUENCE "PUBLIC"."GEN" RESTART WITH 1024;

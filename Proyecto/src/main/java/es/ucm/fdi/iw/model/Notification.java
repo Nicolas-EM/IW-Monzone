@@ -15,46 +15,62 @@ import java.time.format.DateTimeFormatter;
  * Notifications of the system.
  */
 @Entity
+@Inheritance (strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@NamedQueries({
+	@NamedQuery(name="Notification.countUnread",
+	query="SELECT COUNT(n) FROM Notification n "
+			+ "WHERE n.user.id = :userId AND n.dateRead = null")
+})
 @Table(name="IWNotification")
 public class Notification implements Transferable<Notification.Transfer> {
     
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen")
     @SequenceGenerator(name = "gen", sequenceName = "gen")
-	private long id;
+	protected long id;
+
+    public enum NotificationType {
+        BASIC,
+        INVITATION,
+        BUDGET_WARNING,
+        DEBT_WARNING
+    }
 
     @Column(nullable = false)
-    private String desc;
+    protected String msg;
     
-    private LocalDateTime read;
+    protected LocalDateTime dateRead;
     
     @Column(nullable = false)
-    private boolean actionRequired;
+    protected NotificationType type;
     
     @Getter(AccessLevel.NONE)
     @Column(nullable = false)
-    private LocalDateTime date;
+    protected LocalDateTime dateSent;
 
     @ManyToOne
-    private User user;
+    protected User user;
   
     @AllArgsConstructor
     @Data
     public static class Transfer {
         private long id;
-        private String desc;
+        private String msg;
         private LocalDateTime read;
-        private boolean actionRequired;
+        private NotificationType type;
         private LocalDateTime date;
         private long idUser;
+        private boolean accepted;
+        private long idGroup;
+        private long idSender;
     }
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(id, desc, read, actionRequired, date, user.getId());
+		return new Transfer(id, msg, dateRead, type, dateSent, user.getId(), false, -1, -1);
 	}
 	
 	@Override
@@ -64,7 +80,7 @@ public class Notification implements Transferable<Notification.Transfer> {
 
     public String getDate(){
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");  
-        return date.format(format);  
+        return dateSent.format(format);  
     }
 
 }
