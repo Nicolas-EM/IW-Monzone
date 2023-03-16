@@ -125,6 +125,7 @@ public class GroupController {
         model.addAttribute("expenses", expenses);
         model.addAttribute("debts", debts);
         model.addAttribute("groupId", groupId);
+        model.addAttribute("group", group);
         return "group";
 
     }

@@ -17,12 +17,12 @@
         <!-- TODO: title no es responsive en pantallas muy pequeñas... y creo que no está centrado -->
         <div class="row">
             <div class="col align-self-center text-center">
-                <h3><strong>GASTOS PISO</strong></h3>
+                <h3><strong>[[${group.getName()}]]</strong></h3>
             </div>
         </div>
         <div class="row">
             <div class="col align-self-center text-center">
-                <h7 id="description">Grupo para los gastos del piso</h7>
+                <h7 id="description">[[${group.getDesc()}]]</h7>
                 <button id="groupConfigBtn" class="btn button_config btn-outline-warning" type="button" th:onclick="|location.href='/group/${groupId}/config'|"><i class="fa fa-cog fa-2x"></i></button>
                 <hr>
             </div>
@@ -72,10 +72,11 @@
                                         <div class="col-md-3 d-flex align-items-center justify-content-center">
                                             <div class="card-text">[[${expense.getDate()}]]</div>
                                         </div>
-                                        <!-- Amount (poner la divisa correspondiente) -->
+                                        <!-- Amount -->
                                         <div class="col-md-2 d-flex align-items-center justify-content-center expense-amount">
-                                            <div class="card-text">[[${expense.getAmount()}]] €</div>
-                                        </div>
+                                            <div class="card-text">[[${expense.getAmount()}]] [[${group.getCurrencyText()}]]</div>
+                                            <!-- (Falta poner que elimine el gasto) -->
+                                            <button class="btn button-add-expense btn-outline" type="button"><i class="fa fa-trash fa-lg"></i></button>
                                     </div>
                                 </div>
                             </div>

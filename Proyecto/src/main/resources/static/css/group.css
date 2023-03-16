@@ -34,6 +34,10 @@
     border-color: #886402;
 }
 
+.icon{
+    float : right;
+}
+
 .card-title{
     float: left;
 }
