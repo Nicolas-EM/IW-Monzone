@@ -36,13 +36,13 @@ public class Notification implements Transferable<Notification.Transfer> {
         BASIC,
         INVITATION,
         BUDGET_WARNING,
-        DEBT_WARNING
+        DEBT_WARNING 
     }
 
     @Column(nullable = false)
     protected String msg;
     
-    protected LocalDateTime dateRead;
+    protected LocalDateTime dateRead = null;
     
     @Column(nullable = false)
     protected NotificationType type;
@@ -53,6 +53,31 @@ public class Notification implements Transferable<Notification.Transfer> {
 
     @ManyToOne
     protected User user;
+
+    @ManyToOne
+    private Group group;
+
+    @ManyToOne
+    private User sender;
+
+    public Notification(NotificationType type, User user, User sender, Group group){
+        this.type = type;
+        this.dateSent = LocalDateTime.now();
+        this.user = user;
+        this.sender = sender;
+        this.group = group;
+
+        StringBuilder sb = new StringBuilder();
+        switch(this.type){
+            case INVITATION:
+                sb.append("You have been invited to join the group ");
+                sb.append(group.getName());
+                this.msg = sb.toString();
+                break;
+            default:
+            this.msg = "TODO: Notification message";
+        }
+    }
   
     @AllArgsConstructor
     @Data

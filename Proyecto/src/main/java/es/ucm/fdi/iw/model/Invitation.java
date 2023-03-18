@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 public class Invitation extends Notification {
     
     @Column(nullable = false)
-    private boolean accepted;
+    private boolean accepted = false;
     
     @ManyToOne
     private Group group;

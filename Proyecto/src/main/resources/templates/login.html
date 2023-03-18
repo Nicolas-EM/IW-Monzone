@@ -46,25 +46,6 @@
             </div>
         </div>
     </div>
-
-    <!--    CÓDIGO PLANTILLA    -->
-    <!--    (cosas que pueden servirnos para implementar login)
-    
-            <form class="form-signin" method="post" th:action="@{/login}">
-                
-                <p th:if="${#request.getQueryString() == 'error'}" class="error">
-                    Error en nombre de usuario o contraseña
-                </p>
-                <p>
-                    <label for="username" class="visually-hidden">Username</label>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Username" required="required">
-                </p>
-                <p>
-                    <label for="password" class="visually-hidden">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required="required">
-                </p>
-    -->
-
 </body>
 
 </html>

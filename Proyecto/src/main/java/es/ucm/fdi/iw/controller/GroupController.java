@@ -16,19 +16,26 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
+import es.ucm.fdi.iw.model.Notification;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Group.Currency;
 import es.ucm.fdi.iw.model.Member.GroupRole;
+import es.ucm.fdi.iw.model.Notification.NotificationType;
 import es.ucm.fdi.iw.model.Debt;
 
 /**
@@ -48,41 +55,47 @@ public class GroupController {
     private static final Logger log = LogManager.getLogger(AdminController.class);
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request") // 400
-    public static class BadRequestException extends RuntimeException {}
+    public static class BadRequestException extends RuntimeException {
+    }
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You don't belong to this group") // 403
-    public static class NoMemberException extends RuntimeException {}
+    public static class NoMemberException extends RuntimeException {
+    }
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not the moderator of this group") // 403
-    public static class NoModeratorException extends RuntimeException {}
+    public static class NoModeratorException extends RuntimeException {
+    }
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The expense does not exist or has been removed") // 403
-    public static class ExpenseNotExistException extends RuntimeException {}
+    public static class ExpenseNotExistException extends RuntimeException {
+    }
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The expense does not belong to this group") // 403
-    public static class ExpenseNotBelongException extends RuntimeException {}
+    public static class ExpenseNotBelongException extends RuntimeException {
+    }
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You cannot leave a group if your balance is not 0.") // 403
-    public static class BalanceNotZero extends RuntimeException {}
+    public static class BalanceNotZero extends RuntimeException {
+    }
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error with DB") // 500
-    public static class NoTransactionException extends RuntimeException {}
-
+    public static class BadDataInDB extends RuntimeException {
+    }
 
     /*
      * 
-     *  GET MAPPINGS
+     * GET MAPPINGS
      * 
-    */
+     */
 
     /*
      * View: new group
      */
     @GetMapping("/new")
-    public String newGroup(HttpSession session, Model model){
-        
+    public String newGroup(HttpSession session, Model model) {
+
         List<String> currencies = new ArrayList<>();
-        for(Group.Currency g : Group.Currency.values()) {
+        for (Group.Currency g : Group.Currency.values()) {
             currencies.add(g.name());
         }
         model.addAttribute("currencies", currencies);
@@ -96,7 +109,7 @@ public class GroupController {
      */
     @GetMapping("{groupId}")
     public String index(@PathVariable long groupId, Model model, HttpSession session) {
-        
+
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
@@ -105,7 +118,7 @@ public class GroupController {
         if (group == null || !group.isEnabled())
             throw new BadRequestException();
 
-        // check if user belongs to the group        
+        // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
@@ -135,7 +148,7 @@ public class GroupController {
      */
     @GetMapping("{groupId}/config")
     public String config(@PathVariable long groupId, Model model, HttpSession session) {
-        
+
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
@@ -144,52 +157,53 @@ public class GroupController {
         if (group == null || !group.isEnabled())
             throw new BadRequestException();
 
-        // check if user belongs to the group        
+        // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
             throw new NoMemberException();
-        }        
+        }
 
         // get members
         List<Member> members = group.getMembers();
-        
+
         // get currencies
         List<String> currencies = new ArrayList<>();
-        for(Group.Currency g : Group.Currency.values()){
+        for (Group.Currency g : Group.Currency.values()) {
             currencies.add(g.name());
         }
 
         model.addAttribute("group", group);
         model.addAttribute("isGroupAdmin", member.getRole() == GroupRole.GROUP_MODERATOR);
         model.addAttribute("members", members);
-        model.addAttribute("currencies", currencies);        
+        model.addAttribute("currencies", currencies);
         return "group_config";
 
     }
 
-
     /*
      * 
-     *  POST MAPPINGS
+     * POST MAPPINGS
      * 
-    */
+     */
 
     /*
      * Creates group
      */
     @Transactional
     @PostMapping("/newGroup")
-    public String newGroup(HttpSession session, @RequestParam(required = true) String name, @RequestParam(required = false) String desc, @RequestParam(required = true) Integer currId, @RequestParam(required = true) Float budget) {       
-        
+    public String newGroup(HttpSession session, @RequestParam(required = true) String name,
+            @RequestParam(required = false) String desc, @RequestParam(required = true) Integer currId,
+            @RequestParam(required = true) Float budget) {
+
         User u = (User) session.getAttribute("u");
-        u = entityManager.find(User.class, u.getId());       
+        u = entityManager.find(User.class, u.getId());
 
         // parse budget
         if (budget < 0)
             throw new BadRequestException();
 
-        // parse curr        
+        // parse curr
         if (currId < 0 || currId >= Currency.values().length)
             throw new BadRequestException();
         Currency curr = Currency.values()[currId];
@@ -204,7 +218,8 @@ public class GroupController {
         log.warn("ID de grupo creado es {}", g.getId());
 
         // create member
-        Member m = new Member(new MemberID(g.getId(), u.getId()), true, GroupRole.GROUP_MODERATOR, budget, u.getId(), g, u);
+        Member m = new Member(new MemberID(g.getId(), u.getId()), true, GroupRole.GROUP_MODERATOR, budget, u.getId(), g,
+                u);
         entityManager.persist(m);
         entityManager.flush(); // forces DB to add group & assign valid id
         // add member to the group
@@ -212,10 +227,10 @@ public class GroupController {
         u.getMemberOf().add(m);
         // update group
         g.setNumMembers(1);
-        g.setTotBudget(budget);       
+        g.setTotBudget(budget);
 
         return "redirect:/user/";
-        
+
     }
 
     /*
@@ -223,7 +238,9 @@ public class GroupController {
      */
     @Transactional
     @PostMapping("{groupId}/updateGroup")
-    public String updateGroup(HttpSession session, @PathVariable long groupId, @RequestParam(required = true) String name, @RequestParam(required = false) String desc, @RequestParam(required = true) Integer currId) {
+    public String updateGroup(HttpSession session, @PathVariable long groupId,
+            @RequestParam(required = true) String name, @RequestParam(required = false) String desc,
+            @RequestParam(required = true) Integer currId) {
 
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
@@ -233,7 +250,7 @@ public class GroupController {
         if (group == null || !group.isEnabled())
             throw new BadRequestException();
 
-        // check if user belongs to the group  
+        // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled()) {
@@ -245,7 +262,7 @@ public class GroupController {
             throw new NoModeratorException();
         }
 
-        // parse curr        
+        // parse curr
         if (currId < 0 || currId >= Currency.values().length)
             throw new BadRequestException();
         Currency curr = Currency.values()[currId];
@@ -255,7 +272,7 @@ public class GroupController {
             desc = "";
         group.setDesc(desc);
         group.setName(name);
-        group.setCurrency(curr);        
+        group.setCurrency(curr);
 
         return "redirect:/group/{groupId}";
 
@@ -266,17 +283,17 @@ public class GroupController {
      */
     @Transactional
     @PostMapping("{groupId}/delGroup")
-    public String delGroup(HttpSession session, @PathVariable long groupId){       
-        
+    public String delGroup(HttpSession session, @PathVariable long groupId) {
+
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
-        
+
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
             throw new BadRequestException();
 
-        // check if user belongs to the group  
+        // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled()) {
@@ -287,13 +304,14 @@ public class GroupController {
         if (member.getRole() != GroupRole.GROUP_MODERATOR) {
             throw new NoModeratorException();
         }
-        
+
         // check all balances = 0 and remove member from the group
         List<Member> members = group.getMembers();
         for (Member m : members) {
             if (m.getBalance() != 0)
                 throw new BadRequestException();
-            m.setEnabled(false);;
+            m.setEnabled(false);
+            ;
         }
 
         // disable expenses
@@ -304,7 +322,7 @@ public class GroupController {
         }
 
         // disable group
-        group.setEnabled(false);        
+        group.setEnabled(false);
 
         return "redirect:/user/";
 
@@ -315,17 +333,18 @@ public class GroupController {
      */
     @Transactional
     @PostMapping("{groupId}/delMember")
-    public String removeMember(@PathVariable long groupId, Model model, HttpSession session, @RequestParam(required = true) long removeId) {
-        
+    public String removeMember(@PathVariable long groupId, Model model, HttpSession session,
+            @RequestParam(required = true) long removeId) {
+
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
-        
+
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
             throw new BadRequestException();
 
-        // check if user belongs to the group  
+        // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled()) {
@@ -353,73 +372,73 @@ public class GroupController {
         group.setNumMembers(group.getNumMembers() - 1);
         group.setTotBudget(group.getTotBudget() - member.getBudget());
 
-        if (user.getId() == removeId) 
+        if (user.getId() == removeId)
             return "redirect:/user/";
         else // TODO: CAMBIAR A AJAX
             return config(groupId, model, session);
     }
 
-    /*
-     * TODO: Invite member
+    /**
+     * Invites a user to a group
      */
+    @PostMapping("/{id}/inviteMember")
     @Transactional
-    @PostMapping("{id}/inviteMember")
-    public String inviteMember(@PathVariable long id, Model model, HttpSession session, @RequestParam(required = true) long userId) {
-        User requestingUser = (User) session.getAttribute("u");
-        requestingUser = entityManager.find(User.class, requestingUser.getId());
-        
-        // check if group exists
+    @ResponseBody
+    public String inviteMember(@PathVariable long id, @RequestBody JsonNode o, HttpSession session) throws JsonProcessingException  {
+        String username = o.get("username").asText();
+        User sender = (User) session.getAttribute("u");
+        sender = entityManager.find(User.class, sender.getId());
         Group group = entityManager.find(Group.class, id);
+
         if (group == null || !group.isEnabled())
             throw new BadRequestException();
 
-        
-        Member m = entityManager.find(Member.class, new MemberID(id, requestingUser.getId()));
-        // check if user belongs to the group    
-        if (m == null || !m.isEnabled()) {
+        // check if sender belongs to the group
+        MemberID mId = new MemberID(group.getId(), sender.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (member == null || !member.isEnabled()) {
             throw new NoMemberException();
         }
 
-        // only moderators can add other members
-        if (m.getRole() != GroupRole.GROUP_MODERATOR) {
+        // only moderators can invite new members
+        if (member.getRole() != GroupRole.GROUP_MODERATOR) {
             throw new NoModeratorException();
         }
 
-        // check if user to add exists
-        User u = entityManager.find(User.class, userId);
-        if (u == null || !u.isEnabled()) {
+        // Check invited user
+        List<User> userList = entityManager.createNamedQuery("User.byUsername", User.class).setParameter("username", username).getResultList();
+
+        if(userList.isEmpty())
             throw new BadRequestException();
+
+        if(userList.size() > 1)
+            throw new BadDataInDB();
+        
+        User user = userList.get(0);
+        mId = new MemberID(group.getId(), user.getId());
+        member = entityManager.find(Member.class, mId);
+        // Check user not already member
+        if (member == null) {
+            // user is not already in the group, invite
+            Notification invite = new Notification(NotificationType.INVITATION, user, sender, group);
+            entityManager.persist(invite);
+            entityManager.flush();
+            log.info("User {} invited to group {}", username, group.getName());
+            return "{\"status\":\"invited\"}";
+        } else {
+            // user is already in a group
+            log.info("User {} cannot join group {}", member.getUser().getUsername(), group.getName());
+            return "{\"status\":\"already_in_group\"}";
         }
-
-        // // check if user didn't belong to the group
-        // m = entityManager.find(Member.class, new MemberID(id, userId));
-        // if (m != null && !m.isEnabled()){
-        //     // m.setEnabled(true);
-        //     // update group budget
-        //     // group.setTotBudget(group.getTotBudget() + m.getBudget());
-        // }
-        // else if (m == null) {
-        //     // m = new Member(new MemberID(group.getId(), userId), true, GroupRole.GROUP_USER, 0, userId, group, u);
-        //     // entityManager.persist(m);
-        //     // update group budget
-        //     // group.setTotBudget(group.getTotBudget() + 0);
-        // }
-        // else { // User already belongs to the group
-        //     return "error"; // CHECK: Devolver error, mostrar dialog..
-        // }
-
-        entityManager.flush();
-        List<Member> members = group.getMembers();
-        model.addAttribute("members", members);
-        return config(id, model, session);
+        
     }
 
     /*
      * TODO: Accept invite
      */
 
-     /*
+    /*
      * TODO: Edit member
      */
-    
+
 }
