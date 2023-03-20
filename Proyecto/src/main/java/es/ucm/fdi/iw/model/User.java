@@ -63,12 +63,6 @@ public class User implements Transferable<User.Transfer> {
     @OneToMany(mappedBy = "user")
     private List<Participates> expenses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "debtor")
-    private List<Debt> debts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "debtOwner")
-    private List<Debt> debtsOwned = new ArrayList<>();
-
     /**
      * Checks whether this user has a given role.
      * @param role to check
