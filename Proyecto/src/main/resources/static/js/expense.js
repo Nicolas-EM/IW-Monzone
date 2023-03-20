@@ -31,4 +31,37 @@ window.addEventListener("load", (event) => {
     // read the image file as a data URL.
     reader.readAsDataURL(this.files[0]);
   });
+
+  document.getElementById('btn-save').addEventListener('click', function(){
+    e.preventDefault();
+    go(b.parentNode.action, 'POST', {
+      message: document.getElementById("message").value
+  })
+  .then(d => console.log("happy", d))
+  .catch(e => console.log("sad", e))
+  })
+
+  const checkboxes = document.getElementsByClassName('participateCheckbox');
+  for(let i = 0; i < checkboxes.length; i++){
+    checkboxes[i].addEventListener('change', function(){
+      const amount = document.getElementById('amount').value;
+      onChangeAmount(amount);
+    })
+  }
 });
+
+function onChangeAmount(amount){
+  console.log(`onChangeAmount(${amount}) called`);
+  const checkboxes = document.getElementsByClassName('participateCheckbox');
+  const numChecked = document.querySelectorAll('input:checked').length;
+  const values = document.getElementsByClassName('amountPerMember');
+
+  for(let i = 0; i < checkboxes.length; i++){
+    if(checkboxes[i].checked){
+      values[i].innerHTML = amount / numChecked;
+    }
+    else{
+      values[i].innerHTML = '';
+    }
+  }
+}
