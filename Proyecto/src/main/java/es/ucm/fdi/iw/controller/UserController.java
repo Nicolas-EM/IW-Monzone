@@ -113,14 +113,13 @@ public class UserController {
 
         List<Member> memberOf = user.getMemberOf();
 
-        List<Group> groups = new ArrayList<>();
+        List<Member> enabledMemberOf = new ArrayList<>();
         for (Member m : memberOf) {
             if(m.isEnabled())
-                groups.add(m.getGroup());
+                enabledMemberOf.add(m);
         }
 
-        model.addAttribute("memberOf", memberOf);
-        model.addAttribute("groups", groups);
+        model.addAttribute("memberOf", enabledMemberOf);
 
         return "home";
     }

@@ -165,6 +165,9 @@ public class GroupController {
             throw new NoMemberException();
         }
 
+        // Get budget
+        model.addAttribute("budget", member.getBudget());
+
         // get members
         List<Member> members = group.getMembers();
 
@@ -175,6 +178,7 @@ public class GroupController {
         }
 
         model.addAttribute("group", group);
+        model.addAttribute("userId", user.getId());
         model.addAttribute("isGroupAdmin", member.getRole() == GroupRole.GROUP_MODERATOR);
         model.addAttribute("members", members);
         model.addAttribute("currencies", currencies);
@@ -240,7 +244,7 @@ public class GroupController {
     @Transactional
     @PostMapping("{groupId}/updateGroup")
     public String updateGroup(HttpSession session, @PathVariable long groupId,
-            @RequestParam(required = true) String name, @RequestParam(required = false) String desc,
+            @RequestParam(required = true) String name, @RequestParam(required = false) String desc, @RequestParam float budget,
             @RequestParam(required = true) Integer currId) {
 
         User user = (User) session.getAttribute("u");
@@ -259,24 +263,26 @@ public class GroupController {
         }
 
         // only moderators can edit group settings
-        if (member.getRole() != GroupRole.GROUP_MODERATOR) {
-            throw new NoModeratorException();
+        if (member.getRole() == GroupRole.GROUP_MODERATOR) {
+            // parse curr
+            if (currId < 0 || currId >= Currency.values().length)
+                throw new BadRequestException();
+            Currency curr = Currency.values()[currId];
+
+            // update group
+            if (desc == null)
+                desc = "";
+            group.setDesc(desc);
+            group.setName(name);
+            group.setCurrency(curr);
         }
+        
+        // Anyone can update their budget
+        // update member
+        member.setBudget(budget);
 
-        // parse curr
-        if (currId < 0 || currId >= Currency.values().length)
-            throw new BadRequestException();
-        Currency curr = Currency.values()[currId];
-
-        // update group
-        if (desc == null)
-            desc = "";
-        group.setDesc(desc);
-        group.setName(name);
-        group.setCurrency(curr);
-
+        // TODO cambiar a AJAX
         return "redirect:/group/{groupId}";
-
     }
 
     /*

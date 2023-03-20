@@ -79,20 +79,21 @@
                                             <form method="post" th:action="@{/group/{groupId}/{expenseId}/delExpense(groupId=${groupId}, expenseId=${expense.getId()})}">
                                                 <button class="btn button-add-expense btn-outline" type="submit">
                                                     <i class="fa fa-trash fa-lg"></i></button>
-                                            </form>                                            
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <!-- No hay gastos -->
+                            <div th:unless="${!expenses.isEmpty()}" class="card border-light text-white bg-warning mb-3 mx-auto">
+                                <div class="card-header"><strong>There are no expenses in this group!</strong></div>
+                            </div>
                         </div>
-                        <!-- No hay gastos -->
-                        <div th:unless="${!expenses.isEmpty()}" class="card border-light text-white bg-warning mb-3 mx-auto">
-                            <div class="card-header"><strong>There are no expenses in this group!</strong></div>
-                        </div>
-                    </div>
-                    <!-- newExpenseBtn -->
-                    <div class="row text-center">
-                        <div class="col align-self-center">
-                            <button id="addExpense" class="btn button-add-expense btn-outline-warning" type="button" th:onclick="|location.href='/group/${groupId}/new'|"><i class="fa fa-plus fa-2x"></i></button>
+                        <!-- newExpenseBtn -->
+                        <div class="row text-center">
+                            <div class="col align-self-center">
+                                <button id="addExpense" class="btn button-add-expense btn-outline-warning" type="button" th:onclick="|location.href='/group/${groupId}/new'|"><i class="fa fa-plus fa-2x"></i></button>
+                            </div>
                         </div>
                     </div>
                 </div>

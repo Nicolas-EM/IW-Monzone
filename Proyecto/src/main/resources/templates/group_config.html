@@ -30,13 +30,14 @@
                             <option th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
                         </div>
                     </select>
-                    <div th:if="${group != null}">
-                        <label for="budget" class="form-label mt-4 w-100">Group budget:</label>
-                        <label id="budget" class="rounded-corners w-100 bg-white">[[${group?.getCurrencyText()}]] [[${group?.getTotBudget()}]]</label>
+                    <!-- Set budget -->
+                    <div>
+                        <label for="budget" class="form-label mt-4 w-100">Your budget:</label>
+                        <input id="budget" name="budget" type="number" min="0" step="0.1" class="rounded-corners w-100 bg-white" required="required" th:value="${budget}" th:placeholder="${group == null}? 'Enter Budget' : ''"></input>
                     </div>
-                    <div class="row mt-5 w-100">
-                        <button th:if="${group == null} or ${isGroupAdmin}" th:formaction="@{/group/{action}(action=${group == null} ? 'newGroup' : ${group?.getId()} + '/updateGroup')}" type="submit" class="btn btn-func btn-primary rounded-pill fw-bold w-25">Save</button>
-                        <button th:if="${group == null}" th:onclick="|location.href='/user/'|" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Cancel</button>
+                    <div class="mt-5 w-100">
+                        <button th:formaction="@{/group/{action}(action=${group == null} ? 'newGroup' : ${group?.getId()} + '/updateGroup')}" type="submit" class="btn btn-func btn-primary rounded-pill fw-bold w-25">Save</button>
+                        <button type="button" th:if="${group == null}" th:onclick="|location.href='/user/'|" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Cancel</button>
                         <button th:if="${group != null} and ${isGroupAdmin}" th:formaction="@{/group/{id}/delGroup(id=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Delete Group</button>
                     </div>
                 </div>
@@ -60,7 +61,7 @@
                         <th:block th:each="member : ${members}">
                             <div th:if="${member.isEnabled()}" class="row p-2 member">
                                 <div th:if="${isGroupAdmin}" class="col btn-remove">
-                                    <form method="post" th:action="@{/group/{groupId}/removeMember(groupId=${group.getId()})}">
+                                    <form method="post" th:action="@{/group/{groupId}/delMember(groupId=${group?.getId()})}">
                                         <input type="hidden" name="removeId" th:value="${member.getUser().getId()}">
                                         <button type="submit" class="btn">
                                             <svg id="trash" xmlns="http://www.w3.org/2000/svg" width="25" fill="white" class="bi bi-trash3" viewbox="0 0 16 16">
@@ -84,14 +85,20 @@
                             </div>
                         </th:block>
                     </div>
+                    <!-- Invite / Leave buttons -->
                     <div class="row pt-4 pb-4">
                         <button id="inviteBtn" th:if="${isGroupAdmin}" class="btn btn-func btn-primary rounded-pill fw-bold w-25" data-bs-toggle="modal" data-bs-target="#inviteModal" formaction="">Invite a Friend</button>
-                        <button th:formaction="@{/group/{groupId}/leave(groupId=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Leave Group</button>
+                        <button type="submit" form="leaveGroupForm" formmethod="post" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Leave Group</button>
                     </div>
                 </div>
             </div>
         </div>
 
+
+        <!-- Hidden form -->
+        <form id="leaveGroupForm" method="post" th:action="@{/group/{groupId}/delMember(groupId=${group?.getId()})}">
+            <input type="hidden" name="removeId" th:value="${userId}">
+        </form>
     </main>
 
     <!-- Invite Member Modal -->
@@ -114,7 +121,6 @@
             </div>
         </div>
     </div>
-
 
     <th:block th:replace="fragments/footer.html :: footer" />
     <script th:src="@{/js/group_config.js}"></script>
