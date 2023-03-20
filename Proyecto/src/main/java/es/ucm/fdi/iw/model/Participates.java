@@ -13,6 +13,9 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Participates.getParticipants", query = "SELECT obj FROM Participates obj WHERE obj.group.id = :groupId AND obj.expense.id = :expenseId")
+})
 @Table(name="IWParticipates")
 public class Participates {
 

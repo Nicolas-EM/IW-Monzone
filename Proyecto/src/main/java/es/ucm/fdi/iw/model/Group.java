@@ -7,9 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-import es.ucm.fdi.iw.model.Member.GroupRole;
-import es.ucm.fdi.iw.model.User.Role;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.time.LocalDate;
@@ -42,7 +43,7 @@ public class Expense implements Transferable<Expense.Transfer>, Comparator<Expen
     private String desc;
 
     @Column(nullable = false)
-    private long amount;
+    private float amount;
 
     @Getter(AccessLevel.NONE)
     @Column(nullable = false)
@@ -57,6 +58,17 @@ public class Expense implements Transferable<Expense.Transfer>, Comparator<Expen
     @OneToMany(mappedBy = "expense")
     private List<Participates> belong;
 
+    public Expense(String name, String desc, float amount, LocalDate date, Type type, User paidBy) {
+        this.enabled = true;
+        this.name = name;
+        this.desc = desc;
+        this.amount = amount;
+        this.date = date;
+        this.type = type;
+        this.paidBy = paidBy;
+        this.belong = new ArrayList<Participates>();
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -65,7 +77,7 @@ public class Expense implements Transferable<Expense.Transfer>, Comparator<Expen
         private boolean enabled;
         private String name;
         private String desc;
-        private long amount;
+        private float amount;
         private LocalDate date;
         private long typeID;
         private long paidByID;

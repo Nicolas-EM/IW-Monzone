@@ -36,7 +36,7 @@ import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Group.Currency;
 import es.ucm.fdi.iw.model.Member.GroupRole;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
-import es.ucm.fdi.iw.model.Debt;
+import es.ucm.fdi.iw.model.DebtCalculator;
 
 /**
  * Group (and expenses) management.
@@ -132,8 +132,9 @@ public class GroupController {
             expenses.add(e);
         }
 
-        // get balance
-        List<Debt> debts = group.getDebts();
+        // get debts
+        DebtCalculator dc = new DebtCalculator(group.getMembers());
+        List<DebtCalculator.Tuple> debts = dc.calculateDebts();
 
         model.addAttribute("expenses", expenses);
         model.addAttribute("debts", debts);
@@ -385,39 +386,39 @@ public class GroupController {
     @Transactional
     @ResponseBody
     public String inviteMember(@PathVariable long id, @RequestBody JsonNode o, HttpSession session) throws JsonProcessingException  {
+        
         String username = o.get("username").asText();
         User sender = (User) session.getAttribute("u");
         sender = entityManager.find(User.class, sender.getId());
+        
+        // check if group exists
         Group group = entityManager.find(Group.class, id);
-
         if (group == null || !group.isEnabled())
             throw new BadRequestException();
 
         // check if sender belongs to the group
         MemberID mId = new MemberID(group.getId(), sender.getId());
         Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled()) {
+        if (member == null || !member.isEnabled()) 
             throw new NoMemberException();
-        }
 
         // only moderators can invite new members
-        if (member.getRole() != GroupRole.GROUP_MODERATOR) {
+        if (member.getRole() != GroupRole.GROUP_MODERATOR) 
             throw new NoModeratorException();
-        }
 
         // Check invited user
         List<User> userList = entityManager.createNamedQuery("User.byUsername", User.class).setParameter("username", username).getResultList();
 
-        if(userList.isEmpty())
+        if (userList.isEmpty())
             throw new BadRequestException();
 
-        if(userList.size() > 1)
+        if (userList.size() > 1)
             throw new BadDataInDB();
         
         User user = userList.get(0);
         mId = new MemberID(group.getId(), user.getId());
         member = entityManager.find(Member.class, mId);
-        // Check user not already member
+        // check user not already member
         if (member == null) {
             // user is not already in the group, invite
             Notification invite = new Notification(NotificationType.INVITATION, user, sender, group);

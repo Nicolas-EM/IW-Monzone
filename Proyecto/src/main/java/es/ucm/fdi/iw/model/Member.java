@@ -16,10 +16,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Entity
-@NamedQueries({
-    @NamedQuery(name = "Member.getByUserId", query = "SELECT obj FROM Member obj WHERE obj.mId.userID = :userId"),
-    @NamedQuery(name = "Member.getByGroupId", query = "SELECT obj FROM Member obj WHERE obj.mId.groupID = :groupId"),
-})
 @Table(name="IWMember")
 public class Member implements Transferable<Member.Transfer>, Comparator<Member> {
 

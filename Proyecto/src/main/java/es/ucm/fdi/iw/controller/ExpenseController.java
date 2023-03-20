@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 
@@ -37,9 +36,6 @@ import es.ucm.fdi.iw.model.ParticipatesID;
 import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
-import es.ucm.fdi.iw.model.Group.Currency;
-import es.ucm.fdi.iw.model.Member.GroupRole;
-import es.ucm.fdi.iw.model.Debt;
 
 /**
  * Group (and expenses) management.
@@ -47,7 +43,7 @@ import es.ucm.fdi.iw.model.Debt;
  * Access to this end-point is authenticated - see SecurityConfig
  */
 @Controller
-@RequestMapping("group/{groupId}/")
+@RequestMapping("group/{groupId}")
 public class ExpenseController {
 
     // private static final Logger log =
@@ -61,7 +57,7 @@ public class ExpenseController {
     private static final Logger log = LogManager.getLogger(AdminController.class);
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request") // 400
-    public static class BadRequestExpection extends RuntimeException {}
+    public static class BadRequestException extends RuntimeException {}
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You don't belong to this group") // 403
     public static class NoMemberException extends RuntimeException {}
@@ -82,33 +78,74 @@ public class ExpenseController {
     public static class NoTransactionException extends RuntimeException {}
 
     private void setExpenseAttributes(Group group, long expenseId, Model model, boolean newExpense) {
-        List<Member> members = entityManager.createNamedQuery("Member.getByGroupId", Member.class).setParameter("groupId", group.getId()).getResultList();
+        
+        List<Participates> participants = new ArrayList<>();
+        if (!newExpense) {
+            entityManager.createNamedQuery("Participates.getParticipants", Participates.class)
+                    .setParameter("groupId", group.getId())
+                    .setParameter("expenseId", expenseId)
+                    .getResultList();
+        }
+        model.addAttribute("participants", participants);
+        List<Member> members = group.getMembers();
         model.addAttribute("members", members);
-
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
         model.addAttribute("types", types);
         model.addAttribute("groupId", group.getId());
         model.addAttribute("newExpense", newExpense);
+
     }
 
-    /**
-     * View group expense
+    /*
+     * 
+     * GET MAPPINGS
+     * 
      */
-    @GetMapping("{expenseId}")
-    public String expense(@PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session) {
+
+     /*
+     * View: create group expense
+     */
+    @GetMapping("/new")
+    public String newExpense(@PathVariable long groupId, Model model, HttpSession session) {
+        
         User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
 
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestExpection();
+            throw new BadRequestException();
 
         // check if user belongs to the group        
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
-        if (user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
+        if (member == null || !member.isEnabled())
             throw new NoMemberException();
-        }
+
+        setExpenseAttributes(group, 0, model, true);
+        return "expense";
+
+    }
+
+    /*
+     * View: edit group expense
+     */
+    @GetMapping("{expenseId}")
+    public String expense(@PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session) {
+        
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new BadRequestException();
+
+        // check if user belongs to the group        
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled()))
+            throw new NoMemberException();
 
         // check if expense exists
         Expense expense = entityManager.find(Expense.class, expenseId);
@@ -122,121 +159,71 @@ public class ExpenseController {
         setExpenseAttributes(group, expenseId, model, false);
         model.addAttribute("expense", expense);
         return "expense";
+
     }
 
     /*
-     * Edit group expense
+     * 
+     * POST MAPPINGS
+     * 
      */
-    // TODO: Review
-    @PostMapping("{expenseId}")
-    @Transactional
-    public String postEditExpense(HttpServletResponse response, @PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc, @RequestParam String dateString, @RequestParam long amount, @RequestParam long paidById, @RequestParam long typeId) throws IOException {
-        User user = (User) session.getAttribute("u");
-        user = entityManager.find(User.class, user.getId());
 
-        Group group = entityManager.find(Group.class, groupId);
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new NoMemberException();
-        }
-
-        Expense e = entityManager.find(Expense.class, expenseId);
-        if(e != null){
-            User paidBy = entityManager.find(User.class, paidById);
-            Type type = entityManager.find(Type.class, typeId);
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");    
-            LocalDate date = LocalDate.parse(dateString, formatter);
-
-            if(!e.getName().equals(name)){
-                e.setName(name);
-            }
-            if(desc != null && !e.getDesc().equals(desc)){
-                e.setDesc(desc);
-            }
-            if(paidBy != null && !e.getPaidBy().equals(paidBy)){
-                e.setPaidBy(paidBy);
-            }
-            if(type != null && !e.getType().equals(type)){
-                e.setType(type);
-            }
-            if(!e.getDate().equals(date)){
-                e.setDate(date);
-            }
-            if(e.getAmount() != amount){
-                e.setAmount(amount);
-            }
-        }
-        else{
-            throw new BadRequestExpection();
-        }
-
-        return "redirect:/group/" + groupId + "/" + expenseId;
-    }
-
-    /**
-     * View: create group expense
-     */
-    @GetMapping("new")
-    public String createExpense(@PathVariable long groupId, Model model, HttpSession session) {
-        User user = (User) session.getAttribute("u");
-        user = entityManager.find(User.class, user.getId());
-
-        // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new BadRequestExpection();
-
-        // check if user belongs to the group        
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new NoMemberException();
-        }
-
-        setExpenseAttributes(group, 0, model, true);
-        return "expense";
-    }
-
-    /*
+     // TODO: Debería recibir lista participantes, y falta actualizar los balance
+     /*
      * Add expense to group
-     */
-    // TODO: Review
-    @PostMapping("new")
+     */   
+    @PostMapping("/newExpense")
     @Transactional
-    public String postExpense(HttpServletResponse response, @PathVariable long groupId, Model model, HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc, @RequestParam String dateString, @RequestParam long amount, @RequestParam long paidById, @RequestParam long typeId) throws IOException {
+    public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestParam String name,
+            @RequestParam(required = false) String desc, @RequestParam String dateString, @RequestParam float amount,
+            @RequestParam long paidById, @RequestParam long typeId) {
+
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestExpection();
+            throw new BadRequestException();
 
         // check if user belongs to the group        
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
-        if (user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
+        if (member == null || !member.isEnabled())
             throw new NoMemberException();
-        }
 
+        // check if user who paid exists
         User paidBy = entityManager.find(User.class, paidById);
-        if(paidBy == null)
-            throw new BadRequestExpection();
+        if (paidBy == null || !paidBy.isEnabled())
+            throw new BadRequestException();
+        
+        // check if user who paid belongs to the group
+        MemberID mpId = new MemberID(groupId, paidById);
+        Member memberPaid = entityManager.find(Member.class, mpId);
+        if (memberPaid == null || !memberPaid.isEnabled())
+            throw new NoMemberException();
 
+        // check if type is one of the availables
         Type type = entityManager.find(Type.class, typeId);
-        if(type == null)
-            throw new BadRequestExpection();
+        if (type == null)
+            throw new BadRequestException();
 
-        if(desc == null){
-            desc = "";
+        // check date format
+        LocalDate date;
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");    
+            date = LocalDate.parse(dateString, formatter);
+        } catch (Exception e) {
+            throw new BadRequestException();
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");    
-        LocalDate date = LocalDate.parse(dateString, formatter);
-        Expense e = new Expense(0, true, name, desc, amount, date, type, paidBy, new ArrayList<Participates>());
 
+        // create expense
+        if (desc == null)
+            desc = "";        
+        
+        Expense e = new Expense(name, desc, amount, date, type, paidBy);
         entityManager.persist(e);
+        entityManager.flush(); // forces DB to add expense & assign valid id
 
         ParticipatesID pId = new ParticipatesID(e.getId(), paidById);
         Participates participates = new Participates(pId, group, paidBy, e);
@@ -245,7 +232,124 @@ public class ExpenseController {
         return "redirect:/group/" + groupId;
     }
 
-    /**
+    // TODO: Debería recibir lista participantes, y falta actualizar los balance
+    /*
+     * Edit group expense
+     */    
+    @PostMapping("{expenseId}/updateExpense")
+    @Transactional
+    public String editExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model,
+            HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc,
+            @RequestParam String dateString, @RequestParam float amount, @RequestParam long paidById,
+            @RequestParam long typeId) {
+  
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new BadRequestException();
+
+        // check if user belongs to the group        
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (member == null || !member.isEnabled())
+            throw new NoMemberException();
+
+        // check if expense exists
+        Expense exp = entityManager.find(Expense.class, expenseId);
+        if (exp == null || !exp.isEnabled())
+            throw new BadRequestException();
+        
+        // check if expense belongs to the group
+        if (!group.hasExpense(exp))
+            throw new BadRequestException();
+
+        // check if user who paid exists
+        User paidBy = entityManager.find(User.class, paidById);
+        if (paidBy == null || !paidBy.isEnabled())
+            throw new BadRequestException();
+        
+        // check if user who paid belongs to the group
+        MemberID mpId = new MemberID(groupId, paidById);
+        Member memberPaid = entityManager.find(Member.class, mpId);
+        if (memberPaid == null || !memberPaid.isEnabled())
+            throw new NoMemberException();
+
+        // check if type is one of the availables
+        Type type = entityManager.find(Type.class, typeId);
+        if (type == null)
+            throw new BadRequestException();
+
+        // check date format
+        LocalDate date;
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");    
+            date = LocalDate.parse(dateString, formatter);
+        } catch (Exception e) {
+            throw new BadRequestException();
+        }
+
+        // update expense
+        exp.setName(name);
+        if (desc == null)
+            desc = "";
+        exp.setDesc(desc);
+        exp.setPaidBy(paidBy);
+        exp.setType(type);
+        exp.setDate(date);
+        exp.setAmount(amount);        
+
+        return "redirect:/group/" + groupId + "/" + expenseId;
+
+    }
+
+    // TODO: Falta actualizar los balance
+    /*
+     * Delete group expense
+     */    
+    @PostMapping("{expenseId}/delExpense")
+    @Transactional
+    public String deleteExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model,
+            HttpSession session) throws IOException {
+  
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new BadRequestException();
+
+        // check if user belongs to the group        
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (member == null || !member.isEnabled())
+            throw new NoMemberException();
+
+        // check if expense exists
+        Expense exp = entityManager.find(Expense.class, expenseId);
+        if (exp == null || !exp.isEnabled())
+            throw new BadRequestException();
+        
+        // check if expense belongs to the group
+        if (!group.hasExpense(exp))
+            throw new BadRequestException();
+
+        // delete participants
+        List<Participates> participants = exp.getBelong();
+        for (Participates p : participants)
+            entityManager.remove(p);
+        
+        // disable expense
+        exp.setEnabled(false);
+
+        return "redirect:/group/" + groupId;
+
+    }
+
+    /*
      * Returns the default expense pic
      * 
      * @return
@@ -263,11 +367,36 @@ public class ExpenseController {
      * @throws IOException
      */
     @GetMapping("{expenseId}/pic")
-    public StreamingResponseBody expensePic(@PathVariable long groupId, @PathVariable long expenseId, Model model)
-            throws IOException {
+    public StreamingResponseBody expensePic(@PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session) throws IOException {
+        
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new BadRequestException();
+
+        // check if user belongs to the group        
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (member == null || !member.isEnabled())
+            throw new NoMemberException();
+
+        // check if expense exists
+        Expense exp = entityManager.find(Expense.class, expenseId);
+        if (exp == null || !exp.isEnabled())
+            throw new BadRequestException();
+        
+        // check if expense belongs to the group
+        if (!group.hasExpense(exp))
+            throw new BadRequestException();
+
         File f = localData.getFile("expense", String.format("%d-%d.jpg", groupId, expenseId));
         InputStream in = new BufferedInputStream(
                 f.exists() ? new FileInputStream(f) : ExpenseController.defaultExpensePic());
         return os -> FileCopyUtils.copy(in, os);
+
     }
+
 }
