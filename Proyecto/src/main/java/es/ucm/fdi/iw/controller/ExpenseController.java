@@ -418,13 +418,15 @@ public class ExpenseController {
         if (member == null || !member.isEnabled())
             throw new NoMemberException();
 
-        // check if expense exists
+
+        // check if expense exists 
+        // If expense == null, its a new expense
         Expense exp = entityManager.find(Expense.class, expenseId);
-        if (exp == null || !exp.isEnabled())
+        if (exp != null && !exp.isEnabled())
             throw new BadRequestException();
         
         // check if expense belongs to the group
-        if (!group.hasExpense(exp))
+        if (exp != null && !group.hasExpense(exp))
             throw new BadRequestException();
 
         File f = localData.getFile("expense", String.format("%d-%d.jpg", groupId, expenseId));
