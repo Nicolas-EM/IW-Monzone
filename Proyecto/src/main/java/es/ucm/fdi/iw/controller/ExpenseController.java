@@ -123,6 +123,8 @@ public class ExpenseController {
             throw new NoMemberException();
 
         setExpenseAttributes(group, 0, model, true);
+        model.addAttribute("group", group);
+
         return "expense";
 
     }
@@ -169,6 +171,8 @@ public class ExpenseController {
         }
         
         model.addAttribute("participateIds", participateIds);
+        model.addAttribute("group", group);
+
         return "expense";
 
     }
@@ -258,9 +262,10 @@ public class ExpenseController {
         entityManager.flush(); // forces DB to add expense & assign valid id
         
         // Add all participants
-        ParticipatesID pId = new ParticipatesID(e.getId(), paidById);
+        
         for(User u : participateUsers){
-            Participates participates = new Participates(pId, group, u, e);
+            ParticipatesID pId = new ParticipatesID(e.getId(), u.getId());
+            Participates participates = new Participates(pId, group, paidBy, e);
             entityManager.persist(participates);
         }
 
@@ -276,7 +281,7 @@ public class ExpenseController {
     public String editExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model,
             HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc,
             @RequestParam String dateString, @RequestParam float amount, @RequestParam long paidById,
-            @RequestParam long typeId) {
+            @RequestParam long typeId, @RequestParam List<String> participateIds) {
   
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());

@@ -171,6 +171,12 @@ public class GroupController {
         // get members
         List<Member> members = group.getMembers();
 
+        // get total budget
+        float totalBudget = 0;
+        for (Member m : members) {
+            totalBudget += m.getBudget();
+        }
+
         // get currencies
         List<String> currencies = new ArrayList<>();
         for (Group.Currency g : Group.Currency.values()) {
@@ -182,6 +188,7 @@ public class GroupController {
         model.addAttribute("isGroupAdmin", member.getRole() == GroupRole.GROUP_MODERATOR);
         model.addAttribute("members", members);
         model.addAttribute("currencies", currencies);
+        model.addAttribute("totalBudget", totalBudget);
         return "group_config";
 
     }
@@ -223,7 +230,7 @@ public class GroupController {
         log.warn("ID de grupo creado es {}", g.getId());
 
         // create member
-        Member m = new Member(new MemberID(g.getId(), u.getId()), true, GroupRole.GROUP_MODERATOR, budget, u.getId(), g,
+        Member m = new Member(new MemberID(g.getId(), u.getId()), true, GroupRole.GROUP_MODERATOR, budget, 0, g,
                 u);
         entityManager.persist(m);
         entityManager.flush(); // forces DB to add group & assign valid id
@@ -352,7 +359,7 @@ public class GroupController {
             throw new BadRequestException();
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
+        MemberID mId = new MemberID(groupId, user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled()) {
             throw new NoMemberException();
@@ -363,9 +370,19 @@ public class GroupController {
             throw new NoModeratorException();
         }
 
-        // moderator can't leave the group
+        // if only member, delete group
+        if(group.getMembers().size() == 1){
+            delGroup(session, groupId);
+            return "redirect:/user/";
+        }
+
+        /*
+         *  moderator can't leave the group if there are no other admins
+         */
         if (user.getId() == removeId && member.getRole() == GroupRole.GROUP_MODERATOR) {
-            throw new BadRequestException();
+            List<Member> moderators = entityManager.createNamedQuery("Member.getGroupAdmins",Member.class).setParameter("groupId", groupId).getResultList();
+            if(moderators.size() == 1)
+                throw new BadRequestException();
         }
 
         // balance must be 0

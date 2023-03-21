@@ -15,8 +15,8 @@
     resize: none;
 }
 
-#budget {
-    max-width: 20%;
+.budget {
+    max-width: 40%;
     display: flex;
     align-items: center;
     height: 4vh;

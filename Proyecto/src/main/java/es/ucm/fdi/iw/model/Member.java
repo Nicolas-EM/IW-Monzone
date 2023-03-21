@@ -16,6 +16,9 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Member.getGroupAdmins", query = "SELECT obj FROM Member obj WHERE group.id = :groupId AND role = 1"),
+})
 @Table(name="IWMember")
 public class Member implements Transferable<Member.Transfer>, Comparator<Member> {
 

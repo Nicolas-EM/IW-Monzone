@@ -36,9 +36,8 @@ public class AdminController {
         User u = (User)session.getAttribute("u");
         log.warn("Usuario {} ha accedido a admin", u.getUsername());
 
-        List<Group> groups = entityManager.createNamedQuery("Group.getAllGroups").getResultList();
+        List<Group> groups = entityManager.createNamedQuery("Group.getAllGroups", Group.class).getResultList();
         model.addAttribute("groups", groups);
         return "home";
     }
-
 }

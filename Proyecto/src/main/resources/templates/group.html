@@ -69,13 +69,12 @@
                                             </div>
                                         </div>
                                         <!-- Date -->
-                                        <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                        <div class="col-md-2 d-flex align-items-center justify-content-center">
                                             <div class="card-text">[[${expense.getDate()}]]</div>
                                         </div>
                                         <!-- Amount -->
-                                        <div class="col-md-2 d-flex align-items-center justify-content-center expense-amount">
+                                        <div class="col-md-3 d-flex align-items-center justify-content-center expense-amount">
                                             <div class="card-text">[[${expense.getAmount()}]] [[${group.getCurrencyText()}]]</div>
-                                            <!-- (Falta poner que elimine el gasto) -->
                                             <form method="post" th:action="@{/group/{groupId}/{expenseId}/delExpense(groupId=${groupId}, expenseId=${expense.getId()})}">
                                                 <button class="btn button-add-expense btn-outline" type="submit">
                                                     <i class="fa fa-trash fa-lg"></i></button>

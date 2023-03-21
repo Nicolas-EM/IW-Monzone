@@ -120,7 +120,5 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
         return g1.getName().compareTo(g2.getName());
     }
 
-    public void addMember(Member m){
-        this.members.add(m);
-    }
+  
 }

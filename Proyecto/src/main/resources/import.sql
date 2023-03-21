@@ -32,7 +32,7 @@ SELECT
     true,
     FLOOR(RAND() * 1000) + 1, -- choose a random budget between 1 and 1000
     FLOOR(RAND() * 1), -- set role to 0 or 1
-    99
+    0
 FROM
     IWUser u WHERE u.id <> 2;
 -- Generate random group memberships for each empty group
