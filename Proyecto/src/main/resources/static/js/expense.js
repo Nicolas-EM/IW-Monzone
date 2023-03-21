@@ -32,15 +32,6 @@ window.addEventListener("load", (event) => {
     reader.readAsDataURL(this.files[0]);
   });
 
-  document.getElementById('btn-save').addEventListener('click', function(){
-    e.preventDefault();
-    go(b.parentNode.action, 'POST', {
-      message: document.getElementById("message").value
-  })
-  .then(d => console.log("happy", d))
-  .catch(e => console.log("sad", e))
-  })
-
   const checkboxes = document.getElementsByClassName('participateCheckbox');
   for(let i = 0; i < checkboxes.length; i++){
     checkboxes[i].addEventListener('change', function(){
@@ -50,6 +41,7 @@ window.addEventListener("load", (event) => {
   }
 });
 
+/* Changes value pero user */
 function onChangeAmount(amount){
   console.log(`onChangeAmount(${amount}) called`);
   const checkboxes = document.getElementsByClassName('participateCheckbox');
@@ -58,7 +50,7 @@ function onChangeAmount(amount){
 
   for(let i = 0; i < checkboxes.length; i++){
     if(checkboxes[i].checked){
-      values[i].innerHTML = amount / numChecked;
+      values[i].innerHTML = (Math.round(amount / numChecked * 100) / 100).toFixed(2);
     }
     else{
       values[i].innerHTML = '';

@@ -158,6 +158,17 @@ public class ExpenseController {
 
         setExpenseAttributes(group, expenseId, model, false);
         model.addAttribute("expense", expense);
+
+        // Get array of participants
+        List<Participates> participates = entityManager.createNamedQuery("Participates.getParticipants", Participates.class).setParameter("groupId", group.getId()).setParameter("expenseId", expenseId).getResultList();
+
+        // Change array to participantIds
+        List<Long> participateIds = new ArrayList<>();
+        for(Participates p : participates){
+            participateIds.add(p.getUser().getId());
+        }
+        
+        model.addAttribute("participateIds", participateIds);
         return "expense";
 
     }
@@ -176,7 +187,7 @@ public class ExpenseController {
     @Transactional
     public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestParam String name,
             @RequestParam(required = false) String desc, @RequestParam String dateString, @RequestParam float amount,
-            @RequestParam long paidById, @RequestParam long typeId) {
+            @RequestParam long paidById, @RequestParam List<String> participateIds, @RequestParam long typeId) {
 
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
@@ -217,6 +228,27 @@ public class ExpenseController {
             throw new BadRequestException();
         }
 
+        // Get all participant users
+        List<User> participateUsers = new ArrayList<>();
+        for(String idString : participateIds){
+            long pId = Long.parseLong(idString);
+            User pUser = entityManager.find(User.class, pId);
+            participateUsers.add(pUser);
+        }
+
+        // Check if all participants exist
+        for(User u : participateUsers){
+            if(u != null){
+                MemberID mParticipatesId = new MemberID(groupId, paidById);
+                Member participatesMember = entityManager.find(Member.class, mParticipatesId);
+                if (participatesMember == null || !participatesMember.isEnabled())
+                    throw new BadRequestException();
+            }
+            else {
+                throw new BadRequestException();
+            }
+        }
+
         // create expense
         if (desc == null)
             desc = "";        
@@ -224,10 +256,13 @@ public class ExpenseController {
         Expense e = new Expense(name, desc, amount, date, type, paidBy);
         entityManager.persist(e);
         entityManager.flush(); // forces DB to add expense & assign valid id
-
+        
+        // Add all participants
         ParticipatesID pId = new ParticipatesID(e.getId(), paidById);
-        Participates participates = new Participates(pId, group, paidBy, e);
-        entityManager.persist(participates);
+        for(User u : participateUsers){
+            Participates participates = new Participates(pId, group, u, e);
+            entityManager.persist(participates);
+        }
 
         return "redirect:/group/" + groupId;
     }
