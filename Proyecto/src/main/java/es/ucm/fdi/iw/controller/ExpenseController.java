@@ -261,12 +261,15 @@ public class ExpenseController {
         entityManager.persist(e);
         entityManager.flush(); // forces DB to add expense & assign valid id
         
-        // Add all participants
-        
+        // add all participants
         for(User u : participateUsers){
             ParticipatesID pId = new ParticipatesID(e.getId(), u.getId());
             Participates participates = new Participates(pId, group, paidBy, e);
             entityManager.persist(participates);
+            // add debts of balance
+            MemberID memberID = new MemberID(group.getId(), u.getId());
+            Member m = entityManager.find(Member.class, memberID);
+            m.setBalance(m.getBalance() - e.getAmount() / participateUsers.size());
         }
 
         return "redirect:/group/" + groupId;
@@ -339,7 +342,47 @@ public class ExpenseController {
         exp.setPaidBy(paidBy);
         exp.setType(type);
         exp.setDate(date);
-        exp.setAmount(amount);        
+        exp.setAmount(amount);       
+        
+        // delete debts of balances
+        List<Participates> participants = exp.getBelong();
+        for(Participates p : participants){
+            MemberID memberID = new MemberID(group.getId(), p.getUser().getId());
+            Member m = entityManager.find(Member.class, memberID);
+            m.setBalance(m.getBalance() + exp.getAmount() / participants.size());
+        }
+
+        // Get all participant users
+        List<User> participateUsers = new ArrayList<>();
+        for(String idString : participateIds){
+            long pId = Long.parseLong(idString);
+            User pUser = entityManager.find(User.class, pId);
+            participateUsers.add(pUser);
+        }
+
+        // Check if all participants exist
+        for(User u : participateUsers){
+            if(u != null){
+                MemberID mParticipatesId = new MemberID(groupId, paidById);
+                Member participatesMember = entityManager.find(Member.class, mParticipatesId);
+                if (participatesMember == null || !participatesMember.isEnabled())
+                    throw new BadRequestException();
+            }
+            else {
+                throw new BadRequestException();
+            }
+        }
+
+        // add all participants
+        for(User u : participateUsers){
+            ParticipatesID pId = new ParticipatesID(exp.getId(), u.getId());
+            Participates participates = new Participates(pId, group, paidBy, exp);
+            entityManager.persist(participates);
+            // add debts of balance
+            MemberID memberID = new MemberID(group.getId(), u.getId());
+            Member m = entityManager.find(Member.class, memberID);
+            m.setBalance(m.getBalance() - exp.getAmount() / participateUsers.size());
+        }
 
         return "redirect:/group/" + groupId + "/" + expenseId;
 
@@ -377,8 +420,15 @@ public class ExpenseController {
         if (!group.hasExpense(exp))
             throw new BadRequestException();
 
-        // delete participants
+        // delete debts of balances
         List<Participates> participants = exp.getBelong();
+        for(Participates p : participants){
+            MemberID memberID = new MemberID(group.getId(), p.getUser().getId());
+            Member m = entityManager.find(Member.class, memberID);
+            m.setBalance(m.getBalance() + exp.getAmount() / participants.size());
+        }
+
+        // delete participants
         for (Participates p : participants)
             entityManager.remove(p);
         
