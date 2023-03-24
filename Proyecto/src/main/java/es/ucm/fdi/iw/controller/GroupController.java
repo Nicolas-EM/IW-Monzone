@@ -126,11 +126,7 @@ public class GroupController {
         }
 
         // get expenses
-        List<Expense> expenses = new ArrayList<>();
-        for (Participates p : group.getOwns()) {
-            Expense e = p.getExpense();
-            expenses.add(e);
-        }
+        List<Expense> expenses = entityManager.createNamedQuery("Participates.getUniqueExpensesByGroup", Expense.class).setParameter("groupId", groupId).getResultList();
 
         // get debts
         DebtCalculator dc = new DebtCalculator(group.getMembers());
