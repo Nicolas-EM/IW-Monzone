@@ -203,7 +203,8 @@ public class ExpenseController {
         public List<Member> participateMembers;
     }
 
-    private PostParams validatedPostParams(HttpSession session, long groupId, String dateString, float amount, long paidById,
+    private PostParams validatedPostParams(HttpSession session, long groupId, String dateString, float amount,
+            long paidById,
             List<String> participateIds, long typeId) {
 
         PostParams validated = new PostParams();
@@ -278,14 +279,13 @@ public class ExpenseController {
         validated.participateMembers = participateMembers;
 
         // check amount is not negative
-        if(amount <= 0)
+        if (amount <= 0)
             throw new BadRequestException();
 
         validated.valid = true;
         return validated;
     }
 
-    // TODO: Debería recibir lista participantes, y falta actualizar los balance
     /*
      * Add expense to group
      */
@@ -443,7 +443,6 @@ public class ExpenseController {
 
     }
 
-    // TODO: Falta actualizar los balance
     /*
      * Delete group expense
      */
@@ -482,6 +481,11 @@ public class ExpenseController {
             Member m = entityManager.find(Member.class, memberID);
             m.setBalance(m.getBalance() + exp.getAmount() / participants.size());
         }
+
+        // delete owed from balance
+        MemberID paidByMemberID = new MemberID(group.getId(), exp.getPaidBy().getId());
+        Member m = entityManager.find(Member.class, paidByMemberID);
+        m.setBalance(m.getBalance() - exp.getAmount());
 
         // delete participants
         for (Participates p : participants)
