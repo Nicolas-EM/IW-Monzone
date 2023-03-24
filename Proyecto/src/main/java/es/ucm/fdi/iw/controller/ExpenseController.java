@@ -342,19 +342,10 @@ public class ExpenseController {
             @RequestParam String dateString, @RequestParam float amount, @RequestParam long paidById,
             @RequestParam long typeId, @RequestParam List<String> participateIds) {
 
-        User user = (User) session.getAttribute("u");
-        user = entityManager.find(User.class, user.getId());
+        PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
-        // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
+        if (!params.valid)
             throw new BadRequestException();
-
-        // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled())
-            throw new NoMemberException();
 
         // check if expense exists
         Expense exp = entityManager.find(Expense.class, expenseId);
@@ -362,32 +353,27 @@ public class ExpenseController {
             throw new BadRequestException();
 
         // check if expense belongs to the group
-        if (!group.hasExpense(exp))
+        if (!params.group.hasExpense(exp))
             throw new BadRequestException();
 
-        // check if user who paid exists
-        User paidBy = entityManager.find(User.class, paidById);
-        if (paidBy == null || !paidBy.isEnabled())
-            throw new BadRequestException();
+        // delete debts of balances
+        List<Participates> participants = exp.getBelong();
+        for (Participates p : participants) {
+            MemberID memberID = new MemberID(params.group.getId(), p.getUser().getId());
+            Member m = entityManager.find(Member.class, memberID);
+            m.setBalance(m.getBalance() + exp.getAmount() / participants.size());
+        }
 
-        // check if user who paid belongs to the group
-        MemberID mpId = new MemberID(groupId, paidById);
-        Member memberPaid = entityManager.find(Member.class, mpId);
-        if (memberPaid == null || !memberPaid.isEnabled())
-            throw new NoMemberException();
+        // delete owed from balance
+        MemberID originalPaidByMemberID = new MemberID(params.group.getId(), exp.getPaidBy().getId());
+        Member m = entityManager.find(Member.class, originalPaidByMemberID);
+        m.setBalance(m.getBalance() - exp.getAmount());
 
-        // check if type is one of the availables
-        Type type = entityManager.find(Type.class, typeId);
-        if (type == null)
-            throw new BadRequestException();
-
-        // check date format
-        LocalDate date;
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            date = LocalDate.parse(dateString, formatter);
-        } catch (Exception e) {
-            throw new BadRequestException();
+        // delete removed participants
+        for (Participates p : exp.getBelong()) {
+            if (!participateIds.contains(String.valueOf(p.getUser().getId()))) {
+                entityManager.remove(p);
+            }
         }
 
         // update expense
@@ -395,52 +381,29 @@ public class ExpenseController {
         if (desc == null)
             desc = "";
         exp.setDesc(desc);
-        exp.setPaidBy(paidBy);
-        exp.setType(type);
-        exp.setDate(date);
+        exp.setPaidBy(params.paidBy);
+        exp.setType(params.type);
+        exp.setDate(params.date);
         exp.setAmount(amount);
 
-        // delete debts of balances
-        List<Participates> participants = exp.getBelong();
-        for (Participates p : participants) {
-            MemberID memberID = new MemberID(group.getId(), p.getUser().getId());
-            Member m = entityManager.find(Member.class, memberID);
-            m.setBalance(m.getBalance() + exp.getAmount() / participants.size());
-        }
-
-        // Get all participant users
-        List<User> participateUsers = new ArrayList<>();
-        for (String idString : participateIds) {
-            long pId = Long.parseLong(idString);
-            User pUser = entityManager.find(User.class, pId);
-            participateUsers.add(pUser);
-        }
-
-        // Check if all participants exist
-        for (User u : participateUsers) {
-            if (u != null) {
-                MemberID mParticipatesId = new MemberID(groupId, u.getId());
-                Member participatesMember = entityManager.find(Member.class, mParticipatesId);
-                if (participatesMember == null || !participatesMember.isEnabled())
-                    throw new BadRequestException();
-            } else {
-                throw new BadRequestException();
-            }
-        }
+        // add balance to paidBy
+        params.paidByMember.setBalance(params.paidByMember.getBalance() + amount);
 
         // add all participants
-        for (User u : participateUsers) {
+        for (User u : params.participateUsers) {
             ParticipatesID pId = new ParticipatesID(exp.getId(), u.getId());
-            Participates participates = new Participates(pId, group, u, exp);
-            entityManager.persist(participates);
+            Participates participates = entityManager.find(Participates.class, pId);
+            if (participates == null) {
+                participates = new Participates(pId, params.group, u, exp);
+                entityManager.persist(participates);
+            }
             // add debts of balance
-            MemberID memberID = new MemberID(group.getId(), u.getId());
-            Member m = entityManager.find(Member.class, memberID);
-            m.setBalance(m.getBalance() - exp.getAmount() / participateUsers.size());
+            MemberID memberID = new MemberID(params.group.getId(), u.getId());
+            m = entityManager.find(Member.class, memberID);
+            m.setBalance(m.getBalance() - amount / params.participateUsers.size());
         }
 
         return "redirect:/group/" + groupId + "/" + expenseId;
-
     }
 
     /*
