@@ -5,7 +5,7 @@ Feature: flujo de la app
     Given call read('login.feature@login_b')
     And driver baseUrl + '/user/'
     And delay(350)
-    When submit().click(".card")
+    When submit().click("#home_groups .card")
     Then waitForUrl(baseUrl + '/group/2')
 
   @group_config
@@ -21,7 +21,7 @@ Feature: flujo de la app
     Given call read('principal.feature@group')
     And driver baseUrl + '/group/2'
     And delay(350)
-    When submit().click(".card")
+    When submit().click(".body div.card")
     Then waitForUrl(baseUrl + '/group/2/99')
 
   @group_addExpense
