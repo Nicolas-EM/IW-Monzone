@@ -52,7 +52,7 @@ public class GroupController {
     @Autowired
     private EntityManager entityManager;
 
-    private static final Logger log = LogManager.getLogger(AdminController.class);
+    private static final Logger log = LogManager.getLogger(GroupController.class);
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request") // 400
     public static class BadRequestException extends RuntimeException {
@@ -131,6 +131,7 @@ public class GroupController {
         // get debts
         DebtCalculator dc = new DebtCalculator(group.getMembers());
         List<DebtCalculator.Tuple> debts = dc.calculateDebts();
+        log.warn("{}", expenses);
 
         model.addAttribute("expenses", expenses);
         model.addAttribute("debts", debts);

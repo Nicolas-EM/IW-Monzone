@@ -117,64 +117,12 @@
                             <h5>DEBTS</h5>
                             <hr>
                             <div class="colscroll overflow-auto">
-                                <ul class="list-group">
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marta owes Ana 17.32€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Pablo owes Marta 2.53€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                    <li class="list-group-item list-group-item-warning">
-                                        <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        Marcos owes Ana 6.33€
-                                    </li>
-                                </ul>
+                                <th:block th:each="debt : ${debts}">
+                                    <button>
+                                        Mark as paid
+                                    </button>
+                                    <label>[[${debt.getDebtorName()}]] owes [[${debt.getDebtOwnerName()}]] [[${debt.getAmount()}]] [[group.getCurrencyText()]]</label>
+                                </th:block>
                             </div>
                         </div>
                     </div>
