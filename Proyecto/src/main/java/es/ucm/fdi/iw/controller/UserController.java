@@ -176,6 +176,27 @@ public class UserController {
     }
 
     /**
+     * Returns JSON with ids of groups that user belongs to
+     */
+    @GetMapping(path = "groups", produces = "application/json")
+	@Transactional // para no recibir resultados inconsistentes
+	@ResponseBody  // para indicar que no devuelve vista, sino un objeto (jsonizado)
+	public List<Long> getGroups(HttpSession session) {
+		long userId = ((User)session.getAttribute("u")).getId();		
+		User u = entityManager.find(User.class, userId);
+
+        List<Long> groupIds = new ArrayList<>();
+        for(Member m : u.getMemberOf()){
+            if(m.isEnabled())
+                groupIds.add(m.getGroup().getId());
+        }
+        
+		log.info("Generating group list for user {} ({} groups)",  u.getUsername(), groupIds.size());
+		return groupIds;
+	}
+
+
+    /**
      * Returns the default profile pic
      * 
      * @return

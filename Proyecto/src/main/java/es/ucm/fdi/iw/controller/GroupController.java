@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
@@ -51,6 +53,9 @@ public class GroupController {
     // LogManager.getLogger(GroupController.class);
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+	private SimpMessagingTemplate messagingTemplate;
 
     private static final Logger log = LogManager.getLogger(AdminController.class);
 
@@ -451,6 +456,19 @@ public class GroupController {
             return "{\"status\":\"already_in_group\"}";
         }
         
+    }
+
+    @PostMapping("/{id}/Notif")
+    @Transactional
+    @ResponseBody
+    public String sendGroupNotif(@PathVariable long id, @RequestBody JsonNode o) throws JsonProcessingException {
+        Notification notif = new Notification();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonNotif = mapper.writeValueAsString(notif.toTransfer());
+
+        messagingTemplate.convertAndSend("/group/"+ id +"/queue/updates", jsonNotif);
+        return "{\"result\": \"ok\"}";
     }
 
     /*
