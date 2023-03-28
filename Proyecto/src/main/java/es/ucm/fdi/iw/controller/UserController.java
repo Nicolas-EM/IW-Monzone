@@ -175,7 +175,7 @@ public class UserController {
 
         List<GroupNotification> groupNotifs = new ArrayList<>();
         for(Member m : u.getMemberOf()){
-            groupNotifs = Stream.concat(groupNotifs.stream(), m.getGroup().getNotifs().stream()).toList();
+            groupNotifs = Stream.concat(groupNotifs.stream(), m.getGroup().getNotifs().stream()).collect(Collectors.toList());
         }
 
 		log.info("Generating group notification list for user {} ({} notifications)",  u.getUsername(), groupNotifs.size());
