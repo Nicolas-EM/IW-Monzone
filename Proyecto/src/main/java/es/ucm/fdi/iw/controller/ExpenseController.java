@@ -400,11 +400,9 @@ public class ExpenseController {
 
         // save the new expense image
         // try{
-        //     String filename = String.valueOf(expenseId);
-        //     File dest = new File("/tmp/iwdata/expense/" + filename);
-        //     if(dest.exists()){
-        //         dest.delete();
-        //     }
+        //     String filename = String.valueOf(expenseId); //ver ejemplo de user controller de la plantilla
+        //     File dest = localData.getFile("expense", filename); //no molestarse en ver que había antes machacar lo anterior
+        //     dest.delete();
         //     file.transferTo(dest);
         // }
         // catch(IOException e){

@@ -2,14 +2,11 @@ package es.ucm.fdi.iw.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
 
 import javax.persistence.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Notifications of the system.
@@ -20,63 +17,64 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 @AllArgsConstructor
 @NamedQueries({
-	@NamedQuery(name="Notification.countUnread",
-	query="SELECT COUNT(n) FROM Notification n "
-			+ "WHERE n.user.id = :userId AND n.dateRead = null")
+	@NamedQuery(name="GroupNotification.countUnread",
+	query="SELECT COUNT(n) FROM GroupNotification n "
+			+ "WHERE n.group.id = :groupId AND n.dateRead = null")
 })
-@Table(name="IWNotification")
-public class GroupNotification extends Notification {
-    private float amount;
+@Table(name="IWGroupNotification")
+public class GroupNotification extends Notification implements Transferable<GroupNotification.Transfer> {
+    private String expenseName;
   
     // Group Notification constructor
-    public GroupNotification(NotificationType type, User sender, Group group){
+    public GroupNotification(NotificationType type, User sender, Group group, String expenseName) {
         super(type, sender, group);
+        this.expenseName = expenseName;
+        buildMessage(type);
+    }
 
-        switch(type){
+    private void buildMessage(NotificationType type) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("The user ");
+        sb.append(this.sender.getName());
+
+        switch(type) {
             case EXPENSE_CREATED:
-                expenseCreated();
+                sb.append("has created a new expense ");
                 break;
             case EXPENSE_MODIFIED:
-                expenseModified();
+                sb.append("has updated the expense ");
                 break;
             case EXPENSE_DELETED:
-                expenseDeleted();
+                sb.append("has deleted the expense ");
                 break;
-            default:
+            default: {}                
         }
-    }
 
-    private void expenseCreated(){
+        sb.append(this.expenseName);
+        sb.append(" in group ");
+        sb.append(this.group.getName());
 
-    }
-
-    private void expenseModified(){
-        
-    }
-
-    private void expenseDeleted(){
-        
+        this.message = sb.toString();
     }
 
     @AllArgsConstructor
     @Data
     public static class Transfer {
         private long id;
-        private String msg;
-        private LocalDateTime read;
         private NotificationType type;
-        private LocalDateTime date;
+        private LocalDateTime dateRead;
+        private LocalDateTime dateSent;
+        private String message;
+        private String senderName;
         private long senderId;
-        private boolean accepted;
-        private long idGroup;
-        private long idSender;
-        private long idRecipient;
+        private String groupName;
+        private long groupId;
+        private String expenseName;
     }
-
 
     @Override
     public Transfer toTransfer() {
-        return new Transfer(id, msg, dateRead, type, dateSent, user.getId(), false, -1, -1);
+        return new Transfer(id, type, dateRead, dateSent, message, sender.getName(), sender.getId(), group.getName(), group.getId(), expenseName);
     }
 }
 

@@ -19,13 +19,8 @@ import java.time.format.DateTimeFormatter;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@NamedQueries({
-	@NamedQuery(name="Notification.countUnread",
-	query="SELECT COUNT(n) FROM Notification n "
-			+ "WHERE n.user.id = :userId AND n.dateRead = null")
-})
 @Table(name="IWNotification")
-public abstract class Notification implements Transferable<Notification.Transfer> {
+public abstract class Notification {
     
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen")
@@ -67,18 +62,6 @@ public abstract class Notification implements Transferable<Notification.Transfer
         this.sender = sender;
         this.group = group;
     }
-
-    @AllArgsConstructor
-    @Data
-    public static abstract class Transfer {}
-
-	@Override
-    public abstract Transfer toTransfer();
-	
-	@Override
-	public String toString() {
-		return toTransfer().toString();
-	}
 
     public String getDateSent(){
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");  

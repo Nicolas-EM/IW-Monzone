@@ -1,4 +1,4 @@
-// envio de invitiaciones con AJAX
+// envio de invitaciones con AJAX
 let b = document.getElementById("confirmInviteBtn");
 b.onclick = (e) => {
     e.preventDefault();

@@ -76,7 +76,7 @@
                                         <div class="col-md-3 d-flex align-items-center justify-content-center expense-amount">
                                             <div class="card-text">[[${expense.getAmount()}]] [[${group.getCurrencyText()}]]</div>
                                             <form method="post" th:action="@{/group/{groupId}/{expenseId}/delExpense(groupId=${groupId}, expenseId=${expense.getId()})}">
-                                                <button class="btn button-add-expense btn-outline" type="submit">
+                                                <button class="btn button-del-expense btn-outline" type="submit">
                                                     <i class="fa fa-trash fa-lg"></i></button>
                                             </form>
                                         </div>
@@ -121,7 +121,7 @@
                                     <button>
                                         Mark as paid
                                     </button>
-                                    <label>[[${debt.getDebtorName()}]] owes [[${debt.getDebtOwnerName()}]] [[${debt.getAmount()}]] [[group.getCurrencyText()]]</label>
+                                    <label>[[${debt.getDebtorName()}]] owes [[${debt.getDebtOwnerName()}]] [[${debt.getAmount()}]] [[${group.getCurrencyText()}]]</label>
                                 </th:block>
                             </div>
                         </div>
@@ -132,6 +132,7 @@
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />
+    <script th:src="@{/js/group.js}" src="/js/group.js"></script>
 </body>
 
 </html>

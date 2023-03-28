@@ -57,8 +57,11 @@ public class User implements Transferable<User.Transfer> {
     @OneToMany(fetch= FetchType.EAGER, mappedBy = "user")
     private List<Member> memberOf = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<Notification> notifications = new ArrayList<>();
+    @OneToMany(mappedBy = "recipient")
+    private List<UserNotification> notifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sender")
+    private List<Notification> sentNotifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<Participates> expenses = new ArrayList<>();

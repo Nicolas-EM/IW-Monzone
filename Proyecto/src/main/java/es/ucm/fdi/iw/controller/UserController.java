@@ -6,7 +6,8 @@ import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Type;
-import es.ucm.fdi.iw.model.Notification;
+import es.ucm.fdi.iw.model.UserNotification;
+import es.ucm.fdi.iw.model.GroupNotification;
 import es.ucm.fdi.iw.model.Transferable;
 
 import org.apache.logging.log4j.LogManager;
@@ -39,6 +40,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.ArrayList;
 
 /**
@@ -149,16 +151,35 @@ public class UserController {
     }
 
     /**
-     * Returns JSON with all received messages
+     * Returns JSON with all received USER messages
      */
-    @GetMapping(path = "receivedNotifs", produces = "application/json")
+    @GetMapping(path = "receivedUserNotifs", produces = "application/json")
 	@Transactional // para no recibir resultados inconsistentes
 	@ResponseBody  // para indicar que no devuelve vista, sino un objeto (jsonizado)
-	public List<Notification.Transfer> retrieveMessages(HttpSession session) {
+	public List<UserNotification.Transfer> retrieveUserMessages(HttpSession session) {
 		long userId = ((User)session.getAttribute("u")).getId();		
 		User u = entityManager.find(User.class, userId);
 		log.info("Generating notification list for user {} ({} notifications)",  u.getUsername(), u.getNotifications().size());
 		return u.getNotifications().stream().map(Transferable::toTransfer).collect(Collectors.toList());
+	}
+
+    /**
+     * Returns JSON with all received GROUP messages
+     */
+    @GetMapping(path = "receivedGroupNotifs", produces = "application/json")
+	@Transactional // para no recibir resultados inconsistentes
+	@ResponseBody  // para indicar que no devuelve vista, sino un objeto (jsonizado)
+	public List<GroupNotification.Transfer> retrieveGroupMessages(HttpSession session) {
+		long userId = ((User)session.getAttribute("u")).getId();		
+		User u = entityManager.find(User.class, userId);
+
+        List<GroupNotification> groupNotifs = new ArrayList<>();
+        for(Member m : u.getMemberOf()){
+            groupNotifs = Stream.concat(groupNotifs.stream(), m.getGroup().getNotifs().stream()).toList();
+        }
+
+		log.info("Generating group notification list for user {} ({} notifications)",  u.getUsername(), groupNotifs.size());
+		return groupNotifs.stream().map(Transferable::toTransfer).collect(Collectors.toList());
 	}
 
     /**
@@ -167,10 +188,19 @@ public class UserController {
 	@GetMapping(path = "unread", produces = "application/json")
 	@ResponseBody
 	public String checkUnread(HttpSession session) {
-		long userId = ((User)session.getAttribute("u")).getId();		
-		long unread = entityManager.createNamedQuery("Notification.countUnread", Long.class)
+        User u = (User)session.getAttribute("u");
+        long userId = u.getId();
+        u = entityManager.find(User.class, userId);       
+				
+		long unread = entityManager.createNamedQuery("UserNotification.countUnread", Long.class)
 			.setParameter("userId", userId)
 			.getSingleResult();
+            
+        for(Member m : u.getMemberOf()){
+            unread += entityManager.createNamedQuery("GroupNotification.countUnread", Long.class)
+			.setParameter("groupId", m.getGroup().getId())
+			.getSingleResult();
+        }
 		session.setAttribute("unread", unread);
 		return "{\"unread\": " + unread + "}";
     }

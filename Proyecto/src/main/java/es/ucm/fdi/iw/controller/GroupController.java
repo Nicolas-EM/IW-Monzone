@@ -33,6 +33,7 @@ import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Notification;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
+import es.ucm.fdi.iw.model.GroupNotification;
 import es.ucm.fdi.iw.model.UserNotification;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.User;
@@ -137,7 +138,6 @@ public class GroupController {
         // get debts
         DebtCalculator dc = new DebtCalculator(group.getMembers());
         List<DebtCalculator.Tuple> debts = dc.calculateDebts();
-        log.warn("{}", expenses);
 
         model.addAttribute("expenses", expenses);
         model.addAttribute("debts", debts);
@@ -463,8 +463,32 @@ public class GroupController {
     @PostMapping("/{id}/notify")
     @Transactional
     @ResponseBody
-    public String sendGroupNotif(@PathVariable long id, @RequestBody JsonNode o) throws JsonProcessingException {
-        Notification notif = new Notification();
+    public String sendGroupNotif(@PathVariable long id, @RequestBody JsonNode jsonNode, HttpSession session) throws JsonProcessingException {
+        User sender = (User)session.getAttribute("u");
+        sender = entityManager.find(User.class, sender.getId());
+
+        Group group = entityManager.find(Group.class, id);
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        String action = objectMapper.convertValue(jsonNode.get("action"), String.class);
+        String expenseName = objectMapper.convertValue(jsonNode.get("expenseName"), String.class);
+        
+        NotificationType type;
+        switch(action){
+            case "created":
+                type = NotificationType.EXPENSE_CREATED;
+                break;
+            case "updated":
+                type = NotificationType.EXPENSE_MODIFIED;
+                break;
+            case "deleted":
+                type = NotificationType.EXPENSE_DELETED;
+                break;
+            default:
+                throw new BadRequestException();
+        }
+
+        GroupNotification notif = new GroupNotification(type, sender, group, expenseName);
 
         ObjectMapper mapper = new ObjectMapper();
         String jsonNotif = mapper.writeValueAsString(notif.toTransfer());

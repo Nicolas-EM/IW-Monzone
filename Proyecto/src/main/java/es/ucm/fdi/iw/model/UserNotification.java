@@ -2,9 +2,7 @@ package es.ucm.fdi.iw.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
 
 import javax.persistence.*;
 
@@ -20,16 +18,15 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 @AllArgsConstructor
 @NamedQueries({
-	@NamedQuery(name="Notification.countUnread",
-	query="SELECT COUNT(n) FROM Notification n "
-			+ "WHERE n.user.id = :userId AND n.dateRead = null")
+	@NamedQuery(name="UserNotification.countUnread",
+	query="SELECT COUNT(n) FROM UserNotification n "
+			+ "WHERE n.recipient.id = :userId AND n.dateRead = null")
 })
-@Table(name="IWNotification")
-public class UserNotification extends Notification {
+@Table(name="IWUserNotification")
+public class UserNotification extends Notification implements Transferable<UserNotification.Transfer> {
     
     @ManyToOne
     private User recipient;
-
 
     // User notification constructor
     public UserNotification(NotificationType type, User sender, Group group, User recipient){
@@ -75,7 +72,7 @@ public class UserNotification extends Notification {
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(id, message, dateRead, type, dateSent, sender.getId(), recipient.getId(), false, -1, -1);
+		return new Transfer(id, message, dateRead, type, dateSent, sender.getId(), false, recipient.getId(), -1, -1);
 	}
 	
 	@Override

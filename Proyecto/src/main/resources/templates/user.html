@@ -81,13 +81,14 @@
           </div>
         </div>
         <!-- Categories -->
+        <form method="post" th:action="@{/group/{groupId}/{action}(groupId=${groupId}, action=${expense != null} ? ${expense?.getId()} : 'new')}">
         <div class="row">
           <div class="col-8">
             <h4>How much do you spend in each category?</h4>
           </div>
           <div class="col-4">
             <select id="cur2" class="form-select rounded-corners" required name="currId">
-              <option  th:unless="${group != null}" selected disabled hidden value="">Currency</option>
+              <option th:unless="${group != null}" selected disabled hidden value="">Currency</option>
               <div th:each="curr,i : ${currencies}">
                 <option id="curValue2"  th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
               </div>
@@ -101,10 +102,11 @@
             <div class="col align-items-center justify-content-center">
               <img class="separator" th:src="@{/img/type/{id}.png(id=${type.getId()})}" src="/img/type/error.png" alt="Category Icon" width="auto" height="50">
               <!--eso cambiarlo por el valor que calcules para cada categoria-->
-              <p class="amount">10 <span class="curr">€</span></p>
+              <p class="amount">10 <span class="curr">[[${currency}]]</span></p>
             </div>
           </div>
         </div>
+      </form>
         <!-- Groups -->
         <div class="row">
           <h4>Your Groups</h4>

@@ -36,11 +36,11 @@ window.addEventListener("load", (event) => {
     const paidById = document.getElementById("paidById").value;
   
     go(b.getAttribute('formaction'), 'POST', {
-      name: name,
+      name,
       desc: document.getElementById("desc").value,
       dateString: document.getElementById("dateString").value,
-      amount: amount,
-      paidById: paidById,
+      amount,
+      paidById,
       participateIds: Array.from(document.querySelectorAll('input[name="participateIds"]:checked')).map(cb => cb.value),
       typeId: document.getElementById("typeId").value
     })
@@ -54,10 +54,8 @@ window.addEventListener("load", (event) => {
       .then(d => {
         // Send expense creation notification
         go(notificationUrl, 'POST', {
-          paidById: paidById,
-          name: name,
-          amount: amount,
-          action: "created"
+          expenseName: name,
+          action: (b.getAttribute('formaction').includes("ne")) ? "created" : "updated"
         }).then(response => {
           console.log("Notification sent", response);
         }).catch(error => {
@@ -82,5 +80,5 @@ function onChangeAmount(amount) {
     else {
       values[i].innerHTML = '';
     }
-  }
+  }  
 }
