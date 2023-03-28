@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import es.ucm.fdi.iw.LocalData;
@@ -340,7 +341,7 @@ public class ExpenseController {
     public String editExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model,
             HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc,
             @RequestParam String dateString, @RequestParam float amount, @RequestParam long paidById,
-            @RequestParam long typeId, @RequestParam List<String> participateIds) {
+            @RequestParam long typeId, @RequestParam List<String> participateIds,@RequestParam("img[]") MultipartFile file) {
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
@@ -375,6 +376,19 @@ public class ExpenseController {
                 entityManager.remove(p);
             }
         }
+
+        // save the new expense image
+        // try{
+        //     String filename = String.valueOf(expenseId);
+        //     File dest = new File("/tmp/iwdata/expense/" + filename);
+        //     if(dest.exists()){
+        //         dest.delete();
+        //     }
+        //     file.transferTo(dest);
+        // }
+        // catch(IOException e){
+        //     return "Error IMAGEN " + e.getMessage();
+        // }
 
         // update expense
         exp.setName(name);
@@ -506,7 +520,7 @@ public class ExpenseController {
         if (exp != null && !group.hasExpense(exp))
             throw new BadRequestException();
 
-        File f = localData.getFile("expense", String.format("%d-%d.jpg", groupId, expenseId));
+        File f = localData.getFile("expense", String.valueOf(expenseId));
         InputStream in = new BufferedInputStream(
                 f.exists() ? new FileInputStream(f) : ExpenseController.defaultExpensePic());
         return os -> FileCopyUtils.copy(in, os);
