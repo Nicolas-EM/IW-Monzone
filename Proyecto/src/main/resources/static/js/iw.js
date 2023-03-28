@@ -194,20 +194,18 @@ function postImage(img, endpoint, name, filename) {
 /**
  * Actions to perform once the page is fully loaded
  */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     if (config.socketUrl) {
         let subs = config.admin ? ["/topic/admin", "/user/queue/updates"] : ["/user/queue/updates"]
 
-        // get all groups and subscribte to their notifs
-        go(`${config.rootUrl}/user/groups`, "GET")
-        .then(
-            groupIds => {
-                let groupSubs = groupIds.map(groupId => `/group/${groupId}/queue/updates`);
-                subs.concat(groupSubs);
-            }
-        ).catch(error => {
+        // get all groups and subscribe to their notifs
+        try {
+            const groupIds = await go(`${config.rootUrl}/user/groups`, "GET");
+            let groupSubs = groupIds.map(groupId => `/group/${groupId}/queue/notifications`);
+            subs = subs.concat(groupSubs);
+        } catch (error) {
             console.error("Error fetching user groups:", error);
-        });
+        }
 
         ws.initialize(config.socketUrl, subs);
 
@@ -218,8 +216,4 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         console.log("Not opening websocket: missing config", config)
     }
-
-    // add your after-page-loaded JS code here; or even better, call 
-    // 	 document.addEventListener("DOMContentLoaded", () => { /* your-code-here */ });
-    //   (assuming you do not care about order-of-execution, all such handlers will be called correctly)
 });

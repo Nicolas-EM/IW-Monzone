@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 			+ "WHERE n.user.id = :userId AND n.dateRead = null")
 })
 @Table(name="IWNotification")
-public class Notification implements Transferable<Notification.Transfer> {
+public abstract class Notification implements Transferable<Notification.Transfer> {
     
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen")
@@ -33,80 +33,56 @@ public class Notification implements Transferable<Notification.Transfer> {
 	protected long id;
 
     public enum NotificationType {
-        BASIC,
-        INVITATION,
+        GROUP_INVITATION,
         BUDGET_WARNING,
-        DEBT_WARNING 
+        // DEBT_WARNING,
+        EXPENSE_CREATED,
+        EXPENSE_MODIFIED,
+        EXPENSE_DELETED
     }
 
+    @ManyToOne
+    protected User sender;
+
+    @ManyToOne
+    protected Group group;
+
     @Column(nullable = false)
-    protected String msg;
-    
-    protected LocalDateTime dateRead = null;
-    
+    protected String message;
+
     @Column(nullable = false)
     protected NotificationType type;
-    
+
     @Getter(AccessLevel.NONE)
     @Column(nullable = false)
     protected LocalDateTime dateSent;
 
-    @ManyToOne
-    protected User user;
+    @Column(nullable = true)
+    protected LocalDateTime dateRead = null;
 
-    @ManyToOne
-    private Group group;
-
-    @ManyToOne
-    private User sender;
-
-    public Notification(NotificationType type, User user, User sender, Group group){
+    // User notification constructor
+    public Notification(NotificationType type, User sender, Group group){
         this.type = type;
         this.dateSent = LocalDateTime.now();
-        this.user = user;
         this.sender = sender;
         this.group = group;
-
-        StringBuilder sb = new StringBuilder();
-        switch(this.type){
-            case INVITATION:
-                sb.append("You have been invited to join the group ");
-                sb.append(group.getName());
-                this.msg = sb.toString();
-                break;
-            default:
-            this.msg = "TODO: Notification message";
-        }
     }
-  
+
     @AllArgsConstructor
     @Data
-    public static class Transfer {
-        private long id;
-        private String msg;
-        private LocalDateTime read;
-        private NotificationType type;
-        private LocalDateTime date;
-        private long idUser;
-        private boolean accepted;
-        private long idGroup;
-        private long idSender;
-    }
+    public static abstract class Transfer {}
 
 	@Override
-    public Transfer toTransfer() {
-		return new Transfer(id, msg, dateRead, type, dateSent, user.getId(), false, -1, -1);
-	}
+    public abstract Transfer toTransfer();
 	
 	@Override
 	public String toString() {
 		return toTransfer().toString();
 	}
 
-    public String getDate(){
+    public String getDateSent(){
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");  
         return dateSent.format(format);  
     }
-
 }
 

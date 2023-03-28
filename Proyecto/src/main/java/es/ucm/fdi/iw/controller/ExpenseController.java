@@ -21,11 +21,17 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import es.ucm.fdi.iw.LocalData;
 import es.ucm.fdi.iw.model.Expense;
@@ -292,9 +298,17 @@ public class ExpenseController {
      */
     @PostMapping("/newExpense")
     @Transactional
-    public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestParam String name,
-            @RequestParam(required = false) String desc, @RequestParam String dateString, @RequestParam float amount,
-            @RequestParam long paidById, @RequestParam List<String> participateIds, @RequestParam long typeId) {
+    @ResponseBody
+    public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestBody JsonNode jsonNode) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String name = objectMapper.convertValue(jsonNode.get("name"), String.class);
+        String desc = objectMapper.convertValue(jsonNode.get("desc"), String.class);
+        String dateString = objectMapper.convertValue(jsonNode.get("dateString"), String.class);
+        float amount = objectMapper.convertValue(jsonNode.get("amount"), Float.class);
+        long paidById = objectMapper.convertValue(jsonNode.get("paidById"), Long.class);
+        List<String> participateIds = objectMapper.convertValue(jsonNode.get("participateIds"), new TypeReference<List<String>>() {});
+        long typeId = objectMapper.convertValue(jsonNode.get("typeId"), Long.class);
+
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
@@ -329,19 +343,26 @@ public class ExpenseController {
             m.setBalance(m.getBalance() - e.getAmount() / params.participateUsers.size());
         }
 
-        return "redirect:/group/" + groupId;
+        return "{\"action\": \"redirect\",\"redirect\": \"/group/" + groupId + "\"}";
     }
 
-    // TODO: Debería recibir lista participantes, y falta actualizar los balance
     /*
      * Edit group expense
      */
     @PostMapping("{expenseId}/updateExpense")
     @Transactional
+    @ResponseBody
     public String editExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model,
-            HttpSession session, @RequestParam String name, @RequestParam(required = false) String desc,
-            @RequestParam String dateString, @RequestParam float amount, @RequestParam long paidById,
-            @RequestParam long typeId, @RequestParam List<String> participateIds,@RequestParam("img[]") MultipartFile file) {
+            HttpSession session, @RequestBody JsonNode jsonNode) {
+    
+        ObjectMapper objectMapper = new ObjectMapper();
+        String name = objectMapper.convertValue(jsonNode.get("name"), String.class);
+        String desc = objectMapper.convertValue(jsonNode.get("desc"), String.class);
+        String dateString = objectMapper.convertValue(jsonNode.get("dateString"), String.class);
+        float amount = objectMapper.convertValue(jsonNode.get("amount"), Float.class);
+        long paidById = objectMapper.convertValue(jsonNode.get("paidById"), Long.class);
+        List<String> participateIds = objectMapper.convertValue(jsonNode.get("participateIds"), new TypeReference<List<String>>() {});
+        long typeId = objectMapper.convertValue(jsonNode.get("typeId"), Long.class);
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
@@ -417,7 +438,7 @@ public class ExpenseController {
             m.setBalance(m.getBalance() - amount / params.participateUsers.size());
         }
 
-        return "redirect:/group/" + groupId + "/" + expenseId;
+        return "{\"action\": \"none\"}";
     }
 
     /*

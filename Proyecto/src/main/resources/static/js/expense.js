@@ -1,7 +1,7 @@
 window.addEventListener("load", (event) => {
   console.log("page is fully loaded");
 
-  document.getElementById('imgBtn').addEventListener('click', function(){
+  document.getElementById('imgBtn').addEventListener('click', function () {
     document.getElementById('imgFileInput').click();
   });
 
@@ -18,36 +18,69 @@ window.addEventListener("load", (event) => {
   });
 
   const checkboxes = document.getElementsByClassName('participateCheckbox');
-  for(let i = 0; i < checkboxes.length; i++){
-    checkboxes[i].addEventListener('change', function(){
+  for (let i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].addEventListener('change', function () {
       const amount = document.getElementById('amount').value;
       onChangeAmount(amount);
     })
   }
+
+  // Submit Button
+  document.getElementById("btn-save").onclick = (e) => {
+    e.preventDefault();
+    console.log('Saving expense');
+    const b = document.getElementById("btn-save");
+    const notificationUrl = b.getAttribute("data-notification-url");
+    const name = document.getElementById("name").value;
+    const amount = document.getElementById("amount").value;
+    const paidById = document.getElementById("paidById").value;
+  
+    go(b.getAttribute('formaction'), 'POST', {
+      name: name,
+      desc: document.getElementById("desc").value,
+      dateString: document.getElementById("dateString").value,
+      amount: amount,
+      paidById: paidById,
+      participateIds: Array.from(document.querySelectorAll('input[name="participateIds"]:checked')).map(cb => cb.value),
+      typeId: document.getElementById("typeId").value
+    })
+      .then(d => {
+        console.log("Expense: success", d);
+        if(d.action === "redirect"){
+          console.log("Redirecting to ", d.redirect);
+          window.location.replace(d.redirect);
+        }
+      })
+      .then(d => {
+        // Send expense creation notification
+        go(notificationUrl, 'POST', {
+          paidById: paidById,
+          name: name,
+          amount: amount,
+          action: "created"
+        }).then(response => {
+          console.log("Notification sent", response);
+        }).catch(error => {
+          console.log("Error sending notification", error);
+        });
+      })
+      .catch(e => console.log("Error creating expense", e))
+  }
 });
 
 /* Changes value pero user */
-function onChangeAmount(amount){
+function onChangeAmount(amount) {
   console.log(`onChangeAmount(${amount}) called`);
   const checkboxes = document.getElementsByClassName('participateCheckbox');
   const numChecked = document.querySelectorAll('input:checked').length;
   const values = document.getElementsByClassName('amountPerMember');
 
-  for(let i = 0; i < checkboxes.length; i++){
-    if(checkboxes[i].checked){
+  for (let i = 0; i < checkboxes.length; i++) {
+    if (checkboxes[i].checked) {
       values[i].innerHTML = (Math.round(amount / numChecked * 100) / 100).toFixed(2);
     }
-    else{
+    else {
       values[i].innerHTML = '';
     }
   }
-}
-
-document.getElementById("btn-save").onclick = (e) => {
-  e.preventDefault();
-  go(b.parentNode.action, 'POST', {
-          message: document.getElementById("message").value
-      })
-      .then(d => console.log("happy", d))
-      .catch(e => console.log("sad", e))
 }

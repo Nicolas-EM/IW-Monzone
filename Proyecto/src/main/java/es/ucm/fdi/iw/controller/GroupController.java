@@ -32,12 +32,13 @@ import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Notification;
+import es.ucm.fdi.iw.model.Notification.NotificationType;
+import es.ucm.fdi.iw.model.UserNotification;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Group.Currency;
 import es.ucm.fdi.iw.model.Member.GroupRole;
-import es.ucm.fdi.iw.model.Notification.NotificationType;
 import es.ucm.fdi.iw.model.DebtCalculator;
 
 /**
@@ -445,7 +446,7 @@ public class GroupController {
         // check user not already member
         if (member == null) {
             // user is not already in the group, invite
-            Notification invite = new Notification(NotificationType.INVITATION, user, sender, group);
+            Notification invite = new UserNotification(NotificationType.GROUP_INVITATION, user, group, sender);
             entityManager.persist(invite);
             entityManager.flush();
             log.info("User {} invited to group {}", username, group.getName());
@@ -458,7 +459,7 @@ public class GroupController {
         
     }
 
-    @PostMapping("/{id}/Notif")
+    @PostMapping("/{id}/notify")
     @Transactional
     @ResponseBody
     public String sendGroupNotif(@PathVariable long id, @RequestBody JsonNode o) throws JsonProcessingException {
@@ -467,7 +468,7 @@ public class GroupController {
         ObjectMapper mapper = new ObjectMapper();
         String jsonNotif = mapper.writeValueAsString(notif.toTransfer());
 
-        messagingTemplate.convertAndSend("/group/"+ id +"/queue/updates", jsonNotif);
+        messagingTemplate.convertAndSend("/group/"+ id +"/queue/notifications", jsonNotif);
         return "{\"result\": \"ok\"}";
     }
 
