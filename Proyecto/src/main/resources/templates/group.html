@@ -75,10 +75,6 @@
                                         <!-- Amount -->
                                         <div class="col-md-3 d-flex align-items-center justify-content-center expense-amount">
                                             <div class="card-text">[[${expense.getAmount()}]] [[${group.getCurrencyText()}]]</div>
-                                            <form method="post" th:action="@{/group/{groupId}/{expenseId}/delExpense(groupId=${groupId}, expenseId=${expense.getId()})}">
-                                                <button class="btn button-del-expense btn-outline" type="submit">
-                                                    <i class="fa fa-trash fa-lg"></i></button>
-                                            </form>
                                         </div>
                                     </div>
                                 </div>

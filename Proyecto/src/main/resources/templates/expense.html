@@ -82,6 +82,7 @@
           <!-- Submit button -->
           <div class="row mt-3">
             <button type="submit" id="btn-save" th:formaction="@{/group/{groupId}/{action}(groupId=${groupId}, action=${expense == null} ? 'newExpense' : ${expense?.getId()} + '/updateExpense')}" th:data-notification-url="@{/group/{groupId}/notify(groupId=${groupId})}" class="btn btn-primary rounded-pill fw-bold mt-2">Save</button>
+            <button th:if="${expense != null}" id="btn-delete" th:formaction="@{/group/{groupId}/{expenseId}/delExpense(groupId=${groupId}, expenseId=${expense.getId()})}" class="btn btn-primary rounded-pill fw-bold mt-2">Delete</button>
           </div>
         </div>
       </div>

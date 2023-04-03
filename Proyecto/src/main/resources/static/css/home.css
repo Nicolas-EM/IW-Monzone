@@ -1,23 +1,62 @@
+
+/* ------------ GENERAL ------------*/
+
+#home_groups {
+    margin-top: 3vh;
+    margin-left: 3vh;
+    margin-right: 2vh;
+    row-gap: 4vh;
+}
+
 #home_groups .card {
     max-width: 20rem;
-    max-height: 10rem;
+    max-height: 15rem;
+    background-color: #ac760a;
+    border-radius: 12px;
 }
 
 .colscroll{
     overflow-y: scroll;
 }
 
+/* ------------ CARD ------------*/
+
+.card-header h5 {
+    margin-top: 4px;
+    font-size: 120%;
+}
+
 .height{
     height: 7vh;
 }
 
-.rounded-corners {
-    height: 4vh;
-    border-radius: 8px;
-    padding-top:2px;
+.balance {
+    border: 2px solid;
+    border-radius: 4px;
+    border-color: white;
 }
 
-.numPersons{
-    margin-left: 4px;
-    float : right;
+.col-num-members {
+    width: 70%;
+}
+
+.icon {
+    width: 10%;
+    float: right;
+    margin-left: 9px;
+}
+
+.num-members{
+    float: right;
+    width: auto;
+    margin-left: 20%;
+}
+
+/* ------------ ADD BUTTON ------------*/
+
+.btn-lg {
+    background-color: #f5b301;
+    color: #2A2E34;
+    font-size: 2em;
+    width: 20%;
 }
