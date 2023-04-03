@@ -305,22 +305,22 @@ public class ExpenseController {
     }
 
     @Async
-    public CompletableFuture<Void> sendNotifications(NotificationType type, User sender, List<Member> members, Expense e) {
-        for(Member m : members){
+    public CompletableFuture<Void> sendNotifications(NotificationType type, User sender, List<User> users, Group group, Expense e) {
+        for(User u : users){
             // Do not send notification to sender
-            if(m.getUser().getId() == sender.getId())
+            if(u.getId() == sender.getId())
                 continue;
 
-            Notification notif = new Notification(type, sender, m.getUser(), m.getGroup(), e);
+            Notification notif = new Notification(type, sender, u, group, e);
             entityManager.persist(notif);
             entityManager.flush();
             ObjectMapper mapper = new ObjectMapper();
             String jsonNotif;
             try {
                 jsonNotif = mapper.writeValueAsString(notif.toTransfer());
-                log.info("Sending a notification to {} with contents '{}'", "/user/"+ m.getUser().getId() +"/queue/notifications", jsonNotif);
+                log.info("Sending a notification to {} with contents '{}'", "/user/"+ u.getId() +"/queue/notifications", jsonNotif);
     
-                messagingTemplate.convertAndSend("/user/"+ m.getUser().getUsername() +"/queue/notifications", jsonNotif);
+                messagingTemplate.convertAndSend("/user/"+ u.getUsername() +"/queue/notifications", jsonNotif);
             } catch (JsonProcessingException exception) {
                 log.error("Failed to parse notification - Type {}, sender {}, expense {}", type, sender, e);
                 log.error("Exception {}", exception);
@@ -380,7 +380,7 @@ public class ExpenseController {
         }
 
         // create notification ASYNC
-        sendNotifications(NotificationType.EXPENSE_CREATED, params.currUser, params.participateMembers, e);
+        sendNotifications(NotificationType.EXPENSE_CREATED, params.currUser, params.participateUsers, params.group, e);
 
         return "{\"action\": \"redirect\",\"redirect\": \"/group/" + groupId + "\"}";
     }
@@ -475,6 +475,9 @@ public class ExpenseController {
             m.setBalance(m.getBalance() - amount / params.participateUsers.size());
         }
 
+        // create notification ASYNC
+        sendNotifications(NotificationType.EXPENSE_MODIFIED, params.currUser, params.participateUsers, params.group, exp);
+
         return "{\"action\": \"none\"}";
     }
 
@@ -509,12 +512,16 @@ public class ExpenseController {
         if (!group.hasExpense(exp))
             throw new BadRequestException();
 
+        // List of users to notify
+        List<User> notifyUsers = new ArrayList<>();
+
         // delete debts of balances
         List<Participates> participants = exp.getBelong();
         for (Participates p : participants) {
             MemberID memberID = new MemberID(group.getId(), p.getUser().getId());
             Member m = entityManager.find(Member.class, memberID);
             m.setBalance(m.getBalance() + exp.getAmount() / participants.size());
+            notifyUsers.add(p.getUser());
         }
 
         // delete owed from balance
@@ -529,8 +536,10 @@ public class ExpenseController {
         // disable expense
         exp.setEnabled(false);
 
-        return "redirect:/group/" + groupId;
+        // create notification ASYNC
+        sendNotifications(NotificationType.EXPENSE_DELETED, user, notifyUsers, group, exp);
 
+        return "redirect:/group/" + groupId;
     }
 
     /*
