@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
@@ -16,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -38,9 +40,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import es.ucm.fdi.iw.LocalData;
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
-import es.ucm.fdi.iw.model.GroupNotification;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
+import es.ucm.fdi.iw.model.Notification;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.ParticipatesID;
 import es.ucm.fdi.iw.model.Type;
@@ -208,7 +210,7 @@ public class ExpenseController {
 
     class PostParams {
         public Boolean valid = false;
-        public User creator;
+        public User currUser;
         public Group group;
         public User paidBy;
         public Member paidByMember;
@@ -225,7 +227,7 @@ public class ExpenseController {
         PostParams validated = new PostParams();
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
-        validated.creator = user;
+        validated.currUser = user;
 
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
@@ -302,13 +304,39 @@ public class ExpenseController {
         return validated;
     }
 
+    @Async
+    public CompletableFuture<Void> sendNotifications(NotificationType type, User sender, List<Member> members, Expense e) {
+        for(Member m : members){
+            // Do not send notification to sender
+            if(m.getUser().getId() == sender.getId())
+                continue;
+
+            Notification notif = new Notification(type, sender, m.getUser(), m.getGroup(), e);
+            entityManager.persist(notif);
+            entityManager.flush();
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonNotif;
+            try {
+                jsonNotif = mapper.writeValueAsString(notif.toTransfer());
+                log.info("Sending a notification to {} with contents '{}'", "/user/"+ m.getUser().getId() +"/queue/notifications", jsonNotif);
+    
+                messagingTemplate.convertAndSend("/user/"+ m.getUser().getUsername() +"/queue/notifications", jsonNotif);
+            } catch (JsonProcessingException exception) {
+                log.error("Failed to parse notification - Type {}, sender {}, expense {}", type, sender, e);
+                log.error("Exception {}", exception);
+            }
+        }
+
+        return CompletableFuture.completedFuture(null);
+    }
+
     /*
      * Add expense to group
      */
     @PostMapping("/newExpense")
     @Transactional
     @ResponseBody
-    public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestBody JsonNode jsonNode) throws JsonProcessingException {
+    public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestBody JsonNode jsonNode) {
         ObjectMapper objectMapper = new ObjectMapper();
         String name = objectMapper.convertValue(jsonNode.get("name"), String.class);
         String desc = objectMapper.convertValue(jsonNode.get("desc"), String.class);
@@ -351,17 +379,9 @@ public class ExpenseController {
             m.setBalance(m.getBalance() - e.getAmount() / params.participateUsers.size());
         }
 
-        // create notification
-        GroupNotification notif = new GroupNotification(NotificationType.EXPENSE_CREATED, params.creator, params.group, name);
-        entityManager.persist(notif);
-        entityManager.flush();
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonNotif = mapper.writeValueAsString(notif.toTransfer());
+        // create notification ASYNC
+        sendNotifications(NotificationType.EXPENSE_CREATED, params.currUser, params.participateMembers, e);
 
-        log.info("Sending a notification to group {} with contents '{}'", params.group.getId(), jsonNotif);
-
-        messagingTemplate.convertAndSend("/group/"+ params.group.getId() +"/queue/notifications", jsonNotif);
-        
         return "{\"action\": \"redirect\",\"redirect\": \"/group/" + groupId + "\"}";
     }
 

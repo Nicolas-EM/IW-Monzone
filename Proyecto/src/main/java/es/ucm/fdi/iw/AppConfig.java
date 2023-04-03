@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * General configuration for a Spring app.
@@ -15,6 +16,7 @@ import org.springframework.core.env.Environment;
  * Spring magic. 
  */
 @Configuration	
+@EnableAsync
 public class AppConfig {
 
 	@Autowired

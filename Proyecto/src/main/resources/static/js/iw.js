@@ -194,19 +194,9 @@ function postImage(img, endpoint, name, filename) {
 /**
  * Actions to perform once the page is fully loaded
  */
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
     if (config.socketUrl) {
-        let subs = config.admin ? ["/topic/admin", "/user/queue/updates"] : ["/user/queue/updates"]
-
-        // get all groups and subscribe to their notifs
-        try {
-            const groupIds = await go(`${config.rootUrl}/user/groups`, "GET");
-            let groupSubs = groupIds.map(groupId => `/group/${groupId}/queue/notifications`);
-            subs = subs.concat(groupSubs);
-        } catch (error) {
-            console.error("Error fetching user groups:", error);
-        }
-
+        let subs = config.admin ? ["/topic/admin", "/user/queue/notifications"] : ["/user/queue/notifications"]
         ws.initialize(config.socketUrl, subs);
 
         let p = document.querySelector("#nav-unread");

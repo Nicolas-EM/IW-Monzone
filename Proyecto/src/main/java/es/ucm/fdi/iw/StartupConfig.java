@@ -9,7 +9,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletContext;
-import java.text.SimpleDateFormat;
 
 /**
  * This code will execute when the application first starts.

@@ -30,7 +30,6 @@ window.addEventListener("load", (event) => {
     e.preventDefault();
     console.log('Saving expense');
     const b = document.getElementById("btn-save");
-    const notificationUrl = b.getAttribute("data-notification-url");
     const name = document.getElementById("name").value;
     const amount = document.getElementById("amount").value;
     const paidById = document.getElementById("paidById").value;
@@ -50,17 +49,6 @@ window.addEventListener("load", (event) => {
           console.log("Redirecting to ", d.redirect);
           window.location.replace(d.redirect);
         }
-      })
-      .then(d => {
-        // Send expense creation notification
-        go(notificationUrl, 'POST', {
-          expenseName: name,
-          action: (b.getAttribute('formaction').includes("ne")) ? "created" : "updated"
-        }).then(response => {
-          console.log("Notification sent", response);
-        }).catch(error => {
-          console.log("Error sending notification", error);
-        });
       })
       .catch(e => console.log("Error creating expense", e))
   }

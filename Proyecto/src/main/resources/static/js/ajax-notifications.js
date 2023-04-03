@@ -5,38 +5,24 @@
 function renderNotif(notif) {
     console.log("rendering: ", notif);
     return `<div class="row my-2">
-                <div class="card text-white bg-warning" role="button" tabindex="0">
-                    <div class="card-header"><h5>${notif.msg}</h5></div>
-                    <div class="card-body">
-                        <td class="card-title">Text</td>
-                    </div>
+                <div class="card text-white bg-warning" role="button">
+                    <div class="card-header"><h5>${notif.message}</h5></div>
                 </div>
             </div>`
-    // return `<div>${msg.from} @${msg.sent}: ${msg.text}</div>`;
 }
 
 // pinta notifs viejos al cargarse, via AJAX
-// pinta notifs de usuario
-go(config.rootUrl + "/user/receivedUserNotifs", "GET")
+go(config.rootUrl + "/user/receivedNotifs", "GET")
 .then(notifs => {
-    console.log("USER notifications");
-    console.log(notifs);
-    let userNotifsDiv = document.getElementById("user-tab-pane");
+    let actionNotifsDiv = document.getElementById("action-tab-pane");
+    let notifsDiv = document.getElementById("notifs-tab-pane");
+
     notifs.forEach(notif => {
-        console.log(notif);
-        userNotifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
-    })
-    }
-);
-// pinta notifs de grupo
-go(config.rootUrl + "/user/receivedGroupNotifs", "GET")
-.then(notifs => {
-    console.log("GROUP notifications");
-    console.log(notifs);
-    let groupNotifsDiv = document.getElementById("groupNotifs-tab-pane");
-    notifs.forEach(notif => {
-        console.log(notif);
-        groupNotifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
+        if(Object.hasOwn(notif, 'actionEndpoint')){
+            actionNotifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
+        } else {
+            notifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
+        }
     })
     }
 );
@@ -47,8 +33,12 @@ if (ws.receive) {
     ws.receive = (notif) => {
         console.log("Received notification");
         oldFn(notif); // llama al manejador anterior
+
+        let actionNotifsDiv = document.getElementById("action-tab-pane");
+        let notifsDiv = document.getElementById("notifs-tab-pane");
+
         if(notif.type == 'INVITATION'){
-            inviteDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));
+            actionNotifsDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));
         }
         else {
             notifsDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));

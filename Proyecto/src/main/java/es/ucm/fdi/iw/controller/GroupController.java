@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
@@ -33,8 +32,6 @@ import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Notification;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
-import es.ucm.fdi.iw.model.GroupNotification;
-import es.ucm.fdi.iw.model.UserNotification;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
@@ -447,7 +444,7 @@ public class GroupController {
         // check user not already member
         if (member == null) {
             // user is not already in the group, invite
-            Notification invite = new UserNotification(NotificationType.GROUP_INVITATION, user, group, sender);
+            Notification invite = new Notification(NotificationType.GROUP_INVITATION, sender, user, group);
             entityManager.persist(invite);
             entityManager.flush();
             log.info("User {} invited to group {}", username, group.getName());
@@ -457,44 +454,6 @@ public class GroupController {
             log.info("User {} cannot join group {}", member.getUser().getUsername(), group.getName());
             return "{\"status\":\"already_in_group\"}";
         }
-        
-    }
-
-    @PostMapping("/{id}/notify")
-    @Transactional
-    @ResponseBody
-    public String sendGroupNotif(@PathVariable long id, @RequestBody JsonNode jsonNode, HttpSession session) throws JsonProcessingException {
-        User sender = (User)session.getAttribute("u");
-        sender = entityManager.find(User.class, sender.getId());
-
-        Group group = entityManager.find(Group.class, id);
-        
-        ObjectMapper objectMapper = new ObjectMapper();
-        String action = objectMapper.convertValue(jsonNode.get("action"), String.class);
-        String expenseName = objectMapper.convertValue(jsonNode.get("expenseName"), String.class);
-        
-        NotificationType type;
-        switch(action){
-            case "created":
-                type = NotificationType.EXPENSE_CREATED;
-                break;
-            case "updated":
-                type = NotificationType.EXPENSE_MODIFIED;
-                break;
-            case "deleted":
-                type = NotificationType.EXPENSE_DELETED;
-                break;
-            default:
-                throw new BadRequestException();
-        }
-
-        GroupNotification notif = new GroupNotification(type, sender, group, expenseName);
-
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonNotif = mapper.writeValueAsString(notif.toTransfer());
-
-        messagingTemplate.convertAndSend("/group/"+ id +"/queue/notifications", jsonNotif);
-        return "{\"result\": \"ok\"}";
     }
 
     /*
