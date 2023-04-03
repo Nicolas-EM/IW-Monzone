@@ -12,7 +12,7 @@
 	<artifactId>Monzone</artifactId>                      				<!-- cambia esto -->
 	<version>0.0.1-SNAPSHOT</version>     
 	<name>Monzone</name>                                 				<!-- cambia esto -->
-	<description>La aplicación web para dividir gastos</description> 	<!-- cambia esto -->
+	<description>The WebApp to split expenses</description> 	<!-- cambia esto -->
 	<properties>
 		<java.version>11</java.version>
 		<maven.compiler.version>3.8.1</maven.compiler.version>

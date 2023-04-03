@@ -159,7 +159,7 @@ public class UserController {
 	public List<UserNotification.Transfer> retrieveUserMessages(HttpSession session) {
 		long userId = ((User)session.getAttribute("u")).getId();		
 		User u = entityManager.find(User.class, userId);
-		log.info("Generating notification list for user {} ({} notifications)",  u.getUsername(), u.getNotifications().size());
+		log.info("Generating USER NOTIFS list for user {} ({} notifications)",  u.getUsername(), u.getNotifications().size());
 		return u.getNotifications().stream().map(Transferable::toTransfer).collect(Collectors.toList());
 	}
 
@@ -178,7 +178,7 @@ public class UserController {
             groupNotifs = Stream.concat(groupNotifs.stream(), m.getGroup().getNotifs().stream()).collect(Collectors.toList());
         }
 
-		log.info("Generating group notification list for user {} ({} notifications)",  u.getUsername(), groupNotifs.size());
+		log.info("Generating GROUP NOTIFS list for user {} ({} notifications)",  u.getUsername(), groupNotifs.size());
 		return groupNotifs.stream().map(Transferable::toTransfer).collect(Collectors.toList());
 	}
 
@@ -195,6 +195,8 @@ public class UserController {
 		long unread = entityManager.createNamedQuery("UserNotification.countUnread", Long.class)
 			.setParameter("userId", userId)
 			.getSingleResult();
+
+        log.info("UNREAD - {} User notifications",  unread);
             
         for(Member m : u.getMemberOf()){
             unread += entityManager.createNamedQuery("GroupNotification.countUnread", Long.class)

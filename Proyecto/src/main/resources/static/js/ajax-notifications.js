@@ -15,18 +15,28 @@ function renderNotif(notif) {
     // return `<div>${msg.from} @${msg.sent}: ${msg.text}</div>`;
 }
 
-// pinta mensajes viejos al cargarse, via AJAX
-go(config.rootUrl + "/user/receivedNotifs", "GET")
+// pinta notifs viejos al cargarse, via AJAX
+// pinta notifs de usuario
+go(config.rootUrl + "/user/receivedUserNotifs", "GET")
 .then(notifs => {
-    let notifsDiv = document.getElementById("notifs-tab-pane");
-    let inviteDiv = document.getElementById("invite-tab-pane");
+    console.log("USER notifications");
+    console.log(notifs);
+    let userNotifsDiv = document.getElementById("user-tab-pane");
     notifs.forEach(notif => {
-        if(notif.type == 'INVITATION'){
-            inviteDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
-        }
-        else {
-            notifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
-        }
+        console.log(notif);
+        userNotifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
+    })
+    }
+);
+// pinta notifs de grupo
+go(config.rootUrl + "/user/receivedGroupNotifs", "GET")
+.then(notifs => {
+    console.log("GROUP notifications");
+    console.log(notifs);
+    let groupNotifsDiv = document.getElementById("groupNotifs-tab-pane");
+    notifs.forEach(notif => {
+        console.log(notif);
+        groupNotifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
     })
     }
 );
@@ -35,6 +45,7 @@ go(config.rootUrl + "/user/receivedNotifs", "GET")
 if (ws.receive) {
     const oldFn = ws.receive; // guarda referencia a manejador anterior
     ws.receive = (notif) => {
+        console.log("Received notification");
         oldFn(notif); // llama al manejador anterior
         if(notif.type == 'INVITATION'){
             inviteDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));

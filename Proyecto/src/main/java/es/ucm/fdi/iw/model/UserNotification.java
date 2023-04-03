@@ -30,29 +30,32 @@ public class UserNotification extends Notification implements Transferable<UserN
 
     // User notification constructor
     public UserNotification(NotificationType type, User sender, Group group, User recipient){
-        super(type, sender, group);
+        super(type, sender);
 
         switch(type){
             case GROUP_INVITATION:
-                invitationConstructor();
+                invitationConstructor(group);
                 break;
             case BUDGET_WARNING:
-                budgetWarningConstructor();
+                budgetWarningConstructor(group);
                 break;
             default:
 
         }
     }
 
-    public void invitationConstructor(){
+    public void invitationConstructor(Group group){
         StringBuilder sb = new StringBuilder();
         sb.append("You have been invited to join the group ");
-        sb.append(this.group.getName());
+        sb.append(group.getName());
         this.message = sb.toString();
     }
 
-    public void budgetWarningConstructor(){
-
+    public void budgetWarningConstructor(Group group){
+        StringBuilder sb = new StringBuilder();
+        sb.append("You have been invited to join the group ");
+        sb.append(group.getName());
+        this.message = sb.toString();
     }
 
     @AllArgsConstructor

@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -30,18 +31,21 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import es.ucm.fdi.iw.LocalData;
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
+import es.ucm.fdi.iw.model.GroupNotification;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.ParticipatesID;
 import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
+import es.ucm.fdi.iw.model.Notification.NotificationType;
 import es.ucm.fdi.iw.model.User.Role;
 
 /**
@@ -60,6 +64,9 @@ public class ExpenseController {
 
     @Autowired
     private LocalData localData;
+
+    @Autowired
+	private SimpMessagingTemplate messagingTemplate;
 
     private static final Logger log = LogManager.getLogger(AdminController.class);
 
@@ -201,6 +208,7 @@ public class ExpenseController {
 
     class PostParams {
         public Boolean valid = false;
+        public User creator;
         public Group group;
         public User paidBy;
         public Member paidByMember;
@@ -217,6 +225,7 @@ public class ExpenseController {
         PostParams validated = new PostParams();
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
+        validated.creator = user;
 
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
@@ -299,7 +308,7 @@ public class ExpenseController {
     @PostMapping("/newExpense")
     @Transactional
     @ResponseBody
-    public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestBody JsonNode jsonNode) {
+    public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestBody JsonNode jsonNode) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         String name = objectMapper.convertValue(jsonNode.get("name"), String.class);
         String desc = objectMapper.convertValue(jsonNode.get("desc"), String.class);
@@ -308,7 +317,6 @@ public class ExpenseController {
         long paidById = objectMapper.convertValue(jsonNode.get("paidById"), Long.class);
         List<String> participateIds = objectMapper.convertValue(jsonNode.get("participateIds"), new TypeReference<List<String>>() {});
         long typeId = objectMapper.convertValue(jsonNode.get("typeId"), Long.class);
-
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
@@ -343,6 +351,17 @@ public class ExpenseController {
             m.setBalance(m.getBalance() - e.getAmount() / params.participateUsers.size());
         }
 
+        // create notification
+        GroupNotification notif = new GroupNotification(NotificationType.EXPENSE_CREATED, params.creator, params.group, name);
+        entityManager.persist(notif);
+        entityManager.flush();
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonNotif = mapper.writeValueAsString(notif.toTransfer());
+
+        log.info("Sending a notification to group {} with contents '{}'", params.group.getId(), jsonNotif);
+
+        messagingTemplate.convertAndSend("/group/"+ params.group.getId() +"/queue/notifications", jsonNotif);
+        
         return "{\"action\": \"redirect\",\"redirect\": \"/group/" + groupId + "\"}";
     }
 

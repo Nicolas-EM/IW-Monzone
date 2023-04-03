@@ -39,9 +39,6 @@ public abstract class Notification {
     @ManyToOne
     protected User sender;
 
-    @ManyToOne
-    protected Group group;
-
     @Column(nullable = false)
     protected String message;
 
@@ -56,11 +53,10 @@ public abstract class Notification {
     protected LocalDateTime dateRead = null;
 
     // User notification constructor
-    public Notification(NotificationType type, User sender, Group group){
+    public Notification(NotificationType type, User sender){
         this.type = type;
         this.dateSent = LocalDateTime.now();
         this.sender = sender;
-        this.group = group;
     }
 
     public String getDateSent(){
