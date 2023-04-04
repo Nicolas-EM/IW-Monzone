@@ -35,6 +35,7 @@ import javax.transaction.Transactional;
 
 import java.io.*;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -70,6 +71,9 @@ public class UserController {
      */
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not an admin, and this is not your profile") // 403
     public static class NotYourProfileException extends RuntimeException {}
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request") // 400
+    public static class BadRequestException extends RuntimeException {}
 
     /**
      * Encodes a password, so that it can be saved for future checking. Notice
@@ -234,6 +238,27 @@ public class UserController {
      *  POST MAPPINGS
      * 
     */
+
+    @PostMapping("/{notifId}/read")
+    @Transactional
+	@ResponseBody
+    public String markNotifRead(@PathVariable long notifId, HttpSession session){
+        long userId = ((User)session.getAttribute("u")).getId();		
+		User u = entityManager.find(User.class, userId);
+
+        // Check notification exists
+        Notification notif = entityManager.find(Notification.class, notifId);
+        if(notif == null)
+            throw new BadRequestException();
+
+        // Check notification belongs to user
+        if(notif.getRecipient().getId() != userId)
+            throw new BadRequestException();
+
+        notif.setDateRead(LocalDateTime.now());
+
+        return "{\"success\": \"ok\"}";
+    }
 
     /**
      * Alter or create a user

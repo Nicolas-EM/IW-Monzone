@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
@@ -447,7 +448,19 @@ public class GroupController {
             Notification invite = new Notification(NotificationType.GROUP_INVITATION, sender, user, group);
             entityManager.persist(invite);
             entityManager.flush();
-            log.info("User {} invited to group {}", username, group.getName());
+
+            // Send notification
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonNotif = mapper.writeValueAsString(invite.toTransfer());
+                log.info("Sending an invite to {} with contents '{}'", "/user/"+ user.getId() +"/queue/notifications", jsonNotif);
+    
+                messagingTemplate.convertAndSend("/user/"+ user.getUsername() +"/queue/notifications", jsonNotif);
+            } catch (JsonProcessingException exception) {
+                log.error("Failed to parse invitation - {}", invite);
+                log.error("Exception {}", exception);
+            }
+
             return "{\"status\":\"invited\"}";
         } else {
             // user is already in a group
@@ -459,6 +472,53 @@ public class GroupController {
     /*
      * TODO: Accept invite
      */
+    /**
+     * Accept invite to group
+     */
+    @PostMapping("/{groupId}/acceptInvite")
+    @Transactional
+    @ResponseBody
+    public String acceptInvite(@PathVariable long groupId, HttpSession session){
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if(group == null)
+            throw new BadRequestException();
+        
+        // check if an invite for user exists
+        List<Notification> invites = entityManager.createNamedQuery("Notification.byUserAndGroup", Notification.class).setParameter("userId", user.getId()).setParameter("groupId", groupId).getResultList();
+
+        if(invites.size() < 1)
+            throw new BadRequestException();
+
+        for(Notification invite : invites){
+            // Check if sender is an admin in group
+            User sender = invite.getSender();
+            Member m = entityManager.find(Member.class, new MemberID(group.getId(), sender.getId()));
+            if(m == null || m.getRole() != GroupRole.GROUP_MODERATOR){
+                // notification should be deleted as it is no longer valid
+                // TODO: delete expired notification
+
+                return "{\"status\": \"expired\"}";
+            }
+
+            // notification valid, check if user is not already member
+            Member newMember = entityManager.find(Member.class, new MemberID(group.getId(), user.getId()));
+            if(newMember == null){
+                newMember = new Member(new MemberID(group.getId(), user.getId()), true, GroupRole.GROUP_USER, 0, 0, group, user);
+                entityManager.persist(newMember);
+
+                // Update user and group
+                user.getMemberOf().add(newMember);
+                group.getMembers().add(newMember);
+                group.setNumMembers(group.getNumMembers() + 1);
+            }
+        }
+
+        return "{\"status\": \"ok\"}";
+    }
 
     /*
      * TODO: Edit member

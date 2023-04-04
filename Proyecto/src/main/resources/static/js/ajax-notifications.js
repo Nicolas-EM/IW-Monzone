@@ -5,8 +5,32 @@
 function renderNotif(notif) {
     console.log("rendering: ", notif);
     return `<div class="row my-2">
+                <form method="post" th:action="${notif.action}">
+                    <div class="card text-white bg-warning" role="button">
+                        <div class="card-body"><h5>${notif.message}</h5></div>
+                    </div>
+                </form>
+            </div>`
+}
+
+// cómo pintar 1 notificacion (devuelve html que se puede insertar en un div)
+function renderInvite(invite) {
+    console.log("rendering: ", invite);
+    return `<div class="row my-2">
                 <div class="card text-white bg-warning" role="button">
-                    <div class="card-header"><h5>${notif.message}</h5></div>
+                    <div class="card-body">
+                        <div class="row">
+                            <h5>${invite.message}</h5>
+                        </div>
+                        <div class="row">
+                            <form class="col" method="post" action="${invite.actionEndpoint}">
+                                <button onclick="acceptInvite(this)">Accept</button>
+                            </form>
+                            <form class="col" method="post">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>`
 }
@@ -14,12 +38,12 @@ function renderNotif(notif) {
 // pinta notifs viejos al cargarse, via AJAX
 go(config.rootUrl + "/user/receivedNotifs", "GET")
 .then(notifs => {
-    let actionNotifsDiv = document.getElementById("action-tab-pane");
+    let actionNotifsDiv = document.getElementById("actionNotifs-tab-pane");
     let notifsDiv = document.getElementById("notifs-tab-pane");
 
     notifs.forEach(notif => {
-        if(Object.hasOwn(notif, 'actionEndpoint')){
-            actionNotifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
+        if(notif.type == "GROUP_INVITATION"){
+            actionNotifsDiv.insertAdjacentHTML("beforeend", renderInvite(notif));
         } else {
             notifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
         }
@@ -34,14 +58,22 @@ if (ws.receive) {
         console.log("Received notification");
         oldFn(notif); // llama al manejador anterior
 
-        let actionNotifsDiv = document.getElementById("action-tab-pane");
+        let actionNotifsDiv = document.getElementById("actionNotifs-tab-pane");
         let notifsDiv = document.getElementById("notifs-tab-pane");
 
-        if(notif.type == 'INVITATION'){
-            actionNotifsDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));
+        if(notif.type == 'GROUP_INVITATION'){
+            actionNotifsDiv.insertAdjacentHTML("afterbegin", renderInvite(notif));
         }
         else {
             notifsDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));
         }
     }
+}
+
+// Accept Invite Btn
+function acceptInvite(btn) {
+    event.preventDefault();
+    go(btn.parentNode.action, 'POST', {})
+    .then(d => console.log("happy", d))
+    .catch(e => console.log("sad", e))
 }

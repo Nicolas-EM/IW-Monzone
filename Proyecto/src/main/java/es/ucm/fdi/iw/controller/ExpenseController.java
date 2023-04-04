@@ -314,10 +314,11 @@ public class ExpenseController {
             Notification notif = new Notification(type, sender, u, group, e);
             entityManager.persist(notif);
             entityManager.flush();
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonNotif;
+
+            // Send notification
             try {
-                jsonNotif = mapper.writeValueAsString(notif.toTransfer());
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonNotif = mapper.writeValueAsString(notif.toTransfer());
                 log.info("Sending a notification to {} with contents '{}'", "/user/"+ u.getId() +"/queue/notifications", jsonNotif);
     
                 messagingTemplate.convertAndSend("/user/"+ u.getUsername() +"/queue/notifications", jsonNotif);

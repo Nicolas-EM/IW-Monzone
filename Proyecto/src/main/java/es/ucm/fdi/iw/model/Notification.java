@@ -21,8 +21,9 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 @NamedQueries({
 	@NamedQuery(name="Notification.countUnread",
-	query="SELECT COUNT(*) FROM Notification n "
-			+ "WHERE n.recipient.id = :userId AND n.dateRead = null")
+	query="SELECT COUNT(*) FROM Notification n WHERE n.recipient.id = :userId AND n.dateRead = null"),
+    @NamedQuery(name="Notification.byUserAndGroup",
+    query="SELECT n FROM Notification n WHERE recipient.id = :userId AND group.id = :groupId")
 })
 @Table(name="IWNotification")
 public class Notification implements Transferable<Notification.Transfer>  {
@@ -69,6 +70,8 @@ public class Notification implements Transferable<Notification.Transfer>  {
         this.sender = sender;
         this.recipient = recipient;
         this.group = group;
+
+        messageBuilder();
     }
 
     // Expense notifications
@@ -78,11 +81,42 @@ public class Notification implements Transferable<Notification.Transfer>  {
         this.sender = sender;
         this.recipient = recipient;
         this.group = group;
+
         messageBuilder(e);
     }
 
+    private String actionBuilder(){
+        switch(type){
+            case EXPENSE_CREATED:
+            case EXPENSE_MODIFIED:
+            case EXPENSE_DELETED:
+                return "/user/" + this.id + "/read";
+            case GROUP_INVITATION:
+                return "/group/" + this.group.getId() + "/acceptInvite";
+            default:
+                return ""; 
+        }
+    }
+
+    private void messageBuilder(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.sender.getName());
+
+        switch(type) {
+            case GROUP_INVITATION:
+                sb.append(" has invited you to join \"");
+                break;
+            default: {}                
+        }
+
+        sb.append(this.group.getName());
+        sb.append("\"");
+
+        this.message = sb.toString();
+    }
+
     // Expense message builder
-    public void messageBuilder(Expense e){
+    private void messageBuilder(Expense e){
         StringBuilder sb = new StringBuilder();
         sb.append(this.sender.getName());
 
@@ -122,6 +156,7 @@ public class Notification implements Transferable<Notification.Transfer>  {
         private long idGroup;
         private long idSender;
         private long idRecipient;
+        private String actionEndpoint;
     }
 
     @Override
@@ -130,7 +165,7 @@ public class Notification implements Transferable<Notification.Transfer>  {
         if(dateRead != null)
             dateReadString = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateRead);
 
-        return new Transfer(id, message, type, dateReadString, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent), group.getId(), sender.getId(), recipient.getId());
+        return new Transfer(id, message, type, dateReadString, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent), group.getId(), sender.getId(), recipient.getId(), actionBuilder());
     }
 }
 
