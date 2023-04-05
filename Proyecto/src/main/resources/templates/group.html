@@ -76,15 +76,10 @@
                             <h5>Marcos</h5>
                         </div>
                         <div class="colscroll col-md-6">
+                            <!-- DEBTS -->
                             <h5>DEBTS</h5>
                             <hr>
-                            <div class="colscroll overflow-auto">
-                                <th:block th:each="debt : ${debts}">
-                                    <button>
-                                        Mark as paid
-                                    </button>
-                                    <label>[[${debt.getDebtorName()}]] owes [[${debt.getDebtOwnerName()}]] [[${debt.getAmount()}]] [[${group.getCurrencyText()}]]</label>
-                                </th:block>
+                            <div id="debtsTable" class="colscroll overflow-auto">
                             </div>
                         </div>
                     </div>

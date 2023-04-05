@@ -537,8 +537,10 @@ public class ExpenseController {
         }
 
         // create notification ASYNC
-        sendNotifications(NotificationType.EXPENSE_MODIFIED, params.currUser, params.participateUsers, params.group,
-                exp);
+        sendNotifications(NotificationType.EXPENSE_MODIFIED, params.currUser, params.participateUsers, params.group, exp);
+
+        // send expense to group ASYNC
+        sendExpense(NotificationType.EXPENSE_MODIFIED, params.group, exp);
 
         return "{\"action\": \"none\"}";
     }
@@ -600,6 +602,9 @@ public class ExpenseController {
 
         // create notification ASYNC
         sendNotifications(NotificationType.EXPENSE_DELETED, user, notifyUsers, group, exp);
+
+        // send expense to group ASYNC
+        sendExpense(NotificationType.EXPENSE_DELETED, group, exp);
 
         return "redirect:/group/" + groupId;
     }

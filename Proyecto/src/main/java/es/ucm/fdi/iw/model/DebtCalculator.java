@@ -15,12 +15,32 @@ public class DebtCalculator {
     
     @Data
     @AllArgsConstructor
-    public class Tuple {
+    public class Debt implements Transferable<Debt.Transfer>{
         public long debtorId;
         public String debtorName;
         public long debtOwnerId;
         public String debtOwnerName;
         public float amount;
+
+        @Data
+        @AllArgsConstructor
+        public class Transfer {
+            private long debtorId;
+            private String debtorName;
+            private long debtOwnerId;
+            private String debtOwnerName;
+            private float amount;
+        }
+
+        @Override
+        public Transfer toTransfer() {
+            return new Transfer(debtorId, debtorName, debtOwnerId, debtOwnerName, amount);
+        }
+
+        @Override
+	    public String toString() {
+		    return toTransfer().toString();
+	    }
     }
 
     @AllArgsConstructor
@@ -51,8 +71,8 @@ public class DebtCalculator {
         }
     }
 
-    public List<Tuple> calculateDebts() {
-        List<Tuple> debts = new ArrayList<>();
+    public List<Debt> calculateDebts() {
+        List<Debt> debts = new ArrayList<>();
         while (!positiveB.isEmpty()) {
             // get top of both queues
             Balance pos = positiveB.poll();
@@ -64,7 +84,7 @@ public class DebtCalculator {
             String debtorName = neg.username;
             long debtOwnerId = pos.userId;
             String debtOwnerName = pos.username;
-            debts.add(new Tuple(debtorId, debtorName, debtOwnerId, debtOwnerName, amount));
+            debts.add(new Debt(debtorId, debtorName, debtOwnerId, debtOwnerName, amount));
             // get spare balance and insert on queue
             float balance = pos.balance + neg.balance;
             

@@ -52,10 +52,10 @@ go(config.rootUrl + "/user/receivedNotifs", "GET")
 if (ws.receive) {
     const oldFn = ws.receive; // guarda referencia a manejador anterior
     ws.receive = (obj) => {
-        console.log("Received notification");
         oldFn(obj); // llama al manejador anterior
 
         if(obj.type == "NOTIFICATION"){
+            console.log("Received notification");
             let p = document.querySelector("#nav-unread");
             if (p) {
                 p.textContent = +p.textContent + 1;

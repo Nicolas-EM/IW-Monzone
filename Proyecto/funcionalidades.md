@@ -6,6 +6,7 @@
 - Calculo balances y método de repago
 - Eliminar a usuarios de grupos
 - Notificationes de gastos e invitaciones
+- Cuando se añade un gasto al grupo, se muestra en /group/ por WebSocket
 
 
 # Lo que falta:
@@ -26,8 +27,9 @@
 - Calcular gastos por categoría
 - Arreglar vista de grupos
 
-## AJAX
+## AJAX + Websockets
 - Eliminar usuario de grupo
+  - Al eliminar, por websocket (/topic/group/{groupId}) se borre en todas las pantallas
 - Cambiar presupuesto de grupo
 - Cambios dentro del perfil
 - Marcar notificaciones como leidas
@@ -35,7 +37,6 @@
 - Aceptar invitación
   - A usuario que aceptó --> Mostrar grupo si está en /user/
   - A otros usuarios del grupo --> Actualizar /group/id/config si están en esa vista
-- Cuando se añade un gasto al grupo, que se actualice /group/id sin tener que refrescar
 
 
 # Mejoras visuales

@@ -1,15 +1,16 @@
 const expensesTable = document.getElementById("expensesTable");
+const debtsTable = document.getElementById("debtsTable");
 const groupId = expensesTable.dataset.groupid;
 const currencyString = expensesTable.dataset.currency;
 
 // Render EXISTING Expenses
 go(`${config.rootUrl}/group/${groupId}/getExpenses`, "GET")
-.then(expenses => {
-    expenses.forEach(expense => {
-        expensesTable.insertAdjacentHTML("afterbegin", renderExpense(expense));
-    })
+    .then(expenses => {
+        expenses.forEach(expense => {
+            expensesTable.insertAdjacentHTML("afterbegin", renderExpense(expense));
+        })
     }
-);
+    );
 
 // Render INCOMING Expenses
 if (ws.receive) {
@@ -17,8 +18,8 @@ if (ws.receive) {
     ws.receive = (obj) => {
         oldFn(obj); // llama al manejador anterior
 
-        if(obj.type == "EXPENSE"){
-            switch(obj.action){
+        if (obj.type == "EXPENSE") {
+            switch (obj.action) {
                 case "EXPENSE_CREATED":
                     expensesTable.insertAdjacentHTML("afterbegin", renderExpense(obj.expense));
                     break;
@@ -30,14 +31,16 @@ if (ws.receive) {
                     break;
                 default:
             }
+
+            renderAllDebts();
         }
     }
 }
 
 // Render single expense
-function renderExpense(expense){
+function renderExpense(expense) {
     return `<div class="col">
-                <div class="card border-light text-white bg-warning mb-3 mx-auto" role="button" onclick="|location.href='/group/${groupId}/${expense.id}'|">
+                <div class="card border-light text-white bg-warning mb-3 mx-auto" role="button" onclick="location.href='/group/${groupId}/${expense.expenseId}'">
                     <div class="row row-cols-2 row-cols-md-4 g-0">
                         <!-- Icon -->
                         <div class="col-5 col-md-2 text-center">
@@ -61,6 +64,50 @@ function renderExpense(expense){
                             <div class="card-text">${expense.amount} ${currencyString}</div>
                         </div>
                     </div>
+                </div>
+            </div>`
+}
+
+// Llamada inicial
+renderAllDebts()
+
+function renderAllDebts() {
+    debtsTable.innerHTML = '';  // clear debts table
+
+    // Get and render debts
+    go(`${config.rootUrl}/group/${groupId}/getDebts`, "GET")
+        .then(debts => {
+            debts.forEach(debt => {
+                debtsTable.insertAdjacentHTML("afterbegin", renderDebt(debt));
+            })
+
+            if(debts.length == 0){
+                debtsTable.insertAdjacentHTML("afterbegin", renderNoHayDeudas());
+            }
+        }
+        );
+}
+
+// Render single debt
+function renderDebt(debt) {
+    // TODO - añadir funcionalidad a botón
+    return `<div class="row">
+                <div class="col">
+                    <form method="post" action="">
+                        <button type="submit">Mark as paid</button>
+                    </form>
+                </div>
+                <div class="col">
+                    <label>${debt.debtorName} owes ${debt.debtOwnerName} ${debt.amount} ${currencyString}</label>
+                </div>
+            </div>`
+}
+
+// Render no debts message
+function renderNoHayDeudas(){
+    return `<div class="row">
+                <div class="col">
+                    There are no debts to settle :D
                 </div>
             </div>`
 }

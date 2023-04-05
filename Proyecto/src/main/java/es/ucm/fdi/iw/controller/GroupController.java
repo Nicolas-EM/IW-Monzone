@@ -2,6 +2,7 @@ package es.ucm.fdi.iw.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
@@ -39,6 +40,8 @@ import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Group.Currency;
 import es.ucm.fdi.iw.model.Member.GroupRole;
 import es.ucm.fdi.iw.model.DebtCalculator;
+import es.ucm.fdi.iw.model.DebtCalculator.Debt;
+import es.ucm.fdi.iw.model.Transferable;
 
 /**
  * Group (and expenses) management.
@@ -129,11 +132,6 @@ public class GroupController {
             throw new NoMemberException();
         }
 
-        // get debts
-        DebtCalculator dc = new DebtCalculator(group.getMembers());
-        List<DebtCalculator.Tuple> debts = dc.calculateDebts();
-
-        model.addAttribute("debts", debts);
         model.addAttribute("groupId", groupId);
         model.addAttribute("group", group);
         return "group";
@@ -186,6 +184,34 @@ public class GroupController {
         model.addAttribute("totalBudget", totalBudget);
         return "group_config";
 
+    }
+
+    /*
+     * View: group configuration
+     */
+    @ResponseBody
+    @GetMapping("{groupId}/getDebts")
+    public List<Debt.Transfer> getDebts(@PathVariable long groupId, HttpSession session){
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new BadRequestException();
+
+        // check if user belongs to the group
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
+            throw new NoMemberException();
+        }
+
+        // get debts
+        DebtCalculator dc = new DebtCalculator(group.getMembers());
+        List<DebtCalculator.Debt> debts = dc.calculateDebts();
+        
+        return debts.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
 
     /*
