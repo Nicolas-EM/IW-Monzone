@@ -114,7 +114,6 @@ public class GroupController {
      */
     @GetMapping("{groupId}")
     public String index(@PathVariable long groupId, Model model, HttpSession session) {
-
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
@@ -130,19 +129,14 @@ public class GroupController {
             throw new NoMemberException();
         }
 
-        // get expenses
-        List<Expense> expenses = entityManager.createNamedQuery("Participates.getUniqueExpensesByGroup", Expense.class).setParameter("groupId", groupId).getResultList();
-
         // get debts
         DebtCalculator dc = new DebtCalculator(group.getMembers());
         List<DebtCalculator.Tuple> debts = dc.calculateDebts();
 
-        model.addAttribute("expenses", expenses);
         model.addAttribute("debts", debts);
         model.addAttribute("groupId", groupId);
         model.addAttribute("group", group);
         return "group";
-
     }
 
     /*

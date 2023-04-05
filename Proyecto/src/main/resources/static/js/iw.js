@@ -15,10 +15,6 @@ const ws = {
      */
     receive: (text) => {
         console.log(text);
-        let p = document.querySelector("#nav-unread");
-        if (p) {
-            p.textContent = +p.textContent + 1;
-        }
     },
 
     headers: { 'X-CSRF-TOKEN': config.csrf.value },
@@ -197,7 +193,16 @@ function postImage(img, endpoint, name, filename) {
 document.addEventListener("DOMContentLoaded", () => {
     if (config.socketUrl) {
         let subs = config.admin ? ["/topic/admin", "/user/queue/notifications"] : ["/user/queue/notifications"]
-        ws.initialize(config.socketUrl, subs);
+
+        go(`${config.rootUrl}/user/groups`, "GET")
+        .then(groupIds => {
+            subs = subs.concat(groupIds.map(groupId => `/topic/group/${groupId}`));
+            ws.initialize(config.socketUrl, subs);
+        })
+        .catch(error => {
+            console.error(`Failed to get user groups: ${error}`);
+            ws.initialize(config.socketUrl, subs);
+        })
 
         let p = document.querySelector("#nav-unread");
         if (p) {

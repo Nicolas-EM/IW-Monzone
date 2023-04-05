@@ -1,6 +1,3 @@
-
-
-
 // cómo pintar 1 notificacion (devuelve html que se puede insertar en un div)
 function renderNotif(notif) {
     console.log("rendering: ", notif);
@@ -54,25 +51,32 @@ go(config.rootUrl + "/user/receivedNotifs", "GET")
 // y aquí pinta notificaciones según van llegando
 if (ws.receive) {
     const oldFn = ws.receive; // guarda referencia a manejador anterior
-    ws.receive = (notif) => {
+    ws.receive = (obj) => {
         console.log("Received notification");
-        oldFn(notif); // llama al manejador anterior
+        oldFn(obj); // llama al manejador anterior
 
-        let actionNotifsDiv = document.getElementById("actionNotifs-tab-pane");
-        let notifsDiv = document.getElementById("notifs-tab-pane");
+        if(obj.type == "NOTIFICATION"){
+            let p = document.querySelector("#nav-unread");
+            if (p) {
+                p.textContent = +p.textContent + 1;
+            }
+            
+            let notif = obj.notification;
+            let actionNotifsDiv = document.getElementById("actionNotifs-tab-pane");
+            let notifsDiv = document.getElementById("notifs-tab-pane");
 
-        if(notif.type == 'GROUP_INVITATION'){
-            actionNotifsDiv.insertAdjacentHTML("afterbegin", renderInvite(notif));
-        }
-        else {
-            notifsDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));
+            if(notif.type == 'GROUP_INVITATION'){
+                actionNotifsDiv.insertAdjacentHTML("afterbegin", renderInvite(notif));
+            }
+            else {
+                notifsDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));
+            }
         }
     }
 }
 
 // Accept Invite Btn
 function acceptInvite(btn) {
-    event.preventDefault();
     go(btn.parentNode.action, 'POST', {})
     .then(d => console.log("happy", d))
     .catch(e => console.log("sad", e))

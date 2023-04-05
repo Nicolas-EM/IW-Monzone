@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
@@ -45,6 +46,7 @@ import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Notification;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.ParticipatesID;
+import es.ucm.fdi.iw.model.Transferable;
 import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
@@ -68,7 +70,7 @@ public class ExpenseController {
     private LocalData localData;
 
     @Autowired
-	private SimpMessagingTemplate messagingTemplate;
+    private SimpMessagingTemplate messagingTemplate;
 
     private static final Logger log = LogManager.getLogger(AdminController.class);
 
@@ -150,6 +152,34 @@ public class ExpenseController {
 
         return "expense";
 
+    }
+
+    /*
+     * Get all expenses
+     */
+    @ResponseBody
+    @Transactional
+    @GetMapping("/getExpenses")
+    public List<Expense.Transfer> getExpenses(@PathVariable long groupId, HttpSession session) {
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null)
+            throw new BadRequestException();
+
+        // check if user belongs to the group
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
+            throw new NoMemberException();
+        }
+
+        // get expenses
+        List<Expense> expenses = entityManager.createNamedQuery("Participates.getUniqueExpensesByGroup", Expense.class).setParameter("groupId", groupId).getResultList();
+
+        return expenses.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
 
     /*
@@ -306,9 +336,9 @@ public class ExpenseController {
 
     @Async
     public CompletableFuture<Void> sendNotifications(NotificationType type, User sender, List<User> users, Group group, Expense e) {
-        for(User u : users){
+        for (User u : users) {
             // Do not send notification to sender
-            if(u.getId() == sender.getId())
+            if (u.getId() == sender.getId())
                 continue;
 
             Notification notif = new Notification(type, sender, u, group, e);
@@ -319,13 +349,33 @@ public class ExpenseController {
             try {
                 ObjectMapper mapper = new ObjectMapper();
                 String jsonNotif = mapper.writeValueAsString(notif.toTransfer());
-                log.info("Sending a notification to {} with contents '{}'", "/user/"+ u.getId() +"/queue/notifications", jsonNotif);
-    
-                messagingTemplate.convertAndSend("/user/"+ u.getUsername() +"/queue/notifications", jsonNotif);
+                log.info("Sending a notification to {} with contents '{}'", "/user/" + u.getId() + "/queue/notifications", jsonNotif);
+
+                String json = "{\"type\" : \"NOTIFICATION\", \"notification\" : " + jsonNotif + "}";
+
+                messagingTemplate.convertAndSend("/user/" + u.getUsername() + "/queue/notifications", json);
             } catch (JsonProcessingException exception) {
                 log.error("Failed to parse notification - Type {}, sender {}, expense {}", type, sender, e);
                 log.error("Exception {}", exception);
             }
+        }
+
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Async
+    public CompletableFuture<Void> sendExpense(NotificationType type, Group group, Expense e) {
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonExpense = mapper.writeValueAsString(e.toTransfer());
+            log.info("Sending expense to {} with contents '{}'", group, jsonExpense);
+    
+            String json = "{\"type\" : \"EXPENSE\", \"action\" : \"" + type + "\",\"expense\" : " + jsonExpense + "}";
+    
+            messagingTemplate.convertAndSend("/topic/group/" + group.getId(), json);
+        } catch (JsonProcessingException exception) {
+            log.error("Failed to parse expense {}", e);
+            log.error("Exception {}", exception);
         }
 
         return CompletableFuture.completedFuture(null);
@@ -337,14 +387,17 @@ public class ExpenseController {
     @PostMapping("/newExpense")
     @Transactional
     @ResponseBody
-    public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestBody JsonNode jsonNode) {
+    public String createExpense(@PathVariable long groupId, Model model, HttpSession session,
+            @RequestBody JsonNode jsonNode) {
         ObjectMapper objectMapper = new ObjectMapper();
         String name = objectMapper.convertValue(jsonNode.get("name"), String.class);
         String desc = objectMapper.convertValue(jsonNode.get("desc"), String.class);
         String dateString = objectMapper.convertValue(jsonNode.get("dateString"), String.class);
         float amount = objectMapper.convertValue(jsonNode.get("amount"), Float.class);
         long paidById = objectMapper.convertValue(jsonNode.get("paidById"), Long.class);
-        List<String> participateIds = objectMapper.convertValue(jsonNode.get("participateIds"), new TypeReference<List<String>>() {});
+        List<String> participateIds = objectMapper.convertValue(jsonNode.get("participateIds"),
+                new TypeReference<List<String>>() {
+                });
         long typeId = objectMapper.convertValue(jsonNode.get("typeId"), Long.class);
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
@@ -380,8 +433,11 @@ public class ExpenseController {
             m.setBalance(m.getBalance() - e.getAmount() / params.participateUsers.size());
         }
 
-        // create notification ASYNC
+        // send notification ASYNC
         sendNotifications(NotificationType.EXPENSE_CREATED, params.currUser, params.participateUsers, params.group, e);
+
+        // send expense to group ASYNC
+        sendExpense(NotificationType.EXPENSE_CREATED, params.group, e);
 
         return "{\"action\": \"redirect\",\"redirect\": \"/group/" + groupId + "\"}";
     }
@@ -394,14 +450,16 @@ public class ExpenseController {
     @ResponseBody
     public String editExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model,
             HttpSession session, @RequestBody JsonNode jsonNode) {
-    
+
         ObjectMapper objectMapper = new ObjectMapper();
         String name = objectMapper.convertValue(jsonNode.get("name"), String.class);
         String desc = objectMapper.convertValue(jsonNode.get("desc"), String.class);
         String dateString = objectMapper.convertValue(jsonNode.get("dateString"), String.class);
         float amount = objectMapper.convertValue(jsonNode.get("amount"), Float.class);
         long paidById = objectMapper.convertValue(jsonNode.get("paidById"), Long.class);
-        List<String> participateIds = objectMapper.convertValue(jsonNode.get("participateIds"), new TypeReference<List<String>>() {});
+        List<String> participateIds = objectMapper.convertValue(jsonNode.get("participateIds"),
+                new TypeReference<List<String>>() {
+                });
         long typeId = objectMapper.convertValue(jsonNode.get("typeId"), Long.class);
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
@@ -440,13 +498,15 @@ public class ExpenseController {
 
         // save the new expense image
         // try{
-        //     String filename = String.valueOf(expenseId); //ver ejemplo de user controller de la plantilla
-        //     File dest = localData.getFile("expense", filename); //no molestarse en ver que había antes machacar lo anterior
-        //     dest.delete();
-        //     file.transferTo(dest);
+        // String filename = String.valueOf(expenseId); //ver ejemplo de user controller
+        // de la plantilla
+        // File dest = localData.getFile("expense", filename); //no molestarse en ver
+        // que había antes machacar lo anterior
+        // dest.delete();
+        // file.transferTo(dest);
         // }
         // catch(IOException e){
-        //     return "Error IMAGEN " + e.getMessage();
+        // return "Error IMAGEN " + e.getMessage();
         // }
 
         // update expense
@@ -477,7 +537,8 @@ public class ExpenseController {
         }
 
         // create notification ASYNC
-        sendNotifications(NotificationType.EXPENSE_MODIFIED, params.currUser, params.participateUsers, params.group, exp);
+        sendNotifications(NotificationType.EXPENSE_MODIFIED, params.currUser, params.participateUsers, params.group,
+                exp);
 
         return "{\"action\": \"none\"}";
     }

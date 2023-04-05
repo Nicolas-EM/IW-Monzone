@@ -73,19 +73,19 @@ public class Expense implements Transferable<Expense.Transfer>, Comparator<Expen
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Transfer {
-		private long id;
+		private long expenseId;
         private boolean enabled;
         private String name;
         private String desc;
         private float amount;
-        private LocalDate date;
+        private String date;
         private long typeID;
         private long paidByID;
     }
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(id,	enabled, name, desc, amount, date, type.getId(), paidBy.getId());
+		return new Transfer(id,	enabled, name, desc, amount, getDate(), type.getId(), paidBy.getId());
 	}
 	
 	@Override

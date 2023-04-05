@@ -49,41 +49,7 @@
                 <!-- Expenses -->
                 <div class="tab-pane fade show active" id="pills-expenses" role="tabpanel" aria-labelledby="pills-expenses-tab">
                     <!-- CARTAS GASTOS -->
-                    <div class="row row-cols-1 row-cols-lg-2">
-                        <!-- Dynamic expenses with Thymeleaf  -->
-                        <div th:each="expense: ${expenses}">
-                            <div class="col">
-                                <div class="card border-light text-white bg-warning mb-3 mx-auto" role="button" th:onclick="|location.href='/group/${groupId}/${expense.getId()}'|">
-                                    <div class="row row-cols-2 row-cols-md-4 g-0">
-                                        <!-- Icon -->
-                                        <div class="col-5 col-md-2 text-center">
-                                            <img th:src="@{/img/type/{id}.png(id=${expense.getType().getId()})}" src="/img/type/error.png" alt="Category Icon" width="auto" height="50">
-                                        </div>
-                                        <!-- Text Info -->
-                                        <div class="col-7 col-md-5">
-                                            <div class="row card-text-row">
-                                                <div class="card-title">[[${expense.getName()}]]</div>
-                                            </div>
-                                            <div class="row card-text-row">
-                                                <div class="card-subtitle">[[${expense.getDesc()}]]</div>
-                                            </div>
-                                        </div>
-                                        <!-- Date -->
-                                        <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                            <div class="card-text">[[${expense.getDate()}]]</div>
-                                        </div>
-                                        <!-- Amount -->
-                                        <div class="col-md-3 d-flex align-items-center justify-content-center expense-amount">
-                                            <div class="card-text">[[${expense.getAmount()}]] [[${group.getCurrencyText()}]]</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- No hay gastos -->
-                            <div th:unless="${!expenses.isEmpty()}" class="card border-light text-white bg-warning mb-3 mx-auto">
-                                <div class="card-header"><strong>There are no expenses in this group!</strong></div>
-                            </div>
-                        </div>
+                    <div id="expensesTable" th:data-groupid="${groupId}" th:data-currency="${group.getCurrencyText()}" class="row row-cols-1 row-cols-lg-2">
                         <!-- newExpenseBtn -->
                         <div class="row text-center">
                             <div class="col align-self-center">
@@ -128,6 +94,7 @@
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />
+    <script th:src="@{/js/group.js}"></script>
 </body>
 
 </html>
