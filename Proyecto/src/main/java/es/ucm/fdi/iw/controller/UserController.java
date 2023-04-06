@@ -1,9 +1,11 @@
 package es.ucm.fdi.iw.controller;
 
 import es.ucm.fdi.iw.LocalData;
+import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.Notification;
+import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Type;
@@ -150,6 +152,22 @@ public class UserController {
             currencies.add(g.name());
         }
         model.addAttribute("currencies", currencies);
+
+        // calculate amounts for category
+        // ArrayList<Float> amounts = new ArrayList<>();
+        // List<Participates> expenses = user.getExpenses();
+        // Float amount = 0f;
+        // for(Participates p : expenses){
+        //     if(amounts.size() >= (int) p.getExpense().getType().getId()){
+        //         amount = amounts.get((int) p.getExpense().getType().getId()) + p.getExpense().getAmount();
+        //     }
+        //     else{
+        //         amount = p.getExpense().getAmount();
+        //     }
+        //     amounts.set((int) p.getExpense().getType().getId(), amount);
+        // }
+        //model.addAttribute("amounts", amounts);
+
         return "user";
     }
 

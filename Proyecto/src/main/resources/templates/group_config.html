@@ -45,9 +45,9 @@
                     </div>
                     <!-- Save / Cancel / DelGroup Btns -->
                     <div class="mt-5 w-100">
-                        <button th:formaction="@{/group/{action}(action=${group == null} ? 'newGroup' : ${group?.getId()} + '/updateGroup')}" type="submit" class="btn btn-func btn-primary rounded-pill fw-bold w-25">Save</button>
-                        <button type="button" th:if="${group == null}" th:onclick="|location.href='/user/'|" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Cancel</button>
-                        <button th:if="${group != null} and ${isGroupAdmin}" th:formaction="@{/group/{id}/delGroup(id=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Delete Group</button>
+                        <button id="btn-func" th:formaction="@{/group/{action}(action=${group == null} ? 'newGroup' : ${group?.getId()} + '/updateGroup')}" type="submit" class="btn btn-primary rounded-pill fw-bold w-25">Save</button>
+                        <button id="btn-delete" type="button" th:if="${group == null}" th:onclick="|location.href='/user/'|" class="btn btn-primary rounded-pill fw-bold w-25">Cancel</button>
+                        <button id="btn-delete" th:if="${group != null} and ${isGroupAdmin}" th:formaction="@{/group/{id}/delGroup(id=${group?.getId()})}" class="btn btn-primary rounded-pill fw-bold w-25">Delete Group</button>
                     </div>
                 </div>
             </form>
