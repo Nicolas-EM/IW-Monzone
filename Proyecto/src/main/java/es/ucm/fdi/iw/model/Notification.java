@@ -39,7 +39,10 @@ public class Notification implements Transferable<Notification.Transfer>  {
         // DEBT_WARNING,
         EXPENSE_CREATED,
         EXPENSE_MODIFIED,
-        EXPENSE_DELETED
+        EXPENSE_DELETED,
+
+        GROUP_MODIFIED,
+        GROUP_DELETED
     }
 
     @ManyToOne

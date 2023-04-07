@@ -17,7 +17,7 @@ import es.ucm.fdi.iw.model.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
+/*
  *  Site administration.
  *
  *  Access to this end-point is authenticated - see SecurityConfig
@@ -40,4 +40,5 @@ public class AdminController {
         model.addAttribute("groups", groups);
         return "home";
     }
+
 }

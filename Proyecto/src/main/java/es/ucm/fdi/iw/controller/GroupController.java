@@ -2,6 +2,7 @@ package es.ucm.fdi.iw.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +35,7 @@ import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Notification;
+import es.ucm.fdi.iw.model.NotificationSender;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.User;
@@ -102,11 +105,20 @@ public class GroupController {
     @GetMapping("/new")
     public String newGroup(HttpSession session, Model model) {
 
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // get currencies
         List<String> currencies = new ArrayList<>();
         for (Group.Currency g : Group.Currency.values()) {
             currencies.add(g.name());
         }
+
         model.addAttribute("currencies", currencies);
+        model.addAttribute("group", null);
+        model.addAttribute("userId", user.getId());
+        model.addAttribute("budget", 0);
+        model.addAttribute("isGroupAdmin", true);
 
         return "group_config";
 
@@ -164,30 +176,76 @@ public class GroupController {
         // get members
         List<Member> members = group.getMembers();
 
-        // get total budget
-        float totalBudget = 0;
-        for (Member m : members) {
-            totalBudget += m.getBudget();
-        }
-
         // get currencies
         List<String> currencies = new ArrayList<>();
         for (Group.Currency g : Group.Currency.values()) {
             currencies.add(g.name());
         }
-
+        
+        model.addAttribute("currencies", currencies);
         model.addAttribute("group", group);
         model.addAttribute("userId", user.getId());
         model.addAttribute("isGroupAdmin", member.getRole() == GroupRole.GROUP_MODERATOR);
         model.addAttribute("members", members);
-        model.addAttribute("currencies", currencies);
-        model.addAttribute("totalBudget", totalBudget);
+
         return "group_config";
 
     }
 
     /*
-     * View: group configuration
+     * Get groupconfig
+     */
+    @ResponseBody
+    @GetMapping("{groupId}/getGroupConfig")
+    public Group.Transfer getGroupConfig(@PathVariable long groupId, HttpSession session) {
+
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new BadRequestException();
+
+        // check if user belongs to the group
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
+            throw new NoMemberException();
+        }
+
+        return group.toTransfer();
+    }
+
+    /*
+     * Get group members
+     */
+    @ResponseBody
+    @GetMapping("{groupId}/getGroupMembers")
+    public List<Member.Transfer> getGroupMembers(@PathVariable long groupId, HttpSession session) {
+
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new BadRequestException();
+
+        // check if user belongs to the group
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
+            throw new NoMemberException();
+        }
+
+        List<Member> members = group.getMembers();
+        return members.stream().map(Transferable::toTransfer).collect(Collectors.toList());
+
+    }
+
+    /*
+     * Get and calculate debts
      */
     @ResponseBody
     @GetMapping("{groupId}/getDebts")
@@ -220,17 +278,61 @@ public class GroupController {
      * 
      */
 
+    @Async
+    private CompletableFuture<Void> createAndSendNotifs(NotificationType type, User sender, Group group) {
+        
+        for (Member m : group.getMembers()) {
+            // Do not send notification to sender
+            if (m.getUser().getId() == sender.getId())
+                continue;
+
+            Notification notif = new Notification(type, sender, m.getUser(), group);
+            entityManager.persist(notif);
+            entityManager.flush();
+
+            // Send notification
+            NotificationSender.sendNotification(notif, "/user/" + m.getUser().getUsername() + "/queue/notifications");
+        }
+
+        return CompletableFuture.completedFuture(null);
+
+    }
+
+    /*
+     * Send group
+     */
+    // @Async
+    // private CompletableFuture<Void> sendGroup(NotificationType type, Group group) {
+    //     try{
+    //         ObjectMapper mapper = new ObjectMapper();
+    //         String jsonGroup = mapper.writeValueAsString(group.toTransfer());
+    //         log.info("Sending group to {} with contents '{}'", group, jsonGroup);
+    
+    //         String json = "{\"type\" : \"GROUP\", \"action\" : \"" + type + "\",\"group\" : " + jsonGroup + "}";
+    
+    //         messagingTemplate.convertAndSend("/topic/group/" + group.getId(), json);
+    //     } catch (JsonProcessingException exception) {
+    //         log.error("Failed to parse group {}", group);
+    //         log.error("Exception {}", exception);
+    //     }
+
+    //     return CompletableFuture.completedFuture(null);
+    // }
+
     /*
      * Creates group
      */
     @Transactional
     @PostMapping("/newGroup")
-    public String newGroup(HttpSession session, @RequestParam(required = true) String name,
-            @RequestParam(required = false) String desc, @RequestParam(required = true) Integer currId,
-            @RequestParam(required = true) Float budget) {
+    public String newGroup(HttpSession session, @RequestBody JsonNode jsonNode) {
 
         User u = (User) session.getAttribute("u");
         u = entityManager.find(User.class, u.getId());
+
+        String name = jsonNode.get("name").asText();
+        String desc = jsonNode.get("desc").asText();
+        Float budget = Float.parseFloat(jsonNode.get("budget").asText());
+        Integer currId = jsonNode.get("currId").asInt();       
 
         // parse budget
         if (budget < 0)
@@ -262,7 +364,7 @@ public class GroupController {
         g.setNumMembers(1);
         g.setTotBudget(budget);
 
-        return "redirect:/user/";
+        return "{\"action\": \"redirect\",\"redirect\": \"/user/\"}";
 
     }
 
@@ -271,10 +373,8 @@ public class GroupController {
      */
     @Transactional
     @PostMapping("{groupId}/updateGroup")
-    public String updateGroup(HttpSession session, @PathVariable long groupId,
-            @RequestParam(required = true) String name, @RequestParam(required = false) String desc, @RequestParam float budget,
-            @RequestParam(required = true) Integer currId) {
-
+    public String updateGroup(HttpSession session, @PathVariable long groupId, @RequestBody JsonNode jsonNode) {
+        
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
@@ -289,6 +389,11 @@ public class GroupController {
         if (member == null || !member.isEnabled()) {
             throw new NoMemberException();
         }
+
+        String name = jsonNode.get("name").asText();
+        String desc = jsonNode.get("desc").asText();
+        Float budget = Float.parseFloat(jsonNode.get("budget").asText());
+        Integer currId = jsonNode.get("currId").asInt();        
 
         // only moderators can edit group settings
         if (member.getRole() == GroupRole.GROUP_MODERATOR) {
@@ -305,12 +410,16 @@ public class GroupController {
             group.setCurrency(curr);
         }
         
-        // Anyone can update their budget
-        // update member
+        // Anyone can update their budget update member
         member.setBudget(budget);
 
-        // TODO cambiar a AJAX
-        return "redirect:/group/{groupId}";
+        // TODO: send notif GROUP_MODIFIED
+        createAndSendNotifs(NotificationType.GROUP_MODIFIED, user, group);
+
+        // send group to other members
+        NotificationSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_MODIFIED);
+
+        return "{\"action\": \"none\"}";
     }
 
     /*
@@ -359,7 +468,13 @@ public class GroupController {
         // disable group
         group.setEnabled(false);
 
-        return "redirect:/user/";
+        // send notif
+        createAndSendNotifs(NotificationType.GROUP_DELETED, user, group);
+        
+        // send group to other members
+        NotificationSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_DELETED);
+
+        return "{\"action\": \"redirect\",\"redirect\": \"/user/\"}";
 
     }
 

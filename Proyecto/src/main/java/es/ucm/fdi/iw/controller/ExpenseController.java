@@ -44,6 +44,7 @@ import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Notification;
+import es.ucm.fdi.iw.model.NotificationSender;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.ParticipatesID;
 import es.ucm.fdi.iw.model.Transferable;
@@ -336,7 +337,7 @@ public class ExpenseController {
     }
 
     @Async
-    public CompletableFuture<Void> sendNotifications(NotificationType type, User sender, List<User> users, Group group, Expense e) {
+    private CompletableFuture<Void> createAndSendNotifs(NotificationType type, User sender, List<User> users, Group group, Expense e) {
         for (User u : users) {
             // Do not send notification to sender
             if (u.getId() == sender.getId())
@@ -347,36 +348,7 @@ public class ExpenseController {
             entityManager.flush();
 
             // Send notification
-            try {
-                ObjectMapper mapper = new ObjectMapper();
-                String jsonNotif = mapper.writeValueAsString(notif.toTransfer());
-                log.info("Sending a notification to {} with contents '{}'", "/user/" + u.getId() + "/queue/notifications", jsonNotif);
-
-                String json = "{\"type\" : \"NOTIFICATION\", \"notification\" : " + jsonNotif + "}";
-
-                messagingTemplate.convertAndSend("/user/" + u.getUsername() + "/queue/notifications", json);
-            } catch (JsonProcessingException exception) {
-                log.error("Failed to parse notification - Type {}, sender {}, expense {}", type, sender, e);
-                log.error("Exception {}", exception);
-            }
-        }
-
-        return CompletableFuture.completedFuture(null);
-    }
-
-    @Async
-    public CompletableFuture<Void> sendExpense(NotificationType type, Group group, Expense e) {
-        try{
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonExpense = mapper.writeValueAsString(e.toTransfer());
-            log.info("Sending expense to {} with contents '{}'", group, jsonExpense);
-    
-            String json = "{\"type\" : \"EXPENSE\", \"action\" : \"" + type + "\",\"expense\" : " + jsonExpense + "}";
-    
-            messagingTemplate.convertAndSend("/topic/group/" + group.getId(), json);
-        } catch (JsonProcessingException exception) {
-            log.error("Failed to parse expense {}", e);
-            log.error("Exception {}", exception);
+            NotificationSender.sendNotification(notif, "/user/" + u.getUsername() + "/queue/notifications");
         }
 
         return CompletableFuture.completedFuture(null);
@@ -417,8 +389,8 @@ public class ExpenseController {
             desc = "";
 
         // Create expense
-        Expense e = new Expense(name, desc, amount, params.date, params.type, params.paidBy);
-        entityManager.persist(e);
+        Expense exp = new Expense(name, desc, amount, params.date, params.type, params.paidBy);
+        entityManager.persist(exp);
         entityManager.flush();
 
         // add balance to paidBy
@@ -426,14 +398,14 @@ public class ExpenseController {
 
         // add all participants
         for (User u : params.participateUsers) {
-            ParticipatesID pId = new ParticipatesID(e.getId(), u.getId());
-            Participates participates = new Participates(pId, params.group, u, e);
+            ParticipatesID pId = new ParticipatesID(exp.getId(), u.getId());
+            Participates participates = new Participates(pId, params.group, u, exp);
             entityManager.persist(participates);
 
             // add debts of balance
             MemberID memberID = new MemberID(params.group.getId(), u.getId());
             Member m = entityManager.find(Member.class, memberID);
-            m.setBalance(m.getBalance() - e.getAmount() / params.participateUsers.size());
+            m.setBalance(m.getBalance() - exp.getAmount() / params.participateUsers.size());
         }
 
         // save the new expense image
@@ -448,10 +420,10 @@ public class ExpenseController {
         // }
 
         // send notification ASYNC
-        sendNotifications(NotificationType.EXPENSE_CREATED, params.currUser, params.participateUsers, params.group, e);
+        createAndSendNotifs(NotificationType.EXPENSE_CREATED, params.currUser, params.participateUsers, params.group, exp);
 
         // send expense to group ASYNC
-        sendExpense(NotificationType.EXPENSE_CREATED, params.group, e);
+        NotificationSender.sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_CREATED);
 
         return "{\"action\": \"redirect\",\"redirect\": \"/group/" + groupId + "\"}";
     }
@@ -551,10 +523,10 @@ public class ExpenseController {
         }
 
         // create notification ASYNC
-        sendNotifications(NotificationType.EXPENSE_MODIFIED, params.currUser, params.participateUsers, params.group, exp);
+        createAndSendNotifs(NotificationType.EXPENSE_MODIFIED, params.currUser, params.participateUsers, params.group, exp);
 
         // send expense to group ASYNC
-        sendExpense(NotificationType.EXPENSE_MODIFIED, params.group, exp);
+        NotificationSender.sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_MODIFIED);
 
         return "{\"action\": \"none\"}";
     }
@@ -615,10 +587,10 @@ public class ExpenseController {
         exp.setEnabled(false);
 
         // create notification ASYNC
-        sendNotifications(NotificationType.EXPENSE_DELETED, user, notifyUsers, group, exp);
+        createAndSendNotifs(NotificationType.EXPENSE_DELETED, user, notifyUsers, group, exp);
 
         // send expense to group ASYNC
-        sendExpense(NotificationType.EXPENSE_DELETED, group, exp);
+        NotificationSender.sendTransfer(exp, "/topic/group/" + group.getId(), "EXPENSE", NotificationType.EXPENSE_DELETED);
 
         return "redirect:/group/" + groupId;
     }

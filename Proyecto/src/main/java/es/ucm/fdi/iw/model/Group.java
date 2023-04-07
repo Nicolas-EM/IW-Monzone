@@ -83,11 +83,12 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
         private int numMembers;
         private float totBudget;
         private Currency currency;
+        private String currencyString;
     }
 
     @Override
     public Transfer toTransfer() {
-        return new Transfer(id, enabled, name, desc, numMembers, totBudget, currency);
+        return new Transfer(id, enabled, name, desc, numMembers, totBudget, currency, getCurrencyText());
     }
 
     @Override

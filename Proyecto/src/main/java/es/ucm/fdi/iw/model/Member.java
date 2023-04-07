@@ -55,6 +55,7 @@ public class Member implements Transferable<Member.Transfer>, Comparator<Member>
     public static class Transfer {
         private long idGroup;
         private long idUser;
+        private String username;
         private boolean enabled;
         private GroupRole role;
         private float budget;
@@ -63,7 +64,7 @@ public class Member implements Transferable<Member.Transfer>, Comparator<Member>
 
     @Override
     public Transfer toTransfer() {
-        return new Transfer(group.getId(), user.getId(), enabled, role, budget, balance);
+        return new Transfer(group.getId(), user.getId(), user.getUsername(), enabled, role, budget, balance);
     }
 
     @Override

@@ -23,7 +23,7 @@
     color: black;
 }
 
-#btn-func {
+.btn-func {
     border-style: none;
     outline: none;
     height: 10%;
@@ -32,20 +32,20 @@
     margin-left: 15px;
 }
 
-#btn-func:hover {
+.btn-func:hover {
     background-color: #b68500;
 }
 
-#btn-delete {
+.btn-delete {
     border-style: none;
     outline: none;
     height: 10%;
-    background-color: #d19900;
+    background-color: #610000;
     margin-left: 40%;
 }
 
-#btn-delete:hover {
-    background-color: #b68500;
+.btn-delete:hover {
+    background-color: #460101;
 }
 
 /* Remove arrows from budget selector */
