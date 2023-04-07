@@ -77,33 +77,35 @@
             </div>
         </div>
 
-
         <!-- Hidden form -->
         <form id="leaveGroupForm" method="post" th:action="@{/group/{groupId}/delMember(groupId=${group?.getId()})}">
             <input type="hidden" name="removeId" th:value="${userId}">
         </form>
-    </main>
 
-    <!-- Invite Member Modal -->
-    <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content bg-dark">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="inviteModalLabel">Enter your friend's username</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input id="inviteUsername" name="inviteUsername" type="text" class="rounded-corners mb-4 w-100" required="required" value="">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <form th:action="@{/group/{groupId}/inviteMember(groupId=${group.getId()})}" method="POST">
-                        <button id="confirmInviteBtn" type="button" class="btn btn-primary">Invite</button>
-                    </form>
+        <th:block th:if="${group} != null">
+            <!-- Invite Member Modal -->
+            <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="inviteModalLabel">Enter your friend's username</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input id="inviteUsername" name="inviteUsername" type="text" class="rounded-corners mb-4 w-100" required="required" value="">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <form th:action="@{/group/{groupId}/inviteMember(groupId=${group?.getId()})}" method="POST">
+                                <button id="confirmInviteBtn" type="button" class="btn btn-primary">Invite</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </th:block>
+
+    </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />
     <script th:src="@{/js/group_config.js}"></script>

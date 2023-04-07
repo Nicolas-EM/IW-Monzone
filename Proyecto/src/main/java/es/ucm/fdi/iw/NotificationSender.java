@@ -1,14 +1,18 @@
-package es.ucm.fdi.iw.model;
+package es.ucm.fdi.iw;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import es.ucm.fdi.iw.model.Notification;
+import es.ucm.fdi.iw.model.Transferable;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
+import lombok.NoArgsConstructor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,19 +20,13 @@ import org.apache.logging.log4j.Logger;
 /**
  * Helper Class to send notifications
  */
+@NoArgsConstructor
 public class NotificationSender {
 
+    @Autowired
     private SimpMessagingTemplate messagingTemplate;
-    private static NotificationSender instance;
-    private static final Logger log = LogManager.getLogger(NotificationSender.class);
-
-    public static NotificationSender getInstance(SimpMessagingTemplate messagingTemplate) {
-        if (instance == null) {
-            instance = new NotificationSender();
-            instance.messagingTemplate = messagingTemplate;
-        }
-        return instance;
-    }    
+    
+    private final Logger log = LogManager.getLogger(NotificationSender.class);  
 
     @Async
     public CompletableFuture<Void> sendNotification(Notification notif, String endpoint) {

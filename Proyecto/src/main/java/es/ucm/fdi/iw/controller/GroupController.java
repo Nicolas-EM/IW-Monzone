@@ -35,13 +35,13 @@ import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Notification;
-import es.ucm.fdi.iw.model.NotificationSender;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Group.Currency;
 import es.ucm.fdi.iw.model.Member.GroupRole;
+import es.ucm.fdi.iw.NotificationSender;
 import es.ucm.fdi.iw.model.DebtCalculator;
 import es.ucm.fdi.iw.model.DebtCalculator.Debt;
 import es.ucm.fdi.iw.model.Transferable;
@@ -61,7 +61,7 @@ public class GroupController {
     private EntityManager entityManager;
 
     @Autowired
-	private SimpMessagingTemplate messagingTemplate;
+	private NotificationSender notifSender;
 
     private static final Logger log = LogManager.getLogger(GroupController.class);
 
@@ -291,7 +291,7 @@ public class GroupController {
             entityManager.flush();
 
             // Send notification
-            NotificationSender.getInstance(messagingTemplate).sendNotification(notif, "/user/" + m.getUser().getUsername() + "/queue/notifications");
+            notifSender.sendNotification(notif, "/user/" + m.getUser().getUsername() + "/queue/notifications");
         }
 
         return CompletableFuture.completedFuture(null);
@@ -419,7 +419,7 @@ public class GroupController {
         createAndSendNotifs(NotificationType.GROUP_MODIFIED, user, group);
 
         // send group to other members
-        NotificationSender.getInstance(messagingTemplate).sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_MODIFIED);
+        notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_MODIFIED);
 
         return "{\"action\": \"none\"}";
     }
@@ -475,7 +475,7 @@ public class GroupController {
         createAndSendNotifs(NotificationType.GROUP_DELETED, user, group);
         
         // send group to other members
-        NotificationSender.getInstance(messagingTemplate).sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_DELETED);
+        notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_DELETED);
 
         return "{\"action\": \"redirect\",\"redirect\": \"/user/\"}";
 
@@ -588,16 +588,7 @@ public class GroupController {
             entityManager.flush();
 
             // Send notification
-            try {
-                ObjectMapper mapper = new ObjectMapper();
-                String jsonNotif = mapper.writeValueAsString(invite.toTransfer());
-                log.info("Sending an invite to {} with contents '{}'", "/user/"+ user.getId() +"/queue/notifications", jsonNotif);
-    
-                messagingTemplate.convertAndSend("/user/"+ user.getUsername() +"/queue/notifications", jsonNotif);
-            } catch (JsonProcessingException exception) {
-                log.error("Failed to parse invitation - {}", invite);
-                log.error("Exception {}", exception);
-            }
+            notifSender.sendNotification(invite, "/user/"+ user.getId() +"/queue/notifications");
 
             return "{\"status\":\"invited\"}";
         } else {

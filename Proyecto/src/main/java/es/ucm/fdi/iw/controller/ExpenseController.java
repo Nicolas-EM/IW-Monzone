@@ -39,12 +39,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import es.ucm.fdi.iw.LocalData;
+import es.ucm.fdi.iw.NotificationSender;
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Notification;
-import es.ucm.fdi.iw.model.NotificationSender;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.ParticipatesID;
 import es.ucm.fdi.iw.model.Transferable;
@@ -71,7 +71,7 @@ public class ExpenseController {
     private LocalData localData;
 
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    private NotificationSender notifSender;
 
     private static final Logger log = LogManager.getLogger(AdminController.class);
 
@@ -348,7 +348,7 @@ public class ExpenseController {
             entityManager.flush();
 
             // Send notification
-            NotificationSender.getInstance(messagingTemplate).sendNotification(notif, "/user/" + u.getUsername() + "/queue/notifications");
+            notifSender.sendNotification(notif, "/user/" + u.getUsername() + "/queue/notifications");
         }
 
         return CompletableFuture.completedFuture(null);
@@ -423,7 +423,7 @@ public class ExpenseController {
         createAndSendNotifs(NotificationType.EXPENSE_CREATED, params.currUser, params.participateUsers, params.group, exp);
 
         // send expense to group ASYNC
-        NotificationSender.getInstance(messagingTemplate).sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_CREATED);
+        notifSender.sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_CREATED);
 
         return "{\"action\": \"redirect\",\"redirect\": \"/group/" + groupId + "\"}";
     }
@@ -526,7 +526,7 @@ public class ExpenseController {
         createAndSendNotifs(NotificationType.EXPENSE_MODIFIED, params.currUser, params.participateUsers, params.group, exp);
 
         // send expense to group ASYNC
-        NotificationSender.getInstance(messagingTemplate).sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_MODIFIED);
+        notifSender.sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_MODIFIED);
 
         return "{\"action\": \"none\"}";
     }
@@ -590,7 +590,7 @@ public class ExpenseController {
         createAndSendNotifs(NotificationType.EXPENSE_DELETED, user, notifyUsers, group, exp);
 
         // send expense to group ASYNC
-        NotificationSender.getInstance(messagingTemplate).sendTransfer(exp, "/topic/group/" + group.getId(), "EXPENSE", NotificationType.EXPENSE_DELETED);
+        notifSender.sendTransfer(exp, "/topic/group/" + group.getId(), "EXPENSE", NotificationType.EXPENSE_DELETED);
 
         return "redirect:/group/" + groupId;
     }

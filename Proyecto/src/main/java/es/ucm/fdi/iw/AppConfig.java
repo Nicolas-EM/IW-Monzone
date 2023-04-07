@@ -46,4 +46,9 @@ public class AppConfig {
         messageSource.setBasename("Messages");
         return messageSource;
     }
+
+	@Bean(name="notifSender")
+	public NotificationSender getNotifSender() {
+		return new NotificationSender();
+	}
 }

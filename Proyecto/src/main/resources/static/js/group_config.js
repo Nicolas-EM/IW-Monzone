@@ -7,14 +7,16 @@ const currencies = infoGroup.dataset.currencies;
 
 // envio de invitaciones con AJAX
 let b = document.getElementById("confirmInviteBtn");
-b.onclick = (e) => {
-    e.preventDefault();
-    // th:formaction="@{/group/{action}(action=${group?.getId()} + '/inviteMember')}"
-    go(b.parentNode.action, 'POST', {
+if(b != null){  // NO para /group/new
+    b.onclick = (e) => {
+        e.preventDefault();
+        // th:formaction="@{/group/{action}(action=${group?.getId()} + '/inviteMember')}"
+        go(b.parentNode.action, 'POST', {
             username: document.getElementById("inviteUsername").value
         })
-        .then(d => console.log("happy", d))
-        .catch(e => console.log("sad", e))
+            .then(d => console.log("happy", d))
+            .catch(e => console.log("sad", e))
+    }
 }
 
 // Render current info group
@@ -42,22 +44,22 @@ function renderGroupData(group) {
     groupBudget.setAttribute('value', group.totBudget);
 }
 
-function renderGroupMembers(group){
+function renderGroupMembers(group) {
     const membersTable = document.getElementById('membersTable');
 
     go(`${config.rootUrl}/group/${groupId}/getGroupMembers`, "GET")
         .then(members => {
             Array.from(members).forEach(member => {
-                if(member.enabled)
+                if (member.enabled)
                     membersTable.insertAdjacentHTML("beforeend", renderMember(member, group));
             })
         })
 }
 
-function renderMember(member, group){
+function renderMember(member, group) {
     let memberHTML = `<div class="row p-2 member">`;
     console.log(`isGroupAdmin: ${isGroupAdmin}`);
-    if(isGroupAdmin){
+    if (isGroupAdmin) {
         memberHTML = `${memberHTML}
                     <div class="col btn-remove">
                     <form method="post" th:action="@{/group/${groupId}/delMember}">
@@ -90,48 +92,51 @@ function renderMember(member, group){
     return memberHTML;
 }
 
- // Submit Button (SAVE)
- document.getElementById("btn-save").onclick = (e) => {
+// Submit Button (SAVE)
+document.getElementById("btn-save").onclick = (e) => {
     e.preventDefault();
     console.log('Saving group');
     const b = document.getElementById("btn-save");
     const name = document.getElementById("name").value;
-    const desc = document.getElementById("desc").value;    
+    const desc = document.getElementById("desc").value;
     const currId = document.querySelector('[name="currId"]').value;
     const budget = document.getElementById("budget").value;
-  
+
     go(b.getAttribute('formaction'), 'POST', {
-      name,
-      desc,
-      budget,
-      currId
+        name,
+        desc,
+        budget,
+        currId
     })
-      .then(d => {
-        console.log("Group: success", d);
-        if (d.action === "redirect") {
-          console.log("Redirecting to ", d.redirect);
-          window.location.replace(d.redirect);
-        }
-      })
-      .catch(e => console.log("Error creating/updating group", e))
+        .then(d => {
+            console.log("Group: success", d);
+            if (d.action === "redirect") {
+                console.log("Redirecting to ", d.redirect);
+                window.location.replace(d.redirect);
+            }
+        })
+        .catch(e => console.log("Error creating/updating group", e))
 };
 
 // Submit Button (DELETE GROUP)
-document.getElementById("btn-delete").onclick = (e) => {
-    e.preventDefault();
-    console.log('Deleting group');
-    const b = document.getElementById("btn-delete");
-  
-    go(b.getAttribute('formaction'), 'POST')
-      .then(d => {
-        console.log("Group: success", d);
-        if (d.action === "redirect") {
-          console.log("Redirecting to ", d.redirect);
-          window.location.replace(d.redirect);
-        }
-      })
-      .catch(e => console.log("Error deleting group", e))
-};
+// NOT for /group/new
+if(document.getElementById("btn-delete") != null){
+    document.getElementById("btn-delete").onclick = (e) => {
+        e.preventDefault();
+        console.log('Deleting group');
+        const b = document.getElementById("btn-delete");
+    
+        go(b.getAttribute('formaction'), 'POST')
+            .then(d => {
+                console.log("Group: success", d);
+                if (d.action === "redirect") {
+                    console.log("Redirecting to ", d.redirect);
+                    window.location.replace(d.redirect);
+                }
+            })
+            .catch(e => console.log("Error deleting group", e))
+    };
+}
 
 // Render INCOMING updates of group
 if (ws.receive) {
@@ -156,36 +161,3 @@ if (ws.receive) {
         }
     }
 }
-
-// function renderGroup(group) {
-//     let currencyArray = JSON.parse(currencies);
-//     let currencyOptions = '';
-//     currencyArray.forEach((curr, index) => {
-//       const selected = group && group.currency && group.currency === curr ? 'selected' : '';
-//       currencyOptions += `<option value="${index}" ${selected}>${curr}</option>`;
-//     });
-
-//     return `<label for="name" class="form-label w-100">Name</label>
-//             <input id="name" name="name" type="text" class="rounded-corners mb-4 w-100" required="required" value="${group ? group.name : ''}" ${isGroupAdmin == null ? '' : isGroupAdmin ? '' : 'disabled'}>
-//             <label for="desc" class="form-label w-100">Description (optional)</label>
-//             <textarea id="desc" name="desc" class="rounded-corners form-control" rows="5" ${isGroupAdmin == null ? '' : isGroupAdmin ? '' : 'disabled'}>${group ? group.desc : ''}</textarea>
-//             <label for="currency" class="form-label mt-4 w-100">Currency</label>
-//             <select class="form-select rounded-corners" required name="currId" ${isGroupAdmin == null ? '' : isGroupAdmin ? '' : 'disabled'}>
-//                 <option ${group ? '' : 'selected disabled hidden'} value="">Select Currency</option>
-//                 ${currencyOptions}
-//             </select>
-//             <!-- Budgets -->
-//             <div class="row">
-//                 <!-- Set personal budget -->
-//                 <div class="col">
-//                     <label for="budget" class="form-label mt-4 w-100">Your budget:</label>
-//                     <input id="budget" name="budget" type="number" min="0" step="0.1" class="rounded-corners w-100 bg-white budget" required="required" value="${budget}" placeholder="${group ? '' : 'Enter Budget'}"></input>
-//                 </div>
-//                 <!-- Total Budget -->
-//                 <div ${group ? '' : 'hidden'} class="col">
-//                     <label class="form-label mt-4 w-100">Group budget:</label>
-//                     <input disabled class="rounded-corners w-100 bg-white budget" value="${group ? group.totBudget : ''}"></input>
-//                 </div>
-//             </div>`;
-// }
-
