@@ -348,7 +348,7 @@ public class ExpenseController {
             entityManager.flush();
 
             // Send notification
-            NotificationSender.sendNotification(notif, "/user/" + u.getUsername() + "/queue/notifications");
+            NotificationSender.getInstance(messagingTemplate).sendNotification(notif, "/user/" + u.getUsername() + "/queue/notifications");
         }
 
         return CompletableFuture.completedFuture(null);
@@ -423,7 +423,7 @@ public class ExpenseController {
         createAndSendNotifs(NotificationType.EXPENSE_CREATED, params.currUser, params.participateUsers, params.group, exp);
 
         // send expense to group ASYNC
-        NotificationSender.sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_CREATED);
+        NotificationSender.getInstance(messagingTemplate).sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_CREATED);
 
         return "{\"action\": \"redirect\",\"redirect\": \"/group/" + groupId + "\"}";
     }
@@ -526,7 +526,7 @@ public class ExpenseController {
         createAndSendNotifs(NotificationType.EXPENSE_MODIFIED, params.currUser, params.participateUsers, params.group, exp);
 
         // send expense to group ASYNC
-        NotificationSender.sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_MODIFIED);
+        NotificationSender.getInstance(messagingTemplate).sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_MODIFIED);
 
         return "{\"action\": \"none\"}";
     }
@@ -590,7 +590,7 @@ public class ExpenseController {
         createAndSendNotifs(NotificationType.EXPENSE_DELETED, user, notifyUsers, group, exp);
 
         // send expense to group ASYNC
-        NotificationSender.sendTransfer(exp, "/topic/group/" + group.getId(), "EXPENSE", NotificationType.EXPENSE_DELETED);
+        NotificationSender.getInstance(messagingTemplate).sendTransfer(exp, "/topic/group/" + group.getId(), "EXPENSE", NotificationType.EXPENSE_DELETED);
 
         return "redirect:/group/" + groupId;
     }

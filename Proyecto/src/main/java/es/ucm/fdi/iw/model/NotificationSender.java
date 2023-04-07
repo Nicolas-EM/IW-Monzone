@@ -2,7 +2,6 @@ package es.ucm.fdi.iw.model;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 
@@ -19,17 +18,20 @@ import org.apache.logging.log4j.Logger;
  */
 public class NotificationSender {
 
-    private static SimpMessagingTemplate messagingTemplate;
-
-    @Autowired
-    public void setMessagingTemplate(SimpMessagingTemplate messagingTemplate) {
-        NotificationSender.messagingTemplate = messagingTemplate;
-    }
-
+    private SimpMessagingTemplate messagingTemplate;
+    private static NotificationSender instance;
     private static final Logger log = LogManager.getLogger(NotificationSender.class);
 
+    public static NotificationSender getInstance(SimpMessagingTemplate messagingTemplate) {
+        if (instance == null) {
+            instance = new NotificationSender();
+            instance.messagingTemplate = messagingTemplate;
+        }
+        return instance;
+    }    
+
     @Async
-    public static CompletableFuture<Void> sendNotification(Notification notif, String endpoint) {
+    public CompletableFuture<Void> sendNotification(Notification notif, String endpoint) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String jsonNotif = mapper.writeValueAsString(notif.toTransfer());
@@ -47,14 +49,14 @@ public class NotificationSender {
     }
 
     @Async
-    public static <T> CompletableFuture<Void> sendTransfer(Transferable<T> obj, String endpoint, String objType, NotificationType type) {
+    public <T> CompletableFuture<Void> sendTransfer(Transferable<T> obj, String endpoint, String objType, NotificationType type) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String jsonTransfer = mapper.writeValueAsString(obj.toTransfer());
 
             log.info("Sending a {} to {} with contents '{}'", objType, endpoint, jsonTransfer);
 
-            String json = "{\"type\" : \"" + objType.toUpperCase() +"\", \"action\" : \"" + type + "\",\"" + objType + "\" : " + jsonTransfer + "}";
+            String json = "{\"type\" : \"" + objType.toUpperCase() +"\", \"action\" : \"" + type + "\",\"" + objType.toLowerCase() + "\" : " + jsonTransfer + "}";
 
             messagingTemplate.convertAndSend(endpoint, json);
         } catch (JsonProcessingException exception) {

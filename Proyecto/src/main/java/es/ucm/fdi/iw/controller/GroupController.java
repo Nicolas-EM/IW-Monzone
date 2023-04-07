@@ -291,7 +291,7 @@ public class GroupController {
             entityManager.flush();
 
             // Send notification
-            NotificationSender.sendNotification(notif, "/user/" + m.getUser().getUsername() + "/queue/notifications");
+            NotificationSender.getInstance(messagingTemplate).sendNotification(notif, "/user/" + m.getUser().getUsername() + "/queue/notifications");
         }
 
         return CompletableFuture.completedFuture(null);
@@ -322,6 +322,7 @@ public class GroupController {
     /*
      * Creates group
      */
+    @ResponseBody
     @Transactional
     @PostMapping("/newGroup")
     public String newGroup(HttpSession session, @RequestBody JsonNode jsonNode) {
@@ -371,6 +372,7 @@ public class GroupController {
     /*
      * Updates group
      */
+    @ResponseBody
     @Transactional
     @PostMapping("{groupId}/updateGroup")
     public String updateGroup(HttpSession session, @PathVariable long groupId, @RequestBody JsonNode jsonNode) {
@@ -413,11 +415,11 @@ public class GroupController {
         // Anyone can update their budget update member
         member.setBudget(budget);
 
-        // TODO: send notif GROUP_MODIFIED
+        // Send notif
         createAndSendNotifs(NotificationType.GROUP_MODIFIED, user, group);
 
         // send group to other members
-        NotificationSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_MODIFIED);
+        NotificationSender.getInstance(messagingTemplate).sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_MODIFIED);
 
         return "{\"action\": \"none\"}";
     }
@@ -425,6 +427,7 @@ public class GroupController {
     /*
      * Delete group
      */
+    @ResponseBody
     @Transactional
     @PostMapping("{groupId}/delGroup")
     public String delGroup(HttpSession session, @PathVariable long groupId) {
@@ -472,7 +475,7 @@ public class GroupController {
         createAndSendNotifs(NotificationType.GROUP_DELETED, user, group);
         
         // send group to other members
-        NotificationSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_DELETED);
+        NotificationSender.getInstance(messagingTemplate).sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_DELETED);
 
         return "{\"action\": \"redirect\",\"redirect\": \"/user/\"}";
 

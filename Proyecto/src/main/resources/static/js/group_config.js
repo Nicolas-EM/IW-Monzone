@@ -112,9 +112,6 @@ function renderMember(member, group){
           console.log("Redirecting to ", d.redirect);
           window.location.replace(d.redirect);
         }
-        else if (d.action === "none") {
-            // ??
-        }
       })
       .catch(e => console.log("Error creating/updating group", e))
 };
@@ -123,6 +120,7 @@ function renderMember(member, group){
 document.getElementById("btn-delete").onclick = (e) => {
     e.preventDefault();
     console.log('Deleting group');
+    const b = document.getElementById("btn-delete");
   
     go(b.getAttribute('formaction'), 'POST')
       .then(d => {
@@ -145,7 +143,7 @@ if (ws.receive) {
             switch (obj.action) {
                 case "GROUP_CREATED":
                     break;
-                case "GROUP_UPDATED":
+                case "GROUP_MODIFIED":
                     renderGroupData(obj.group);
                     renderGroupMembers(obj.group);
                     break;
