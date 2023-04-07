@@ -248,6 +248,7 @@ public class ExpenseController {
         public LocalDate date;
         public List<User> participateUsers;
         public List<Member> participateMembers;
+        //public MultipartFile file;
     }
 
     private PostParams validatedPostParams(HttpSession session, long groupId, String dateString, float amount,
@@ -400,6 +401,8 @@ public class ExpenseController {
                 });
         long typeId = objectMapper.convertValue(jsonNode.get("typeId"), Long.class);
 
+        MultipartFile file = objectMapper.convertValue(jsonNode.get("file"), MultipartFile.class);
+        
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
         if (!params.valid)
@@ -432,6 +435,17 @@ public class ExpenseController {
             Member m = entityManager.find(Member.class, memberID);
             m.setBalance(m.getBalance() - e.getAmount() / params.participateUsers.size());
         }
+
+        // save the new expense image
+        // try{
+        //     String filename = String.valueOf(e); //ver ejemplo de user controller de la plantilla
+        //     File dest = localData.getFile("expense", filename); //no molestarse en ver que había antes machacar lo anterior
+        //     //dest.delete();
+        //    file.transferTo(dest);
+        // }
+        // catch(IOException ex){
+        //     return "Error IMAGEN " + ex.getMessage();
+        // }
 
         // send notification ASYNC
         sendNotifications(NotificationType.EXPENSE_CREATED, params.currUser, params.participateUsers, params.group, e);

@@ -47,8 +47,5 @@
 ## /group/
 - Mejora en vista de deudas
 
-## /group/new
-- Arreglar CSS para que los botones Save/Cancel sean amarillos
-
 ## /user/
 - Refactorizar para que las cartas se vean bien si no tienen descripción
