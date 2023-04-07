@@ -10,7 +10,6 @@ let b = document.getElementById("confirmInviteBtn");
 if(b != null){  // NO para /group/new
     b.onclick = (e) => {
         e.preventDefault();
-        // th:formaction="@{/group/{action}(action=${group?.getId()} + '/inviteMember')}"
         go(b.parentNode.action, 'POST', {
             username: document.getElementById("inviteUsername").value
         })
@@ -49,9 +48,30 @@ function renderGroupMembers(group) {
 
     go(`${config.rootUrl}/group/${groupId}/getGroupMembers`, "GET")
         .then(members => {
+            membersTable.innerHTML = '';
             Array.from(members).forEach(member => {
                 if (member.enabled)
                     membersTable.insertAdjacentHTML("beforeend", renderMember(member, group));
+            })
+
+            // Delete Member button function
+            Array.from(document.getElementsByClassName('delMemberBtn')).forEach(btn => {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    go(btn.parentNode.action, 'POST', {
+                        removeId: btn.parentNode.querySelector('input[name="removeId"]').value
+                    })
+                        .then(d => {
+                            console.log("Removed member");
+                            if(d.action == "redirect"){
+                                console.log("Redirecting to ", d.redirect);
+                                window.location.replace(d.redirect);
+                            } else {
+                                renderGroupMembers(group);
+                            }
+                        })
+                        .catch(e => console.log("Failed to remove member", e))
+                }
             })
         })
 }
@@ -62,9 +82,10 @@ function renderMember(member, group) {
     if (isGroupAdmin) {
         memberHTML = `${memberHTML}
                     <div class="col btn-remove">
-                    <form method="post" th:action="@{/group/${groupId}/delMember}">
-                        <input type="hidden" name="removeId" th:value="${member.idUser}">
-                        <button type="submit" class="btn">
+                    <form method="post" action="/group/${groupId}/delMember">
+                        <input type="hidden" name="removeId" value="${member.idUser}">
+                        <input type="hidden" name="_csrf" value="${config.csrf.value}">
+                        <button type="submit" class="btn delMemberBtn">
                             <svg id="trash" xmlns="http://www.w3.org/2000/svg" width="25" fill="white" class="bi bi-trash3" viewbox="0 0 16 16">
                                 <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
                             </svg>
@@ -80,15 +101,12 @@ function renderMember(member, group) {
                     Budget: ${member.budget}
                 </div>
                 <div id="indicator">
-                    <span class="dot" th:style="${member.balance} >= 0 ? 'background: green' : 'background: red'"></span>
+                    <span class="dot" style="${member.balance} >= 0 ? 'background: green' : 'background: red'"></span>
                 </div>
                 <div class="balance col d-flex align-items-center">
                     ${member.balance} ${group.currencyString}
                 </div>
             </div>`;
-
-    console.log(`Rendering member:`);
-    console.log(memberHTML);
     return memberHTML;
 }
 

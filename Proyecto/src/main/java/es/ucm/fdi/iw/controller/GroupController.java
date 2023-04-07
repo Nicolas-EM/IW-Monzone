@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.HttpClientErrorException.BadRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -485,9 +486,11 @@ public class GroupController {
      * Remove member
      */
     @Transactional
+    @ResponseBody
     @PostMapping("{groupId}/delMember")
-    public String removeMember(@PathVariable long groupId, Model model, HttpSession session,
-            @RequestParam(required = true) long removeId) {
+    public String removeMember(@PathVariable long groupId, Model model, HttpSession session, @RequestBody JsonNode node) {
+                
+        long removeId = node.get("removeId").asLong();
 
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
@@ -497,11 +500,19 @@ public class GroupController {
         if (group == null || !group.isEnabled())
             throw new BadRequestException();
 
-        // check if user belongs to the group
+        // check if requesting user belongs to the group
         MemberID mId = new MemberID(groupId, user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled()) {
             throw new NoMemberException();
+        }
+
+        // check if member to remove belongs to group (only if not leaving group)
+        Member removeMember = entityManager.find(Member.class, new MemberID(groupId, removeId));
+        if (removeId != user.getId()){
+            if (removeMember == null || !removeMember.isEnabled()) {
+                throw new BadRequestException();
+            }
         }
 
         // only moderators can remove other members
@@ -511,8 +522,9 @@ public class GroupController {
 
         // if only member, delete group
         if(group.getMembers().size() == 1){
+            log.warn("Deleting EMPTY group {}", group);
             delGroup(session, groupId);
-            return "redirect:/user/";
+            return "{\"action\": \"redirect\",\"redirect\": \"/user/\"}";
         }
 
         /*
@@ -525,20 +537,22 @@ public class GroupController {
         }
 
         // balance must be 0
-        if (member.getBalance() != 0) {
+        if (removeMember.getBalance() != 0) {
             throw new BadRequestException();
         }
 
         // remove member
-        member.setEnabled(false);
+        removeMember.setEnabled(false);
         // update group budget
         group.setNumMembers(group.getNumMembers() - 1);
-        group.setTotBudget(group.getTotBudget() - member.getBudget());
+        group.setTotBudget(group.getTotBudget() - removeMember.getBudget());
+
+        log.warn("Removed user from group {}", group);
 
         if (user.getId() == removeId)
-            return "redirect:/user/";
-        else // TODO: CAMBIAR A AJAX
-            return config(groupId, model, session);
+            return "{\"action\": \"redirect\",\"redirect\": \"/user/\"}";
+
+        return "{\"action\": \"none\"}";
     }
 
     /**
