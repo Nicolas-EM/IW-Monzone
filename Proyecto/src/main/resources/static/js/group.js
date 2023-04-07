@@ -19,15 +19,17 @@ if (ws.receive) {
         oldFn(obj); // llama al manejador anterior
 
         if (obj.type == "EXPENSE") {
+            const expense = obj.expense;
+            const expenseHTML =  document.getElementById(`expense-${expense.expenseId}`)
             switch (obj.action) {
                 case "EXPENSE_CREATED":
-                    expensesTable.insertAdjacentHTML("afterbegin", renderExpense(obj.expense));
+                    expensesTable.insertAdjacentHTML("afterbegin", renderExpense(expense));
                     break;
-                case "EXPENSE_UPDATED":
-                    // TODO
+                case "EXPENSE_MODIFIED":
+                    expenseHTML.outerHTML = renderExpense(expense);
                     break;
                 case "EXPENSE_DELETED":
-                    // TODO
+                    expenseHTML.parentElement.removeChild(expenseHTML);
                     break;
                 default:
             }
@@ -39,7 +41,7 @@ if (ws.receive) {
 
 // Render single expense
 function renderExpense(expense) {
-    return `<div class="col">
+    return `<div id="expense-${expense.expenseId}" class="col">
                 <div class="card border-light text-white bg-warning mb-3 mx-auto" role="button" onclick="location.href='/group/${groupId}/${expense.expenseId}'">
                     <div class="row row-cols-2 row-cols-md-4 g-0">
                         <!-- Icon -->
