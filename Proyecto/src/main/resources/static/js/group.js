@@ -16,10 +16,11 @@ go(`${config.rootUrl}/group/${groupId}/getExpenses`, "GET")
 // Render INCOMING Expenses
 if (ws.receive) {
     const oldFn = ws.receive; // guarda referencia a manejador anterior
-    ws.receive = (obj) => {
-        oldFn(obj); // llama al manejador anterior
+    ws.receive = (destination, obj) => {
+        oldFn(destination, obj); // llama al manejador anterior
 
-        if (obj.type == "EXPENSE") {
+        // If expense destined to current group
+        if (obj.type == "EXPENSE" && destination.includes(groupId)) {
             const expense = obj.expense;
             const expenseHTML =  document.getElementById(`expense-${expense.expenseId}`)
             switch (obj.action) {

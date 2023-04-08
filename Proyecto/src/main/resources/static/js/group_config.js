@@ -162,7 +162,9 @@ if (ws.receive) {
     ws.receive = (obj) => {
         oldFn(obj); // llama al manejador anterior
 
-        if (obj.type == "GROUP") {
+        // If receiving a group and on that group
+        if (obj.type == "GROUP" && obj.group.id == groupId) {
+            console.log("Updating group view");
             switch (obj.action) {
                 case "GROUP_CREATED":
                     break;

@@ -51,8 +51,8 @@ go(config.rootUrl + "/user/receivedNotifs", "GET")
 // y aquí pinta notificaciones según van llegando
 if (ws.receive) {
     const oldFn = ws.receive; // guarda referencia a manejador anterior
-    ws.receive = (obj) => {
-        oldFn(obj); // llama al manejador anterior
+    ws.receive = (destination, obj) => {
+        oldFn(destination, obj); // llama al manejador anterior
 
         if(obj.type == "NOTIFICATION"){
             console.log("Received notification");

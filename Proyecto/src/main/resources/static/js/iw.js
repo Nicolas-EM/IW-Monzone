@@ -13,8 +13,8 @@ const ws = {
     /**
      * Default action when message is received. 
      */
-    receive: (text) => {
-        console.log(text);
+    receive: (destination, text) => {
+        console.log("Message to ", destination, text);
     },
 
     headers: { 'X-CSRF-TOKEN': config.csrf.value },
@@ -47,7 +47,7 @@ const ws = {
     subscribe: (sub) => {
         try {
             ws.stompClient.subscribe(sub,
-                (m) => ws.receive(JSON.parse(m.body))); // fails if non-json received!
+                (m) => ws.receive(m.headers.destination, JSON.parse(m.body))); // fails if non-json received!
             console.log("Hopefully subscribed to " + sub);
         } catch (e) {
             console.log("Error, could not subscribe to " + sub, e);

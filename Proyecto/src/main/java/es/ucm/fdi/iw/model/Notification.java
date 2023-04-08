@@ -110,6 +110,12 @@ public class Notification implements Transferable<Notification.Transfer>  {
             case GROUP_INVITATION:
                 sb.append(" has invited you to join \"");
                 break;
+            case GROUP_MODIFIED:
+                sb.append(" has modified \"");
+                break;
+            case GROUP_DELETED:
+                sb.append(" has deleted \"");
+                break;
             default: {}                
         }
 
