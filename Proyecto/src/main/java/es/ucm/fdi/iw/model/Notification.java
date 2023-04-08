@@ -41,6 +41,7 @@ public class Notification implements Transferable<Notification.Transfer>  {
         EXPENSE_MODIFIED,
         EXPENSE_DELETED,
 
+        GROUP_ACCEPTED,  // When a user accepts an invite
         GROUP_MODIFIED,
         GROUP_DELETED
     }

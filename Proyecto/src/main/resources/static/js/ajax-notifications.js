@@ -21,7 +21,7 @@ function renderInvite(invite) {
                         </div>
                         <div class="row">
                             <form class="col" method="post" action="${invite.actionEndpoint}">
-                                <button onclick="acceptInvite(this)">Accept</button>
+                                <button onclick="acceptInvite(event, this)">Accept</button>
                             </form>
                             <form class="col" method="post">
                                 <button type="submit">Delete</button>
@@ -76,7 +76,8 @@ if (ws.receive) {
 }
 
 // Accept Invite Btn
-function acceptInvite(btn) {
+function acceptInvite(event, btn) {
+    event.preventDefault();
     go(btn.parentNode.action, 'POST', {})
     .then(d => console.log("happy", d))
     .catch(e => console.log("sad", e))

@@ -630,7 +630,7 @@ public class GroupController {
             entityManager.flush();
 
             // Send notification
-            notifSender.sendNotification(invite, "/user/"+ user.getId() +"/queue/notifications");
+            notifSender.sendNotification(invite, "/user/"+ user.getUsername() +"/queue/notifications");
 
             return "{\"status\":\"invited\"}";
         } else {
@@ -687,6 +687,9 @@ public class GroupController {
                 group.setNumMembers(group.getNumMembers() + 1);
             }
         }
+
+        // Send group transfer to user (to render if on /user/)
+        notifSender.sendTransfer(group, "/user/" + user.getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_ACCEPTED);
 
         return "{\"status\": \"ok\"}";
     }
