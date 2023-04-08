@@ -26,9 +26,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
@@ -37,7 +41,9 @@ import javax.transaction.Transactional;
 
 import java.io.*;
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -65,6 +71,9 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+
+ 
+    
     /**
      * Exception to use when denying access to unauthorized users.
      * 
@@ -72,10 +81,12 @@ public class UserController {
      * each other's profiles.
      */
     @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not an admin, and this is not your profile") // 403
-    public static class NotYourProfileException extends RuntimeException {}
+    public static class NotYourProfileException extends RuntimeException {
+    }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request") // 400
-    public static class BadRequestException extends RuntimeException {}
+    public static class BadRequestException extends RuntimeException {
+    }
 
     /**
      * Encodes a password, so that it can be saved for future checking. Notice
@@ -106,9 +117,9 @@ public class UserController {
 
     /*
      * 
-     *  GET MAPPINGS
+     * GET MAPPINGS
      * 
-    */
+     */
 
     /**
      * Landing page for a user profile
@@ -122,13 +133,107 @@ public class UserController {
 
         List<Member> enabledMemberOf = new ArrayList<>();
         for (Member m : memberOf) {
-            if(m.isEnabled())
+            if (m.isEnabled())
                 enabledMemberOf.add(m);
         }
 
         model.addAttribute("memberOf", enabledMemberOf);
 
         return "home";
+    }
+
+    /**
+     * End point
+     */
+    @GetMapping("/getMonthly")
+    public Float getMonthly(HttpSession session, @RequestBody JsonNode jsonNode) {
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String dateString = objectMapper.convertValue(jsonNode.get("dateString"), String.class);
+        int currId = objectMapper.convertValue(jsonNode.get("currId"), int.class); // tipo correcto?
+
+        // check date format
+        LocalDate formDate;
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            formDate = LocalDate.parse(dateString, formatter);
+        } catch (Exception e) {
+            throw new BadRequestException();
+        }
+
+        // check currency 
+        if (currId < 0 || currId >= Group.Currency.values().length)
+        throw new BadRequestException();
+        Group.Currency newCurr = Group.Currency.values()[currId];
+
+        Float total = 0f;
+        List<Participates> participates = user.getExpenses();
+        for (Participates p : participates) {
+            Expense exp = p.getExpense();
+            LocalDate eDate;
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                eDate = LocalDate.parse(dateString, formatter);
+            } catch (Exception e) {
+                throw new BadRequestException();
+            }
+            
+            if (eDate.getMonthValue() == formDate.getMonthValue() && eDate.getYear() == formDate.getYear())
+                total += changeCurrency(exp.getAmount(), p.getGroup().getCurrency(), newCurr);
+        }
+        return total;
+    }
+
+    private Float changeCurrency(Float amount, Group.Currency actualCurr, Group.Currency newCurr) {
+        if (actualCurr.equals(newCurr))
+            return amount; // No se pueden convertir de una divisa a sí misma
+        // Conforme al orden: EUR, USD, GBP
+        Float[][] exchangeRates = new Float[3][3]; // Group.Currency.values().length
+        exchangeRates[0][1] = 1.19f; // 1 EUR = 1.19 USD
+        exchangeRates[1][0] = 0.84f; // 1 USD = 0.84 EUR
+        exchangeRates[0][2] = 0.85f; // 1 EUR = 0.85 GBP
+        exchangeRates[2][0] = 1.18f; // 1 GBP = 1.18 EUR
+        exchangeRates[1][2] = 0.71f; // 1 USD = 0.71 GBP
+        exchangeRates[2][1] = 1.41f; // 1 GBP = 1.41 USD
+
+        int actualCurrIndex = actualCurr.ordinal();
+        int newCurrIndex = newCurr.ordinal();
+        Float exchangeRate = exchangeRates[actualCurrIndex][newCurrIndex];
+        return amount * exchangeRate;
+    }
+
+    /**
+     * End point
+     */
+    @GetMapping("/getByType")
+        public List<Float> getByType(Model model, HttpSession session, @RequestBody JsonNode jsonNode) {
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        int currId = objectMapper.convertValue(jsonNode.get("currId"), int.class); // tipo correcto?
+
+        // check currency 
+        if (currId < 0 || currId >= Group.Currency.values().length)
+        throw new BadRequestException();
+        Group.Currency newCurr = Group.Currency.values()[currId];
+
+        List<Type> types = entityManager.createNamedQuery("Type.getAllTypes",Type.class).getResultList();
+        List<Float> totals = new ArrayList<>(types.length);
+        
+        // Inicializar los valores de las catergorías a 0
+        for (int i = 0; i < totals.length; i++)
+            totals.add(0);
+
+        List<Participates> participates = user.getExpenses();
+        for (Participates p : participates) {
+            Expense e = p.getExpense();
+            totals[e.getType().getId()] += changeCurrency(e.getAmount(), p.getGroup().getCurrency(), newCurr);
+        }
+
+        return totals;
     }
 
     @GetMapping("/config")
@@ -148,7 +253,7 @@ public class UserController {
         model.addAttribute("groups", groups);
 
         List<String> currencies = new ArrayList<>();
-        for(Group.Currency g : Group.Currency.values()){
+        for (Group.Currency g : Group.Currency.values()) {
             currencies.add(g.name());
         }
         model.addAttribute("currencies", currencies);
@@ -158,15 +263,16 @@ public class UserController {
         // List<Participates> expenses = user.getExpenses();
         // Float amount = 0f;
         // for(Participates p : expenses){
-        //     if(amounts.size() >= (int) p.getExpense().getType().getId()){
-        //         amount = amounts.get((int) p.getExpense().getType().getId()) + p.getExpense().getAmount();
-        //     }
-        //     else{
-        //         amount = p.getExpense().getAmount();
-        //     }
-        //     amounts.set((int) p.getExpense().getType().getId(), amount);
+        // if(amounts.size() >= (int) p.getExpense().getType().getId()){
+        // amount = amounts.get((int) p.getExpense().getType().getId()) +
+        // p.getExpense().getAmount();
         // }
-        //model.addAttribute("amounts", amounts);
+        // else{
+        // amount = p.getExpense().getAmount();
+        // }
+        // amounts.set((int) p.getExpense().getType().getId(), amount);
+        // }
+        // model.addAttribute("amounts", amounts);
 
         return "user";
     }
@@ -175,55 +281,55 @@ public class UserController {
      * Returns JSON with all received USER messages
      */
     @GetMapping(path = "receivedNotifs", produces = "application/json")
-	@Transactional // para no recibir resultados inconsistentes
-	@ResponseBody  // para indicar que no devuelve vista, sino un objeto (jsonizado)
-	public List<Notification.Transfer> retrieveUserMessages(HttpSession session) {
-		long userId = ((User)session.getAttribute("u")).getId();		
-		User u = entityManager.find(User.class, userId);
-		log.info("Generating USER NOTIFS list for user {} ({} notifications)",  u.getUsername(), u.getNotifications().size());
-		return u.getNotifications().stream().map(Transferable::toTransfer).collect(Collectors.toList());
-	}
+    @Transactional // para no recibir resultados inconsistentes
+    @ResponseBody // para indicar que no devuelve vista, sino un objeto (jsonizado)
+    public List<Notification.Transfer> retrieveUserMessages(HttpSession session) {
+        long userId = ((User) session.getAttribute("u")).getId();
+        User u = entityManager.find(User.class, userId);
+        log.info("Generating USER NOTIFS list for user {} ({} notifications)", u.getUsername(),
+                u.getNotifications().size());
+        return u.getNotifications().stream().map(Transferable::toTransfer).collect(Collectors.toList());
+    }
 
     /**
-     * Returns JSON with count of unread messages 
+     * Returns JSON with count of unread messages
      */
-	@GetMapping(path = "unread", produces = "application/json")
-	@ResponseBody
-	public String checkUnread(HttpSession session) {
-        User u = (User)session.getAttribute("u");
+    @GetMapping(path = "unread", produces = "application/json")
+    @ResponseBody
+    public String checkUnread(HttpSession session) {
+        User u = (User) session.getAttribute("u");
         long userId = u.getId();
-        u = entityManager.find(User.class, userId);       
-				
-		long unread = entityManager.createNamedQuery("Notification.countUnread", Long.class)
-			.setParameter("userId", userId)
-			.getSingleResult();
+        u = entityManager.find(User.class, userId);
 
-        log.info("UNREAD - {} User notifications",  unread);
+        long unread = entityManager.createNamedQuery("Notification.countUnread", Long.class)
+                .setParameter("userId", userId)
+                .getSingleResult();
 
-		session.setAttribute("unread", unread);
-		return "{\"unread\": " + unread + "}";
+        log.info("UNREAD - {} User notifications", unread);
+
+        session.setAttribute("unread", unread);
+        return "{\"unread\": " + unread + "}";
     }
 
     /**
      * Returns JSON with ids of groups that user belongs to
      */
     @GetMapping(path = "groups", produces = "application/json")
-	@Transactional // para no recibir resultados inconsistentes
-	@ResponseBody  // para indicar que no devuelve vista, sino un objeto (jsonizado)
-	public List<Long> getGroups(HttpSession session) {
-		long userId = ((User)session.getAttribute("u")).getId();		
-		User u = entityManager.find(User.class, userId);
+    @Transactional // para no recibir resultados inconsistentes
+    @ResponseBody // para indicar que no devuelve vista, sino un objeto (jsonizado)
+    public List<Long> getGroups(HttpSession session) {
+        long userId = ((User) session.getAttribute("u")).getId();
+        User u = entityManager.find(User.class, userId);
 
         List<Long> groupIds = new ArrayList<>();
-        for(Member m : u.getMemberOf()){
-            if(m.isEnabled())
+        for (Member m : u.getMemberOf()) {
+            if (m.isEnabled())
                 groupIds.add(m.getGroup().getId());
         }
-        
-		log.info("Generating group list for user {} ({} groups)",  u.getUsername(), groupIds.size());
-		return groupIds;
-	}
 
+        log.info("Generating group list for user {} ({} groups)", u.getUsername(), groupIds.size());
+        return groupIds;
+    }
 
     /**
      * Returns the default profile pic
@@ -250,27 +356,26 @@ public class UserController {
         return os -> FileCopyUtils.copy(in, os);
     }
 
-
     /*
      * 
-     *  POST MAPPINGS
+     * POST MAPPINGS
      * 
-    */
+     */
 
     @PostMapping("/{notifId}/read")
     @Transactional
-	@ResponseBody
-    public String markNotifRead(@PathVariable long notifId, HttpSession session){
-        long userId = ((User)session.getAttribute("u")).getId();		
-		User u = entityManager.find(User.class, userId);
+    @ResponseBody
+    public String markNotifRead(@PathVariable long notifId, HttpSession session) {
+        long userId = ((User) session.getAttribute("u")).getId();
+        User u = entityManager.find(User.class, userId);
 
         // Check notification exists
         Notification notif = entityManager.find(Notification.class, notifId);
-        if(notif == null)
+        if (notif == null)
             throw new BadRequestException();
 
         // Check notification belongs to user
-        if(notif.getRecipient().getId() != userId)
+        if (notif.getRecipient().getId() != userId)
             throw new BadRequestException();
 
         notif.setDateRead(LocalDateTime.now());
@@ -283,7 +388,8 @@ public class UserController {
      */
     @PostMapping("/{id}")
     @Transactional
-    public String postUser(HttpServletResponse response, @PathVariable long id, @ModelAttribute User edited, @RequestParam(required = false) String pass2, Model model, HttpSession session) throws IOException {
+    public String postUser(HttpServletResponse response, @PathVariable long id, @ModelAttribute User edited,
+            @RequestParam(required = false) String pass2, Model model, HttpSession session) throws IOException {
         User requester = (User) session.getAttribute("u");
         User target = null;
         if (id == -1 && requester.hasRole(Role.ADMIN)) {
@@ -318,7 +424,7 @@ public class UserController {
         // update user session so that changes are persisted in the session, too
         if (requester.getId() == target.getId()) {
             session.setAttribute("u", target);
-        }   
+        }
 
         return "user";
     }

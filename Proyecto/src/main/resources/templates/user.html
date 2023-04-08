@@ -68,7 +68,7 @@
             <input id="date" type="month" name="dateString" class="rounded-corners w-100" value="2023-03">
           </div>
           <div class="col-3">
-            <select id="form" class="form-select rounded-corners" required name="currId">
+            <select id="currMonth" class="form-select rounded-corners" required name="currId">
               <option th:unless="${group != null}" selected disabled hidden value="">Currency</option>
               <div th:each="curr,i : ${currencies}">
                 <option th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
@@ -87,7 +87,7 @@
             <h4>How much do you spend in each category?</h4>
           </div>
           <div class="col-4">
-            <select id="cur2" class="form-select rounded-corners" required name="currId">
+            <select id="currType" class="form-select rounded-corners" required name="currId">
               <option th:unless="${group != null}" selected disabled hidden value="">Currency</option>
               <div th:each="curr,i : ${currencies}">
                 <option id="curValue2"  th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
