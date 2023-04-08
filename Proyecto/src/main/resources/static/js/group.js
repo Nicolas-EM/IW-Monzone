@@ -1,5 +1,6 @@
 const expensesTable = document.getElementById("expensesTable");
 const debtsTable = document.getElementById("debtsTable");
+const balancesTable = document.getElementById("balancesTable");
 const groupId = expensesTable.dataset.groupid;
 const currencyString = expensesTable.dataset.currency;
 
@@ -24,12 +25,15 @@ if (ws.receive) {
             switch (obj.action) {
                 case "EXPENSE_CREATED":
                     expensesTable.insertAdjacentHTML("afterbegin", renderExpense(expense));
+                    renderAllBalances()
                     break;
                 case "EXPENSE_MODIFIED":
                     expenseHTML.outerHTML = renderExpense(expense);
+                    renderAllBalances()
                     break;
                 case "EXPENSE_DELETED":
                     expenseHTML.parentElement.removeChild(expenseHTML);
+                    renderAllBalances()
                     break;
                 default:
             }
@@ -42,11 +46,11 @@ if (ws.receive) {
 // Render single expense
 function renderExpense(expense) {
     return `<div id="expense-${expense.expenseId}" class="col">
-                <div class="card border-light text-white bg-warning mb-3 mx-auto" role="button" onclick="location.href='/group/${groupId}/${expense.expenseId}'">
+                <div class="card border-light text-white mb-3 mx-auto" role="button" onclick="location.href='/group/${groupId}/${expense.expenseId}'">
                     <div class="row row-cols-2 row-cols-md-4 g-0">
                         <!-- Icon -->
-                        <div class="col-5 col-md-2 text-center">
-                            <img src="/img/type/${expense.typeID}.png" alt="Category Icon" width="auto" height="50">
+                        <div class="col-5 col-md-2 d-flex align-items-center justify-content-center">
+                            <img src="/img/type/${expense.typeID}.png" alt="Category Icon" class="icon">
                         </div>
                         <!-- Text Info -->
                         <div class="col-7 col-md-5">
@@ -72,6 +76,7 @@ function renderExpense(expense) {
 
 // Llamada inicial
 renderAllDebts()
+renderAllBalances()
 
 function renderAllDebts() {
     debtsTable.innerHTML = '';  // clear debts table
@@ -84,7 +89,7 @@ function renderAllDebts() {
             })
 
             if(debts.length == 0){
-                debtsTable.insertAdjacentHTML("afterbegin", renderNoHayDeudas());
+                debtsTable.insertAdjacentHTML("afterbegin", renderNoDebts());
             }
         }
         );
@@ -106,10 +111,56 @@ function renderDebt(debt) {
 }
 
 // Render no debts message
-function renderNoHayDeudas(){
+function renderNoDebts(){
     return `<div class="row">
                 <div class="col">
                     There are no debts to settle :D
                 </div>
             </div>`
+}
+
+// Render member balances
+function renderAllBalances() {
+    balancesTable.innerHTML = '';  // clear debts table
+    
+    go(`${config.rootUrl}/group/${groupId}/getMembers`, "GET")
+    .then(members => {
+        members.forEach(member => {
+            balancesTable.insertAdjacentHTML("beforeend", renderMemberBalance(member));
+        })
+    }
+    );
+}
+
+function renderMemberBalance(member) {
+    if (member.balance < 0) {
+        return `<div class="row">
+                    <div class="col text-center">
+                        <h5 class="back_balance_neg">${member.balance}${currencyString}</h5>
+                    </div>   
+                    <div class="col text-center">
+                        <h5>${member.username}</h5>
+                    </div>                             
+                </div>`;
+    }
+    else if (member.balance > 0) {
+        return `<div class="row">
+                    <div class="col text-center">
+                        <h5>${member.username}</h5>
+                    </div>
+                    <div class="col text-center">
+                        <h5 class="back_balance_pos">${member.balance}${currencyString}</h5>
+                    </div>                                
+                </div>`;
+    }
+    else {
+        return `<div class="row">
+                    <div class="col text-center">
+                        <h5>${member.username}</h5>
+                    </div>
+                    <div class="col text-center">
+                        <h5>${member.balance}${currencyString}</h5>
+                    </div>                                
+                </div>`;
+    }
 }

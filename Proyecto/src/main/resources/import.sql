@@ -54,11 +54,13 @@ WHERE
 -- Expenses Type
 INSERT INTO IWTYPE (ID, NAME)
 VALUES 
-  (1, 'Food'),
-  (2, 'Transportation'),
-  (3, 'Entertainment'),
-  (4, 'Housing'),
-  (5, 'Shopping');
+  (1, 'Accommodation'),
+  (2, 'Entertainment'),
+  (3, 'Groceries'),
+  (4, 'Bills'),
+  (5, 'Transport'),
+  (6, 'Restaurants&Bars'),
+  (7, 'Others');
 
 -- Generate fixed expense for test
 INSERT INTO IWExpense (ID, enabled, AMOUNT, DATE, DESC, NAME, PAID_BY_ID, TYPE_ID) VALUES (99, true, 99, '2023-03-04', 'Expense desc', 'Expense name', 2, 1);

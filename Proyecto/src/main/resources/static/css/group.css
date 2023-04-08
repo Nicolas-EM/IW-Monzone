@@ -1,8 +1,9 @@
 /* usa este fichero para personalizar tus vistas */
 
-#card {
+.card {
     /* width: 30rem; */
     text-align: center;
+    background-color: #ac760a;
 }
 
 .card-text-row {
@@ -35,7 +36,9 @@
 }
 
 .icon{
-    float : right;
+    filter: invert(1);
+    width: 40%;
+    height: auto;
 }
 
 .card-title{

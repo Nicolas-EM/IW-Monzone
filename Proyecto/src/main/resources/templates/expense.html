@@ -62,7 +62,7 @@
                   <li>
                     <div class="form-check">
                       <input id="participateIds" class="check-box form-check-input participateCheckbox" type="checkbox" name="participateIds" th:value="${user.getId()}" th:checked="${participateIds != null ? participateIds.contains(user?.getId()) ? true : false : true}">
-                      <label class="form-check-label" for="flexCheckDefault">[[${user.getName()}]]</label>
+                      <label class="form-check-label" for="flexCheckDefault">[[${user.getUsername()}]]</label>
                       <label class="split amountPerMember">[[${expense != null ? participateIds.contains(user?.getId()) ? expense?.getAmount() / participateIds?.size() : '' : ''}]]</label>
                     </div>
                   </li>

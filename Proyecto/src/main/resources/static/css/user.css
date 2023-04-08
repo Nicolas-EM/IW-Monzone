@@ -53,6 +53,10 @@
     color: black;
 }
 
+.card {
+    background-color: #ac760a;
+}
+
 #indicator {
     margin-left: 15vh;
 }

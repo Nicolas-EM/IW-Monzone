@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -243,6 +244,33 @@ public class GroupController {
         List<Member> members = group.getMembers();
         return members.stream().map(Transferable::toTransfer).collect(Collectors.toList());
 
+    }
+
+    /*
+     * Get members
+     */
+    @ResponseBody
+    @GetMapping("{groupId}/getMembers")
+    public List<Member.Transfer> getMembers(@PathVariable long groupId, HttpSession session){
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new BadRequestException();
+
+        // check if user belongs to the group
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
+            throw new NoMemberException();
+        }
+
+        // get members
+        List<Member> members = group.getMembers();
+        
+        return members.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
 
     /*
