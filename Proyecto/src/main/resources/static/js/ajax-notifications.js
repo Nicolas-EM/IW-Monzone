@@ -1,30 +1,27 @@
 // cómo pintar 1 notificacion (devuelve html que se puede insertar en un div)
 function renderNotif(notif) {
     console.log("rendering: ", notif);
-    return `<div class="row my-2">
-                <form method="post" th:action="${notif.action}">
-                    <div class="card text-white bg-warning" role="button">
-                        <div class="card-body"><h5>${notif.message}</h5></div>
-                    </div>
-                </form>
-            </div>`
-}
 
-// cómo pintar 1 notificacion (devuelve html que se puede insertar en un div)
-function renderInvite(invite) {
-    console.log("rendering: ", invite);
-    return `<div class="row my-2">
+    let action = `/user/${notif.id}/read`;
+    let button = `<button type="submit">Mark Read</button>`;
+
+    if(notif.type == "GROUP_INVITATION"){
+        action = `/group/${notif.idGroup}/acceptInvite`;
+        button = `<button onclick="acceptInvite(event, this, ${notif.id})">Accept</button>`;
+    }
+
+    return `<div id="notif-${notif.id}" class="row my-2">
                 <div class="card text-white bg-warning" role="button">
                     <div class="card-body">
                         <div class="row">
-                            <h5>${invite.message}</h5>
+                            <h5>${notif.message}</h5>
                         </div>
                         <div class="row">
-                            <form class="col" method="post" action="${invite.actionEndpoint}">
-                                <button onclick="acceptInvite(event, this)">Accept</button>
+                            <form class="col" method="post" action="${action}">
+                                ${button}
                             </form>
-                            <form class="col" method="post">
-                                <button type="submit">Delete</button>
+                            <form class="col" method="post" action="/user/${notif.id}/delete">
+                                <button onclick="deleteNotif(event, this, ${notif.id})">Delete</button>
                             </form>
                         </div>
                     </div>
@@ -40,7 +37,7 @@ go(config.rootUrl + "/user/receivedNotifs", "GET")
 
     notifs.forEach(notif => {
         if(notif.type == "GROUP_INVITATION"){
-            actionNotifsDiv.insertAdjacentHTML("beforeend", renderInvite(notif));
+            actionNotifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
         } else {
             notifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
         }
@@ -66,19 +63,67 @@ if (ws.receive) {
             let notifsDiv = document.getElementById("notifs-tab-pane");
 
             if(notif.type == 'GROUP_INVITATION'){
-                actionNotifsDiv.insertAdjacentHTML("afterbegin", renderInvite(notif));
+                actionNotifsDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));
             }
             else {
                 notifsDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));
             }
+
+            createToastNotification(notif.id, notif.message);
         }
     }
 }
 
 // Accept Invite Btn
-function acceptInvite(event, btn) {
+function acceptInvite(event, btn, notifId) {
     event.preventDefault();
     go(btn.parentNode.action, 'POST', {})
-    .then(d => console.log("happy", d))
+    .then(d => {
+        console.log("Invite accepted", d);
+        deleteClientNotif(notifId);
+        createToastNotification(notifId, "Invitation Accepted");
+    })
     .catch(e => console.log("sad", e))
+}
+
+// Delete notif client side
+function deleteClientNotif(notifId) {
+    const notifDiv = document.getElementById(`notif-${notifId}`);
+    notifDiv.parentElement.removeChild(notifDiv);
+
+    let p = document.querySelector("#nav-unread");
+    if (p) {
+        p.textContent = +p.textContent - 1;
+    }
+}
+
+// Delete notif server side
+function deleteNotif(event, btn, notifId) {
+    event.preventDefault();
+    go(btn.parentNode.action, 'POST', {})
+    .then(d => {
+        deleteClientNotif(notifId);
+        createToastNotification(notifId, "Notification Deleted");
+    })
+    .catch(e => console.log("sad", e))
+}
+
+function createToastNotification(notifId, body) {
+    document.getElementById('toastNotifBar').insertAdjacentHTML("afterbegin", renderToastNofif(notifId, body));
+
+    const toastNotif = bootstrap.Toast.getOrCreateInstance(document.getElementById(`toast-${notifId}`));
+    toastNotif.show();
+}
+
+function renderToastNofif(notifId, body){
+    return `<div id="toast-${notifId}" class="toast bg-dark" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-dark">
+                    <img src="/img/icon.png" class="rounded me-2" alt="Monzone Icon" width="auto" height="50">
+                    <strong class="me-auto text-light">Monzone</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body text-light">
+                    ${body}
+                </div>
+            </div>`
 }

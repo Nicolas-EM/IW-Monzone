@@ -34,14 +34,14 @@ public class Notification implements Transferable<Notification.Transfer>  {
 	protected long id;
 
     public enum NotificationType {
-        GROUP_INVITATION,
         BUDGET_WARNING,
         // DEBT_WARNING,
         EXPENSE_CREATED,
         EXPENSE_MODIFIED,
         EXPENSE_DELETED,
 
-        GROUP_ACCEPTED,  // When a user accepts an invite
+        GROUP_INVITATION,
+        GROUP_INVITATION_ACCEPTED,  // When a user accepts an invite
         GROUP_MODIFIED,
         GROUP_DELETED
     }
@@ -87,19 +87,6 @@ public class Notification implements Transferable<Notification.Transfer>  {
         this.group = group;
 
         messageBuilder(e);
-    }
-
-    private String actionBuilder(){
-        switch(type){
-            case EXPENSE_CREATED:
-            case EXPENSE_MODIFIED:
-            case EXPENSE_DELETED:
-                return "/user/" + this.id + "/read";
-            case GROUP_INVITATION:
-                return "/group/" + this.group.getId() + "/acceptInvite";
-            default:
-                return ""; 
-        }
     }
 
     private void messageBuilder(){
@@ -166,7 +153,6 @@ public class Notification implements Transferable<Notification.Transfer>  {
         private long idGroup;
         private long idSender;
         private long idRecipient;
-        private String actionEndpoint;
     }
 
     @Override
@@ -175,7 +161,7 @@ public class Notification implements Transferable<Notification.Transfer>  {
         if(dateRead != null)
             dateReadString = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateRead);
 
-        return new Transfer(id, message, type, dateReadString, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent), group.getId(), sender.getId(), recipient.getId(), actionBuilder());
+        return new Transfer(id, message, type, dateReadString, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent), group.getId(), sender.getId(), recipient.getId());
     }
 }
 

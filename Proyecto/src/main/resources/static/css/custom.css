@@ -30,14 +30,14 @@ img.preview {
 
 #bell {
     fill: #fed053;
-}  
+}
 
 #bell:hover {
     fill: #bb911f;
 }
 
 #dropMenu {
-    position:absolute;
+    position: absolute;
     top: 55px;
     left: auto;
     right: 5px;
@@ -57,12 +57,7 @@ img.preview {
     color: #bb911f;
 }
 
-#interactive-tab[aria-selected="true"] {
-    color: white;
-    background-color: #f5a302;
-}
-
-#notifs-tab[aria-selected="true"] {
+#actionNotifsTab .nav-link.active {
     color: white;
     background-color: #f5a302;
 }

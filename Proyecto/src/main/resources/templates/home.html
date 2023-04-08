@@ -15,7 +15,7 @@
     <main class="container-fluid my-4">
         <!-- Dynamic groups with Thymeleaf -->
         <div id="home_groups" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-5 align-items-center">
-            <div th:each="member: ${memberOf}">
+            <th:block th:each="member: ${memberOf}">
                 <div class="col" th:with="group=${member.getGroup()}">
                     <div class="card text-white" role="button" th:onclick="|location.href='/group/${group.getId()}'|" tabindex="0">
                         <div class="card-header">
@@ -39,7 +39,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </th:block>
             <!-- newGroupBtn -->
             <div class="col text-center">
                 <button class="btn-lg" th:onclick="|location.href='/group/new'|"><i class="fa fa-plus"></i></button></h3>
@@ -48,6 +48,7 @@
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />
+    <script th:src="@{/js/home.js}"></script>
 </body>
 
 </html>

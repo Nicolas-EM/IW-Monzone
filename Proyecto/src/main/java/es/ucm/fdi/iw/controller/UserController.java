@@ -367,7 +367,6 @@ public class UserController {
     @ResponseBody
     public String markNotifRead(@PathVariable long notifId, HttpSession session) {
         long userId = ((User) session.getAttribute("u")).getId();
-        User u = entityManager.find(User.class, userId);
 
         // Check notification exists
         Notification notif = entityManager.find(Notification.class, notifId);
@@ -382,6 +381,33 @@ public class UserController {
 
         return "{\"success\": \"ok\"}";
     }
+
+    /**
+     * Delete notification
+     */
+    @PostMapping("/{notifId}/delete")
+    @Transactional
+    @ResponseBody
+    public String deleteNotif(@PathVariable long notifId, HttpSession session) {
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // Check notification exists
+        Notification notif = entityManager.find(Notification.class, notifId);
+        if (notif == null)
+            throw new BadRequestException();
+
+        // Check notification belongs to user
+        if (notif.getRecipient().getId() != user.getId())
+            throw new BadRequestException();
+
+        // delete notification
+        user.getNotifications().remove(notif);
+        entityManager.remove(notif);
+
+        return "{\"success\": \"ok\"}";
+    }
+
 
     /**
      * Alter or create a user

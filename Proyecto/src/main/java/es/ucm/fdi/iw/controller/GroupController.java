@@ -623,16 +623,22 @@ public class GroupController {
         mId = new MemberID(group.getId(), user.getId());
         member = entityManager.find(Member.class, mId);
         // check user not already member
-        if (member == null) {
-            // user is not already in the group, invite
-            Notification invite = new Notification(NotificationType.GROUP_INVITATION, sender, user, group);
-            entityManager.persist(invite);
-            entityManager.flush();
+        if (member == null || !member.isEnabled()) {
+            // check user not already invited
+            List<Notification> invites = entityManager.createNamedQuery("Notification.byUserAndGroup", Notification.class).setParameter("userId", user.getId()).setParameter("groupId", group.getId()).getResultList();
 
-            // Send notification
-            notifSender.sendNotification(invite, "/user/"+ user.getUsername() +"/queue/notifications");
+            if(invites.isEmpty()){
+                Notification invite = new Notification(NotificationType.GROUP_INVITATION, sender, user, group);
+                entityManager.persist(invite);
+                entityManager.flush();
 
-            return "{\"status\":\"invited\"}";
+                // Send notification
+                notifSender.sendNotification(invite, "/user/"+ user.getUsername() +"/queue/notifications");
+
+                return "{\"status\":\"invited\"}";
+            } else {
+                return "{\"status\":\"duplicate_invitation\"}";
+            }
         } else {
             // user is already in a group
             log.info("User {} cannot join group {}", member.getUser().getUsername(), group.getName());
@@ -640,9 +646,6 @@ public class GroupController {
         }
     }
 
-    /*
-     * TODO: Accept invite
-     */
     /**
      * Accept invite to group
      */
@@ -670,7 +673,8 @@ public class GroupController {
             Member m = entityManager.find(Member.class, new MemberID(group.getId(), sender.getId()));
             if(m == null || m.getRole() != GroupRole.GROUP_MODERATOR){
                 // notification should be deleted as it is no longer valid
-                // TODO: delete expired notification
+                user.getNotifications().remove(invite);
+                entityManager.remove(invite);
 
                 return "{\"status\": \"expired\"}";
             }
@@ -685,14 +689,24 @@ public class GroupController {
                 user.getMemberOf().add(newMember);
                 group.getMembers().add(newMember);
                 group.setNumMembers(group.getNumMembers() + 1);
+
+                // Delete notification
+                user.getNotifications().remove(invite);
+                entityManager.remove(invite);
+            } else if(!newMember.isEnabled()) {
+                newMember.setEnabled(true);
+            }
+            else {
+                return "{\"status\": \"already_in_group\"}";
             }
         }
 
         // Send group transfer to user (to render if on /user/)
-        notifSender.sendTransfer(group, "/user/" + user.getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_ACCEPTED);
+        notifSender.sendTransfer(group, "/user/" + user.getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_INVITATION_ACCEPTED);
 
         return "{\"status\": \"ok\"}";
     }
+
 
     /*
      * TODO: Edit member
