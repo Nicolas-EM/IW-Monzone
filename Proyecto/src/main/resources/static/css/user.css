@@ -25,7 +25,18 @@
 }
 
 #img-profile {
-    min-width: 80%;
+    min-width: 100px;
+    min-height: auto;
+    max-width: 100px;
+    max-height: 43vh;
+    border-radius: 8px;
+    margin-top: 2vh;
+    margin-left: 3%;
+}
+
+.file {
+    visibility: hidden;
+    position: absolute;
 }
 
 .amount {

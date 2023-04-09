@@ -221,19 +221,20 @@ public class UserController {
         Group.Currency newCurr = Group.Currency.values()[currId];
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes",Type.class).getResultList();
-        List<Float> totals = new ArrayList<>(types.length);
+        // List<Float> totals = new ArrayList<>(types.length);
         
-        // Inicializar los valores de las catergorías a 0
-        for (int i = 0; i < totals.length; i++)
-            totals.add(0);
+        // // Inicializar los valores de las catergorías a 0
+        // for (int i = 0; i < totals.length; i++)
+        //     totals.add(0);
 
-        List<Participates> participates = user.getExpenses();
-        for (Participates p : participates) {
-            Expense e = p.getExpense();
-            totals[e.getType().getId()] += changeCurrency(e.getAmount(), p.getGroup().getCurrency(), newCurr);
-        }
+        // List<Participates> participates = user.getExpenses();
+        // for (Participates p : participates) {
+        //     Expense e = p.getExpense();
+        //     totals[e.getType().getId()] += changeCurrency(e.getAmount(), p.getGroup().getCurrency(), newCurr);
+        // }
 
-        return totals;
+        //return totals;
+        return null;
     }
 
     @GetMapping("/config")
@@ -349,10 +350,11 @@ public class UserController {
      * @return
      * @throws IOException
      */
-    @GetMapping("{id}/pic")
+    @GetMapping("/user/{id}/pic")
     public StreamingResponseBody getPic(@PathVariable long id) throws IOException {
-        File f = localData.getFile("user", "" + id + ".jpg");
-        InputStream in = new BufferedInputStream(f.exists() ? new FileInputStream(f) : UserController.defaultPic());
+        //File f = localData.getFile("user", "" + id);
+        InputStream in = UserController.defaultPic();
+        //InputStream in = new BufferedInputStream(f.exists() ? new FileInputStream(f) : UserController.defaultPic());
         return os -> FileCopyUtils.copy(in, os);
     }
 
@@ -462,9 +464,9 @@ public class UserController {
      * @return
      * @throws IOException
      */
-    @PostMapping("{id}/pic")
+    @PostMapping("/user/{id}/pic")
     @ResponseBody
-    public String setPic(@RequestParam("photo") MultipartFile photo, @PathVariable long id,
+    public String setPic(@RequestParam("img[]") MultipartFile photo, @PathVariable long id,
             HttpServletResponse response, HttpSession session, Model model) throws IOException {
 
         User target = entityManager.find(User.class, id);
@@ -477,7 +479,7 @@ public class UserController {
         }
 
         log.info("Updating photo for user {}", id);
-        File f = localData.getFile("user", "" + id + ".jpg");
+        File f = localData.getFile("user", "" + id);
         if (photo.isEmpty()) {
             log.info("failed to upload photo: emtpy file?");
         } else {

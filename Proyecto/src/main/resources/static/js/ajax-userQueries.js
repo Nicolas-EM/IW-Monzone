@@ -47,3 +47,24 @@ document.getElementById("currType").addEventListener('change', function () {
             }
         });
 });
+
+// Cargar imagen de perfil
+window.addEventListener("load", (event) => {
+    console.log("page is fully loaded");
+  
+    document.getElementById('img-profile').addEventListener('click', function () {
+      document.getElementById('f_avatar').click();
+    });
+  
+    document.getElementById('f_avatar').addEventListener("change", function (e) {
+      console.log("change detected");
+  
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        // get loaded data and render thumbnail.
+        document.getElementById("img-profile").src = e.target.result;
+      };
+      // read the image file as a data URL.
+      reader.readAsDataURL(this.files[0]);
+    });
+});
