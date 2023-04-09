@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 
@@ -41,6 +42,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import es.ucm.fdi.iw.LocalData;
 import es.ucm.fdi.iw.NotificationSender;
+import es.ucm.fdi.iw.controller.UserController.NotYourProfileException;
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
@@ -361,7 +363,7 @@ public class ExpenseController {
     @PostMapping("/newExpense")
     @Transactional
     @ResponseBody
-    public String createExpense(@PathVariable long groupId, Model model, HttpSession session,
+    public String createExpense(@RequestParam("file") MultipartFile file, HttpServletResponse response, @PathVariable long groupId, Model model, HttpSession session,
             @RequestBody JsonNode jsonNode) {
         ObjectMapper objectMapper = new ObjectMapper();
         String name = objectMapper.convertValue(jsonNode.get("name"), String.class);
@@ -374,8 +376,6 @@ public class ExpenseController {
                 });
         long typeId = objectMapper.convertValue(jsonNode.get("typeId"), Long.class);
 
-        MultipartFile file = objectMapper.convertValue(jsonNode.get("file"), MultipartFile.class);
-        
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
         if (!params.valid)
@@ -410,15 +410,19 @@ public class ExpenseController {
         }
 
         // save the new expense image
-        // try{
-        //     String filename = String.valueOf(e); //ver ejemplo de user controller de la plantilla
-        //     File dest = localData.getFile("expense", filename); //no molestarse en ver que había antes machacar lo anterior
-        //     //dest.delete();
-        //    file.transferTo(dest);
-        // }
-        // catch(IOException ex){
-        //     return "Error IMAGEN " + ex.getMessage();
-        // }
+        File f = localData.getFile("expense", "" + exp.getId());
+        if (file.isEmpty()) {
+            log.info("failed to upload photo: emtpy file?");
+        } else {
+            try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
+                byte[] bytes = file.getBytes();
+                stream.write(bytes);
+                log.info("Uploaded photo for {} into {}!", exp.getId(), f.getAbsolutePath());
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.warn("Error uploading " + exp.getId() + " ", e);
+            }
+        }
 
         // send notification ASYNC
         createAndSendNotifs(NotificationType.EXPENSE_CREATED, params.currUser, params.participateUsers, params.group, exp);
@@ -435,8 +439,8 @@ public class ExpenseController {
     @PostMapping("{expenseId}/updateExpense")
     @Transactional
     @ResponseBody
-    public String editExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model,
-            HttpSession session, @RequestBody JsonNode jsonNode) {
+    public String editExpense(@RequestParam("file") MultipartFile file, @PathVariable long groupId, @PathVariable long expenseId, Model model,
+            HttpSession session, HttpServletResponse response, @RequestBody JsonNode jsonNode) {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String name = objectMapper.convertValue(jsonNode.get("name"), String.class);
@@ -484,18 +488,20 @@ public class ExpenseController {
         }
 
         // save the new expense image
-        // try{
-        // String filename = String.valueOf(expenseId); //ver ejemplo de user controller
-        // de la plantilla
-        // File dest = localData.getFile("expense", filename); //no molestarse en ver
-        // que había antes machacar lo anterior
-        // dest.delete();
-        // file.transferTo(dest);
-        // }
-        // catch(IOException e){
-        // return "Error IMAGEN " + e.getMessage();
-        // }
-
+        File f = localData.getFile("expense", "" + expenseId);
+        if (file.isEmpty()) {
+            log.info("failed to upload photo: emtpy file?");
+        } else {
+            try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
+                byte[] bytes = file.getBytes();
+                stream.write(bytes);
+                log.info("Uploaded photo for {} into {}!", expenseId, f.getAbsolutePath());
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.warn("Error uploading " + expenseId + " ", e);
+            }
+        }
+        
         // update expense
         exp.setName(name);
         if (desc == null)
@@ -646,4 +652,5 @@ public class ExpenseController {
                 f.exists() ? new FileInputStream(f) : ExpenseController.defaultExpensePic());
         return os -> FileCopyUtils.copy(in, os);
     }
+
 }

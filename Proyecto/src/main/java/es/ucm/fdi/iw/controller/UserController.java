@@ -350,11 +350,10 @@ public class UserController {
      * @return
      * @throws IOException
      */
-    @GetMapping("/user/{id}/pic")
+    @GetMapping("/{id}/pic")
     public StreamingResponseBody getPic(@PathVariable long id) throws IOException {
-        //File f = localData.getFile("user", "" + id);
-        InputStream in = UserController.defaultPic();
-        //InputStream in = new BufferedInputStream(f.exists() ? new FileInputStream(f) : UserController.defaultPic());
+        File f = localData.getFile("user", "" + id);
+        InputStream in = new BufferedInputStream(f.exists() ? new FileInputStream(f) : UserController.defaultPic());
         return os -> FileCopyUtils.copy(in, os);
     }
 
@@ -464,9 +463,9 @@ public class UserController {
      * @return
      * @throws IOException
      */
-    @PostMapping("/user/{id}/pic")
+    @PostMapping("{id}/pic")
     @ResponseBody
-    public String setPic(@RequestParam("img[]") MultipartFile photo, @PathVariable long id,
+    public String setPic(@RequestParam("f_avatar") MultipartFile photo, @PathVariable long id,
             HttpServletResponse response, HttpSession session, Model model) throws IOException {
 
         User target = entityManager.find(User.class, id);
