@@ -54,12 +54,12 @@
           </div>
           <!-- Save Btn -->
           <div class="col-12 d-flex align-items-center justify-content-center">
-            <button type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Change Password</button>
-            
+            <button formaction="@{{id}(id=${session.u.id})}" type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Save</button>
+            <!-- Logout Btn -->
             <form id="logoutForm" th:action="@{/logout}" method="post">
               <button type="button" id="btn-logout" class="btn btn-primary rounded-pill fw-bold" onclick="submitLogoutForm()">Logout</button>
             </form>
-            
+
           </div>
         </div>
       </form>
@@ -155,6 +155,7 @@
   <th:block th:replace="fragments/footer.html :: footer" />
   <!--Ajax para cambio de campos-->
   <script th:src="@{/js/ajax-userQueries.js}"></script>
+  <script th:src="@{/js/user.js}"></script>
 </body>
 
 </html>

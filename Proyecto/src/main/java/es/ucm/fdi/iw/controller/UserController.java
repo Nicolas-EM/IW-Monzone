@@ -208,7 +208,7 @@ public class UserController {
      * End point
      */
     @GetMapping("/getByType")
-        public List<Float> getByType(Model model, HttpSession session, @RequestBody JsonNode jsonNode) {
+        public Float [] getByType(Model model, HttpSession session, @RequestBody JsonNode jsonNode) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
         
@@ -221,20 +221,19 @@ public class UserController {
         Group.Currency newCurr = Group.Currency.values()[currId];
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes",Type.class).getResultList();
-        // List<Float> totals = new ArrayList<>(types.length);
+        Float[] totals = new Float[types.size()];
         
-        // // Inicializar los valores de las catergorías a 0
-        // for (int i = 0; i < totals.length; i++)
-        //     totals.add(0);
+        // Inicializar los valores de las catergorías a 0
+        for (int i = 0; i < totals.length; i++)
+            totals[i] = 0.0f;
 
-        // List<Participates> participates = user.getExpenses();
-        // for (Participates p : participates) {
-        //     Expense e = p.getExpense();
-        //     totals[e.getType().getId()] += changeCurrency(e.getAmount(), p.getGroup().getCurrency(), newCurr);
-        // }
+        List<Participates> participates = user.getExpenses();
+        for (Participates p : participates) {
+            Expense e = p.getExpense();
+            totals[(int)e.getType().getId()] += changeCurrency(e.getAmount(), p.getGroup().getCurrency(), newCurr);
+        }
 
-        //return totals;
-        return null;
+        return totals;
     }
 
     @GetMapping("/config")
@@ -409,16 +408,23 @@ public class UserController {
         return "{\"success\": \"ok\"}";
     }
 
-
-    /**
+     /*
      * Alter or create a user
      */
-    @PostMapping("/{id}")
+    @ResponseBody
     @Transactional
-    public String postUser(HttpServletResponse response, @PathVariable long id, @ModelAttribute User edited,
-            @RequestParam(required = false) String pass2, Model model, HttpSession session) throws IOException {
+    @PostMapping("/{id}")
+    public String postUser(HttpSession session, @PathVariable long id, @RequestBody JsonNode jsonNode, Model model) {
+        
+        String name = jsonNode.get("name").asText();
+        String username = jsonNode.get("username").asText();
+        String oldPwd = jsonNode.get("oldPwd").asText();
+        String newPwd = jsonNode.get("newPwd").asText();
+        
         User requester = (User) session.getAttribute("u");
+        // user = entityManager.find(User.class, user.getId());
         User target = null;
+
         if (id == -1 && requester.hasRole(Role.ADMIN)) {
             // create new user with random password
             target = new User();
@@ -437,24 +443,73 @@ public class UserController {
             throw new NotYourProfileException();
         }
 
-        if (edited.getPassword() != null) {
-            if (!edited.getPassword().equals(pass2)) {
+        if (newPwd != null) {
+            if (!newPwd.equals(oldPwd)) {
                 // FIXME: complain
             } else {
                 // save encoded version of password
-                target.setPassword(encodePassword(edited.getPassword()));
+                target.setPassword(encodePassword(newPwd));
             }
         }
-        target.setUsername(edited.getUsername());
-        target.setName(edited.getName());
+        target.setUsername(username);
+        target.setName(name);
 
         // update user session so that changes are persisted in the session, too
         if (requester.getId() == target.getId()) {
             session.setAttribute("u", target);
         }
 
-        return "user";
+        return "{\"action\": \"none\"}";
     }
+
+
+
+    // /**
+    //  * Alter or create a user
+    //  */
+    // @PostMapping("/{id}")
+    // @Transactional
+    // public String postUser(HttpServletResponse response, @PathVariable long id, @ModelAttribute User edited,
+    //         @RequestParam(required = false) String pass2, Model model, HttpSession session) throws IOException {
+        
+    //     User requester = (User) session.getAttribute("u");
+    //     User target = null;
+    //     if (id == -1 && requester.hasRole(Role.ADMIN)) {
+    //         // create new user with random password
+    //         target = new User();
+    //         target.setPassword(encodePassword(generateRandomBase64Token(12)));
+    //         entityManager.persist(target);
+    //         entityManager.flush(); // forces DB to add user & assign valid id
+    //         id = target.getId(); // retrieve assigned id from DB
+    //     }
+
+    //     // retrieve requested user
+    //     target = entityManager.find(User.class, id);
+    //     model.addAttribute("user", target);
+
+    //     if (requester.getId() != target.getId() &&
+    //             !requester.hasRole(Role.ADMIN)) {
+    //         throw new NotYourProfileException();
+    //     }
+
+    //     if (edited.getPassword() != null) {
+    //         if (!edited.getPassword().equals(pass2)) {
+    //             // FIXME: complain
+    //         } else {
+    //             // save encoded version of password
+    //             target.setPassword(encodePassword(edited.getPassword()));
+    //         }
+    //     }
+    //     target.setUsername(edited.getUsername());
+    //     target.setName(edited.getName());
+
+    //     // update user session so that changes are persisted in the session, too
+    //     if (requester.getId() == target.getId()) {
+    //         session.setAttribute("u", target);
+    //     }
+
+    //     return "user";
+    // }
 
     /**
      * Uploads a profile pic for a user id
