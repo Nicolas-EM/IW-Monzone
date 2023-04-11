@@ -58,7 +58,7 @@
 #total-exp {
     margin-top: 2vh;
     margin-bottom: 2vh;
-    max-width: 60%;
+    max-width: 80%;
     display: flex;
     height: 5vh;
     color: black;
@@ -72,7 +72,7 @@
 }
 
 .card {
-    background-color: #ac760a;
+    background-color: var(--bs-orange);
 }
 
 #indicator {

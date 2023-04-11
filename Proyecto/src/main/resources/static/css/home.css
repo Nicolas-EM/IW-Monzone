@@ -11,7 +11,7 @@
 #home_groups .card {
     max-width: 20rem;
     max-height: 15rem;
-    background-color: #ac760a;
+    background-color: var(--bs-orange);
     border-radius: 12px;
 }
 
@@ -55,7 +55,7 @@
 /* ------------ ADD BUTTON ------------*/
 
 .btn-lg {
-    background-color: #f5b301;
+    background-color: var(--bs-orange);
     color: #2A2E34;
     font-size: 2em;
     width: 20%;
