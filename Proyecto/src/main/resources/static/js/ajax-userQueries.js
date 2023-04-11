@@ -53,10 +53,10 @@ window.addEventListener("load", (event) => {
     console.log("page is fully loaded");
   
     document.getElementById('img-profile').addEventListener('click', function () {
-      document.getElementById('f_avatar').click();
+      document.getElementById('avatar').click();
     });
   
-    document.getElementById('f_avatar').addEventListener("change", function (e) {
+    document.getElementById('avatar').addEventListener("change", function (e) {
       console.log("change detected");
   
       var reader = new FileReader();

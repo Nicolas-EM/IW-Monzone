@@ -1,6 +1,7 @@
 package es.ucm.fdi.iw.controller;
 
 import es.ucm.fdi.iw.LocalData;
+import es.ucm.fdi.iw.controller.ExpenseController.ImageSavingFailed;
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
@@ -21,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -414,15 +416,9 @@ public class UserController {
     @ResponseBody
     @Transactional
     @PostMapping("/{id}")
-    public String postUser(HttpSession session, @PathVariable long id, @RequestBody JsonNode jsonNode, Model model) {
-        
-        String name = jsonNode.get("name").asText();
-        String username = jsonNode.get("username").asText();
-        String oldPwd = jsonNode.get("oldPwd").asText();
-        String newPwd = jsonNode.get("newPwd").asText();
+    public String postUser(HttpSession session, @PathVariable long id, Model model, @RequestParam("name") String name,  @RequestParam("username") String username, @RequestParam("oldPwd") String oldPwd, @RequestParam("newPwd") String newPwd,@RequestParam(value = "avatar", required = false) MultipartFile imageFile) {
         
         User requester = (User) session.getAttribute("u");
-        // user = entityManager.find(User.class, user.getId());
         User target = null;
 
         if (id == -1 && requester.hasRole(Role.ADMIN)) {
@@ -453,6 +449,19 @@ public class UserController {
         }
         target.setUsername(username);
         target.setName(name);
+
+        // save the new user image
+        if(imageFile != null){
+            File f = localData.getFile("user", "" + id);
+            try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
+                byte[] imageBytes = imageFile.getBytes();
+                stream.write(imageBytes);
+                log.info("Uploaded photo for {} into {}!", id, f.getAbsolutePath());
+            } catch (Exception e) {
+                log.warn("Error uploading image " + id + " ", e);
+                throw new ImageSavingFailed();
+            }
+        }
 
         // update user session so that changes are persisted in the session, too
         if (requester.getId() == target.getId()) {
