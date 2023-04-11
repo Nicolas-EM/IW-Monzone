@@ -23,11 +23,13 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto">
                         <th:block th:if="${session.u}">
+                            <!-- Admin button -->
                             <li class="nav-item align-self-center mx-3">
                                 <a class="nav-link" th:if="${session.u.hasRole('ADMIN')}" th:href="@{/admin/}">
                                     <button type="button" class="btn btn-outline-secondary">Admin</button>
                                 </a>
                             </li>
+                            <!-- Notification Bell -->
                             <li class="nav-item align-self-center me-4">
                                 <button id="notifB" type="button" class="btn btn-sm position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav" aria-controls="offcanvasNav">
                                     <svg id="bell" xmlns="http://www.w3.org/2000/svg" width="30" height="30" class="bi bi-bell" viewBox="0 0 16 16">

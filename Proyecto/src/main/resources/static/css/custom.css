@@ -59,9 +59,17 @@ img.preview {
 
 #actionNotifsTab .nav-link.active {
     color: white;
-    background-color: #f5a302;
+    background-color: var(--bs-orange);
 }
 
 #notifsTab {
     width: 85%;
+}
+
+#notifsTabContent .card {
+    background-color: var(--bs-orange);
+}
+
+#notifsTabContent .card.disabled {
+    background-color: var(--bs-grey);
 }

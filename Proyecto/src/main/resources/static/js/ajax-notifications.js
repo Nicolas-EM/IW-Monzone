@@ -3,7 +3,7 @@ function renderNotif(notif) {
     console.log("rendering: ", notif);
 
     let action = `/user/${notif.id}/read`;
-    let button = `<button type="submit">Mark Read</button>`;
+    let button = `<button onclick="markNotifRead(event, this, ${notif.id})" type="submit">Mark Read</button>`;
 
     if(notif.type == "GROUP_INVITATION"){
         action = `/group/${notif.idGroup}/acceptInvite`;
@@ -11,12 +11,12 @@ function renderNotif(notif) {
     }
 
     return `<div id="notif-${notif.id}" class="row my-2">
-                <div class="card text-white bg-warning" role="button">
+                <div class="card text-white" role="button">
                     <div class="card-body">
                         <div class="row">
                             <h5>${notif.message}</h5>
                         </div>
-                        <div class="row">
+                        <div class="row mt-2">
                             <form class="col" method="post" action="${action}">
                                 ${button}
                             </form>
@@ -82,8 +82,21 @@ function acceptInvite(event, btn, notifId) {
         console.log("Invite accepted", d);
         deleteClientNotif(notifId);
         createToastNotification(notifId, "Invitation Accepted");
+        document.getElementById('offcanvasNav').hide();
     })
     .catch(e => console.log("sad", e))
+}
+
+function markNotifRead(event, btn, notifId) {
+    event.preventDefault();
+    go(btn.parentNode.action, 'POST', {})
+    .then(d => {
+        let p = document.querySelector("#nav-unread");
+        if (p) {
+            p.textContent = +p.textContent - 1;
+        }
+    })
+    .catch(e => console.log("Failed to mark notif as read", e))
 }
 
 // Delete notif client side
