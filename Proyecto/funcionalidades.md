@@ -23,8 +23,8 @@
 - Hacer vista de balances
 
 ## /user/config
-- Calcular gastos mensuales (ALBERTO)
-- Calcular gastos por categoría (ALBERTO)
+- Calcular gastos mensuales (ALBERTO->HECHO)
+- Calcular gastos por categoría (ALBERTO->HECHO)
 - Arreglar vista de grupos
 
 ## AJAX + Websockets

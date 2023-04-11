@@ -205,14 +205,12 @@ public class UserController {
     /**
      * End point
      */
-    @GetMapping("/getByType")
-        public float [] getByType(Model model, HttpSession session, @RequestBody JsonNode jsonNode) {
+    @ResponseBody
+    @GetMapping("/getByType/{currId}")
+        public float [] getByType(Model model, HttpSession session, @PathVariable int currId) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
-        
-        ObjectMapper objectMapper = new ObjectMapper();
-        int currId = objectMapper.convertValue(jsonNode.get("currId"), int.class); // tipo correcto?
-
+                
         // check currency 
         if (currId < 0 || currId >= Group.Currency.values().length)
         throw new BadRequestException();
@@ -230,6 +228,9 @@ public class UserController {
             Expense e = p.getExpense();
             totals[(int)e.getType().getId()] += changeCurrency(e.getAmount(), p.getGroup().getCurrency(), newCurr);
         }
+
+        for (int i = 0; i < totals.length; i++)
+            totals[i] = (float) Math.round(totals[i] * 100) / 100;
 
         return totals;
     }

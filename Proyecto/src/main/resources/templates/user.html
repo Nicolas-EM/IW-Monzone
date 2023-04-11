@@ -84,7 +84,7 @@
           </div>
           <div class="col-3">
             <!--esto tiene que ser el resultado de la query que te da lo que se ha gastado en todo ese mes-->
-            <label id="total-exp" class="rounded-corners align-items-center w-100 bg-white"> - </label>
+            <label id="total-exp" class="rounded-corners align-items-center w-100 bg-white"> </label>
           </div>
         </div>
         <!-- Categories -->
@@ -109,7 +109,7 @@
             <div class="col align-items-center justify-content-center">
               <img class="separator" th:src="@{/img/type/{id}.png(id=${type.getId()})}" src="/img/type/error.png" alt="Category Icon" width="auto" height="50">
               <!--eso cambiarlo por el valor que calcules para cada categoria-->
-              <p class="amount">10 <span class="curr"></span></p>
+              <p class="amount">-<span class="curr"></span></p>
             </div>
           </div>
         </div>
