@@ -3,7 +3,7 @@
 .card {
     /* width: 30rem; */
     text-align: center;
-    background-color: #ac760a;
+    background-color: var(--bs-orange);
 }
 
 .card-text-row {
@@ -72,5 +72,5 @@
 
 #nav-tab[aria-selected="true"] {
     color: white;
-    background-color: #f5a302;
+    background-color: var(--bs-orange);
 }
