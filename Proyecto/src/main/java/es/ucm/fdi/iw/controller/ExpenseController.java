@@ -4,6 +4,7 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -18,12 +19,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,16 +32,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import es.ucm.fdi.iw.LocalData;
 import es.ucm.fdi.iw.NotificationSender;
-import es.ucm.fdi.iw.controller.UserController.NotYourProfileException;
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
@@ -104,6 +102,10 @@ public class ExpenseController {
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error with DB") // 500
     public static class NoTransactionException extends RuntimeException {
+    }
+
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Failed to save image") // 500
+    public static class ImageSavingFailed extends RuntimeException {
     }
 
     private void setExpenseAttributes(Group group, long expenseId, Model model, boolean newExpense) {
@@ -252,12 +254,9 @@ public class ExpenseController {
         public LocalDate date;
         public List<User> participateUsers;
         public List<Member> participateMembers;
-        //public MultipartFile file;
     }
 
-    private PostParams validatedPostParams(HttpSession session, long groupId, String dateString, float amount,
-            long paidById,
-            List<String> participateIds, long typeId) {
+    private PostParams validatedPostParams(HttpSession session, long groupId, String dateString, float amount, long paidById, List<String> participateIds, long typeId) {
 
         PostParams validated = new PostParams();
         User user = (User) session.getAttribute("u");
@@ -363,18 +362,7 @@ public class ExpenseController {
     @PostMapping("/newExpense")
     @Transactional
     @ResponseBody
-    public String createExpense(@RequestParam("file") MultipartFile file, HttpServletResponse response, @PathVariable long groupId, Model model, HttpSession session,
-            @RequestBody JsonNode jsonNode) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String name = objectMapper.convertValue(jsonNode.get("name"), String.class);
-        String desc = objectMapper.convertValue(jsonNode.get("desc"), String.class);
-        String dateString = objectMapper.convertValue(jsonNode.get("dateString"), String.class);
-        float amount = objectMapper.convertValue(jsonNode.get("amount"), Float.class);
-        long paidById = objectMapper.convertValue(jsonNode.get("paidById"), Long.class);
-        List<String> participateIds = objectMapper.convertValue(jsonNode.get("participateIds"),
-                new TypeReference<List<String>>() {
-                });
-        long typeId = objectMapper.convertValue(jsonNode.get("typeId"), Long.class);
+    public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestParam("name") String name, @RequestParam("desc") String desc, @RequestParam("dateString") String dateString, @RequestParam("amount") float amount, @RequestParam("paidById") long paidById, @RequestParam("participateIds") List<String> participateIds, @RequestParam("typeId") long typeId, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
@@ -410,17 +398,15 @@ public class ExpenseController {
         }
 
         // save the new expense image
-        File f = localData.getFile("expense", "" + exp.getId());
-        if (file.isEmpty()) {
-            log.info("failed to upload photo: emtpy file?");
-        } else {
+        if(imageFile != null){
+            File f = localData.getFile("expense", "" + exp.getId());
             try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
-                byte[] bytes = file.getBytes();
-                stream.write(bytes);
+                byte[] imageBytes = imageFile.getBytes();
+                stream.write(imageBytes);
                 log.info("Uploaded photo for {} into {}!", exp.getId(), f.getAbsolutePath());
             } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                log.warn("Error uploading " + exp.getId() + " ", e);
+                log.warn("Error uploading image " + exp.getId() + " ", e);
+                throw new ImageSavingFailed();
             }
         }
 

@@ -30,19 +30,20 @@ window.addEventListener("load", (event) => {
     e.preventDefault();
     console.log('Saving expense');
     const b = document.getElementById("btn-save");
-    const name = document.getElementById("name").value;
-    const amount = document.getElementById("amount").value;
-    const paidById = document.getElementById("paidById").value;
   
-    go(b.getAttribute('formaction'), 'POST', {
-      name,
-      desc: document.getElementById("desc").value,
-      dateString: document.getElementById("dateString").value,
-      amount,
-      paidById,
-      participateIds: Array.from(document.querySelectorAll('input[name="participateIds"]:checked')).map(cb => cb.value),
-      typeId: document.getElementById("typeId").value
-    })
+    const formData = new FormData();
+    if(document.getElementById("imgFileInput").files[0] !== undefined){
+      formData.append('imageFile', document.getElementById("imgFileInput").files[0]);
+    }
+    formData.append('name', document.getElementById("name").value);
+    formData.append('desc', document.getElementById("desc").value);
+    formData.append('dateString', document.getElementById("dateString").value);
+    formData.append('amount', document.getElementById("amount").value);
+    formData.append('paidById', document.getElementById("paidById").value);
+    formData.append('participateIds', Array.from(document.querySelectorAll('input[name="participateIds"]:checked')).map(cb => cb.value));
+    formData.append('typeId', document.getElementById("typeId").value);
+  
+    go(b.getAttribute('formaction'), 'POST', formData, {})
       .then(d => {
         console.log("Expense: success", d);
         if(d.action === "redirect"){
@@ -51,7 +52,7 @@ window.addEventListener("load", (event) => {
         }
       })
       .catch(e => console.log("Error creating expense", e))
-  }
+  }  
 });
 
 /* Changes value pero user */
