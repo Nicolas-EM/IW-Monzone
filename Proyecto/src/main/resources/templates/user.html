@@ -57,7 +57,7 @@
             <button formaction="@{{id}(id=${session.u.id})}" type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Save</button>
             <!-- Logout Btn -->
             <form id="logoutForm" th:action="@{/logout}" method="post">
-              <button type="button" id="btn-logout" class="btn btn-primary rounded-pill fw-bold" onclick="submitLogoutForm()">Logout</button>
+              <button type="button" id="btn-logout" class="btn btn-primary rounded-pill fw-bold" onclick="document.getElementById('logoutForm').submit();">Logout</button>
             </form>
 
           </div>
@@ -85,7 +85,7 @@
           </div>
           <div class="col-3">
             <!--esto tiene que ser el resultado de la query que te da lo que se ha gastado en todo ese mes-->
-            <label id="total-exp" class="rounded-corners align-items-center w-100 bg-white">100€</label>
+            <label id="total-exp" class="rounded-corners align-items-center w-100 bg-white"> - </label>
           </div>
         </div>
         <!-- Categories -->
@@ -146,11 +146,6 @@
       </div>
     </div>
   </main>
-
-  <!--Llamar al submit del form del botón logout-->
-  <script>
-    function submitLogoutForm() {document.getElementById("logoutForm").submit();}
-  </script>
     
   <th:block th:replace="fragments/footer.html :: footer" />
   <!--Ajax para cambio de campos-->
