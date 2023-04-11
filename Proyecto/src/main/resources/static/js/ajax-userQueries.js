@@ -2,13 +2,18 @@
 // Tiene que enviarse al cambiar los dos campos (Date y Currency)
 document.getElementById("currMonth").addEventListener('change', function () {
     const totalTextMonth = document.getElementById('total-exp');
-    go(`${config.rootUrl}/user/getMonthly`, "GET", {
-        dateString: document.getElementById("date").value,
-        currId: document.getElementById("currMonth").value
+    const dateString = document.getElementById("date").value;
+    const currId = parseInt(document.getElementById("currMonth").value);
+    
+    // Cambiar el tipo de moneda según la seleccionada
+    let currencyString = "";
+    currencyString = getCurrencyString(currId, currencyString);
+
+    go(`${config.rootUrl}/user/getMonthly/${dateString}/${currId}`, "GET", {
     })
-        .then(total => {
-            totalTextMonth.innerHTM = total;
-        });
+        .then(data => {
+            totalTextMonth.innerHTML = data + currencyString;
+        })
 });
 
 // Cálculo de los GASTOS por CATEGORÍAS
@@ -17,22 +22,10 @@ document.getElementById("currType").addEventListener('change', function () {
     const selector = document.getElementsByClassName('curr');
     const amounts = document.getElementsByClassName('amount');
     const valueSelected = parseInt(document.getElementById("currType").value);
-    let currencyString = "";
+
     // Cambiar el tipo de moneda según la seleccionada
-    switch (valueSelected) {
-        case 0:
-            currencyString = "€";
-            break;
-        case 1:
-            currencyString = "$";
-            break;
-        case 2:
-            currencyString = "£";
-            break;
-        default:
-            currencyString = " ";
-            break;
-    }
+    let currencyString = "";
+    currencyString = getCurrencyString(valueSelected, currencyString);
 
     for (let i = 0; i < selector.length; i++) {
         selector[i].innerHTML = currencyString;
@@ -53,10 +46,10 @@ window.addEventListener("load", (event) => {
     console.log("page is fully loaded");
   
     document.getElementById('img-profile').addEventListener('click', function () {
-      document.getElementById('f_avatar').click();
+      document.getElementById('avatar').click();
     });
   
-    document.getElementById('f_avatar').addEventListener("change", function (e) {
+    document.getElementById('avatar').addEventListener("change", function (e) {
       console.log("change detected");
   
       var reader = new FileReader();
@@ -68,3 +61,21 @@ window.addEventListener("load", (event) => {
       reader.readAsDataURL(this.files[0]);
     });
 });
+
+function getCurrencyString(valueSelected, currencyString) {
+    switch (valueSelected) {
+        case 0:
+            currencyString = "€";
+            break;
+        case 1:
+            currencyString = "$";
+            break;
+        case 2:
+            currencyString = "£";
+            break;
+        default:
+            currencyString = "nada";
+            break;
+    }
+    return currencyString;
+}

@@ -425,19 +425,7 @@ public class ExpenseController {
     @PostMapping("{expenseId}/updateExpense")
     @Transactional
     @ResponseBody
-    public String editExpense(@RequestParam("file") MultipartFile file, @PathVariable long groupId, @PathVariable long expenseId, Model model,
-            HttpSession session, HttpServletResponse response, @RequestBody JsonNode jsonNode) {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String name = objectMapper.convertValue(jsonNode.get("name"), String.class);
-        String desc = objectMapper.convertValue(jsonNode.get("desc"), String.class);
-        String dateString = objectMapper.convertValue(jsonNode.get("dateString"), String.class);
-        float amount = objectMapper.convertValue(jsonNode.get("amount"), Float.class);
-        long paidById = objectMapper.convertValue(jsonNode.get("paidById"), Long.class);
-        List<String> participateIds = objectMapper.convertValue(jsonNode.get("participateIds"),
-                new TypeReference<List<String>>() {
-                });
-        long typeId = objectMapper.convertValue(jsonNode.get("typeId"), Long.class);
+    public String editExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session, @RequestParam("name") String name, @RequestParam("desc") String desc, @RequestParam("dateString") String dateString, @RequestParam("amount") float amount, @RequestParam("paidById") long paidById, @RequestParam("participateIds") List<String> participateIds, @RequestParam("typeId") long typeId, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
@@ -474,17 +462,15 @@ public class ExpenseController {
         }
 
         // save the new expense image
-        File f = localData.getFile("expense", "" + expenseId);
-        if (file.isEmpty()) {
-            log.info("failed to upload photo: emtpy file?");
-        } else {
+        if(imageFile != null){
+            File f = localData.getFile("expense", "" + exp.getId());
             try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
-                byte[] bytes = file.getBytes();
-                stream.write(bytes);
-                log.info("Uploaded photo for {} into {}!", expenseId, f.getAbsolutePath());
+                byte[] imageBytes = imageFile.getBytes();
+                stream.write(imageBytes);
+                log.info("Uploaded photo for {} into {}!", exp.getId(), f.getAbsolutePath());
             } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                log.warn("Error uploading " + expenseId + " ", e);
+                log.warn("Error uploading image " + exp.getId() + " ", e);
+                throw new ImageSavingFailed();
             }
         }
         
@@ -575,6 +561,14 @@ public class ExpenseController {
         // delete participants
         for (Participates p : participants)
             entityManager.remove(p);
+
+        // save the new expense image
+        File f = localData.getFile("expense", "" + exp.getId());
+        if (f.delete()) {
+            log.info("Delete photo for {} into {}!", exp.getId(), f.getAbsolutePath());
+        } else {
+            log.warn("Error deleting image " + exp.getId() + " ");
+        }
 
         // disable expense
         exp.setEnabled(false);

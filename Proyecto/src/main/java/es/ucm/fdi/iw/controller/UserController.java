@@ -1,6 +1,7 @@
 package es.ucm.fdi.iw.controller;
 
 import es.ucm.fdi.iw.LocalData;
+import es.ucm.fdi.iw.controller.ExpenseController.ImageSavingFailed;
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
@@ -21,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -145,20 +147,16 @@ public class UserController {
     /**
      * End point
      */
-    @GetMapping("/getMonthly")
-    public Float getMonthly(HttpSession session, @RequestBody JsonNode jsonNode) {
+    @ResponseBody
+    @GetMapping("/getMonthly/{dateString}/{currId}")
+    public float getMonthly(HttpSession session, @PathVariable String dateString, @PathVariable int currId) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String dateString = objectMapper.convertValue(jsonNode.get("dateString"), String.class);
-        int currId = objectMapper.convertValue(jsonNode.get("currId"), int.class); // tipo correcto?
-
-        // check date format
+        
         LocalDate formDate;
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            formDate = LocalDate.parse(dateString, formatter);
+            formDate = LocalDate.parse(dateString + "-01");
         } catch (Exception e) {
             throw new BadRequestException();
         }
@@ -168,14 +166,13 @@ public class UserController {
         throw new BadRequestException();
         Group.Currency newCurr = Group.Currency.values()[currId];
 
-        Float total = 0f;
+        float total = 0f;
         List<Participates> participates = user.getExpenses();
         for (Participates p : participates) {
             Expense exp = p.getExpense();
             LocalDate eDate;
             try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                eDate = LocalDate.parse(dateString, formatter);
+                eDate = LocalDate.parse(exp.getDate());
             } catch (Exception e) {
                 throw new BadRequestException();
             }
@@ -183,14 +180,15 @@ public class UserController {
             if (eDate.getMonthValue() == formDate.getMonthValue() && eDate.getYear() == formDate.getYear())
                 total += changeCurrency(exp.getAmount(), p.getGroup().getCurrency(), newCurr);
         }
-        return total;
+        float totalRounded = (float) Math.round(total * 100) / 100;
+        return totalRounded;
     }
 
-    private Float changeCurrency(Float amount, Group.Currency actualCurr, Group.Currency newCurr) {
+    private float changeCurrency(float amount, Group.Currency actualCurr, Group.Currency newCurr) {
         if (actualCurr.equals(newCurr))
             return amount; // No se pueden convertir de una divisa a sí misma
         // Conforme al orden: EUR, USD, GBP
-        Float[][] exchangeRates = new Float[3][3]; // Group.Currency.values().length
+        float[][] exchangeRates = new float[3][3]; // Group.Currency.values().length
         exchangeRates[0][1] = 1.19f; // 1 EUR = 1.19 USD
         exchangeRates[1][0] = 0.84f; // 1 USD = 0.84 EUR
         exchangeRates[0][2] = 0.85f; // 1 EUR = 0.85 GBP
@@ -200,7 +198,7 @@ public class UserController {
 
         int actualCurrIndex = actualCurr.ordinal();
         int newCurrIndex = newCurr.ordinal();
-        Float exchangeRate = exchangeRates[actualCurrIndex][newCurrIndex];
+        float exchangeRate = exchangeRates[actualCurrIndex][newCurrIndex];
         return amount * exchangeRate;
     }
 
@@ -208,7 +206,7 @@ public class UserController {
      * End point
      */
     @GetMapping("/getByType")
-        public Float [] getByType(Model model, HttpSession session, @RequestBody JsonNode jsonNode) {
+        public float [] getByType(Model model, HttpSession session, @RequestBody JsonNode jsonNode) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
         
@@ -221,7 +219,7 @@ public class UserController {
         Group.Currency newCurr = Group.Currency.values()[currId];
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes",Type.class).getResultList();
-        Float[] totals = new Float[types.size()];
+        float[] totals = new float[types.size()];
         
         // Inicializar los valores de las catergorías a 0
         for (int i = 0; i < totals.length; i++)
@@ -259,9 +257,9 @@ public class UserController {
         model.addAttribute("currencies", currencies);
 
         // calculate amounts for category
-        // ArrayList<Float> amounts = new ArrayList<>();
+        // ArrayList<float> amounts = new ArrayList<>();
         // List<Participates> expenses = user.getExpenses();
-        // Float amount = 0f;
+        // float amount = 0f;
         // for(Participates p : expenses){
         // if(amounts.size() >= (int) p.getExpense().getType().getId()){
         // amount = amounts.get((int) p.getExpense().getType().getId()) +
@@ -414,15 +412,9 @@ public class UserController {
     @ResponseBody
     @Transactional
     @PostMapping("/{id}")
-    public String postUser(HttpSession session, @PathVariable long id, @RequestBody JsonNode jsonNode, Model model) {
-        
-        String name = jsonNode.get("name").asText();
-        String username = jsonNode.get("username").asText();
-        String oldPwd = jsonNode.get("oldPwd").asText();
-        String newPwd = jsonNode.get("newPwd").asText();
+    public String postUser(HttpSession session, @PathVariable long id, Model model, @RequestParam("name") String name,  @RequestParam("username") String username, @RequestParam("oldPwd") String oldPwd, @RequestParam("newPwd") String newPwd,@RequestParam(value = "avatar", required = false) MultipartFile imageFile) {
         
         User requester = (User) session.getAttribute("u");
-        // user = entityManager.find(User.class, user.getId());
         User target = null;
 
         if (id == -1 && requester.hasRole(Role.ADMIN)) {
@@ -453,6 +445,19 @@ public class UserController {
         }
         target.setUsername(username);
         target.setName(name);
+
+        // save the new user image
+        if(imageFile != null){
+            File f = localData.getFile("user", "" + id);
+            try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
+                byte[] imageBytes = imageFile.getBytes();
+                stream.write(imageBytes);
+                log.info("Uploaded photo for {} into {}!", id, f.getAbsolutePath());
+            } catch (Exception e) {
+                log.warn("Error uploading image " + id + " ", e);
+                throw new ImageSavingFailed();
+            }
+        }
 
         // update user session so that changes are persisted in the session, too
         if (requester.getId() == target.getId()) {

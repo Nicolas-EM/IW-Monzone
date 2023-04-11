@@ -8,7 +8,10 @@ if (ws.receive) {
 
         if (obj.type == "GROUP" && obj.action == "GROUP_INVITATION_ACCEPTED") {
             const group = obj.group;
-            groupsTable.insertAdjacentHTML("afterbegin", renderIncomingGroup(group));
+            console.log(group.id, `group-${group.id}`, document.getElementById(`group-${group.id}`));
+            if(document.getElementById(`group-${group.id}`) === null){
+                groupsTable.insertAdjacentHTML("afterbegin", renderIncomingGroup(group));
+            }
             ws.subscribe(`/topic/group/${group.id}`);
         }
     }
@@ -16,7 +19,7 @@ if (ws.receive) {
 
 // Render incoming group
 function renderIncomingGroup(group) {
-    return `<div class="col">
+    return `<div id="group-${group.id}" class="col">
                 <div class="card text-white" role="button" onclick="location.href='/group/${group.id}'" tabindex="0">
                     <div class="card-header">
                         <h5>${group.name}</h5>
@@ -26,7 +29,7 @@ function renderIncomingGroup(group) {
                             <div>${group.desc}</div>
                         </div>
                         <div class="row">
-                            <div class="balance col-9 w-auto ms-3">0 ${group.currencyString} </div>
+                            <div class="balance col-9 w-auto ms-3">0.0 ${group.currencyString} </div>
                             <div class="col-3 col-num-members">
                                 <div class="icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
