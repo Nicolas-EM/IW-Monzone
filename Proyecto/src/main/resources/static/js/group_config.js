@@ -1,5 +1,6 @@
 
 const infoGroup = document.getElementById("info-group");
+const numMembers = document.getElementById("numMembers");
 const groupId = infoGroup.dataset.groupid;
 const budget = infoGroup.dataset.budget;
 const isGroupAdmin = infoGroup.dataset.isgroupadmin;
@@ -41,9 +42,13 @@ function renderGroupData(group) {
 
     const groupBudget = document.getElementById('totalBudget');
     groupBudget.setAttribute('value', group.totBudget);
+    
 }
 
 function renderGroupMembers(group) {
+    
+    numMembers.innerHTML = group.numMembers;
+
     const membersTable = document.getElementById('membersTable');
 
     go(`${config.rootUrl}/group/${groupId}/getGroupMembers`, "GET")
@@ -78,8 +83,7 @@ function renderGroupMembers(group) {
 
 function renderMember(member, group) {
     let memberHTML = `<div class="row p-2 member">`;
-    console.log(`isGroupAdmin: ${isGroupAdmin}`);
-    if (isGroupAdmin) {
+    if (isGroupAdmin === 'true') {
         memberHTML = `${memberHTML}
                     <div class="col btn-remove">
                     <form method="post" action="/group/${groupId}/delMember">
@@ -159,8 +163,8 @@ if(document.getElementById("btn-delete") != null){
 // Render INCOMING updates of group
 if (ws.receive) {
     const oldFn = ws.receive; // guarda referencia a manejador anterior
-    ws.receive = (obj) => {
-        oldFn(obj); // llama al manejador anterior
+    ws.receive = (destination, obj) => {
+        oldFn(destination, obj); // llama al manejador anterior
 
         // If receiving a group and on that group
         if (obj.type == "GROUP" && obj.group.id == groupId) {
@@ -175,6 +179,9 @@ if (ws.receive) {
                 case "GROUP_DELETED":
                     console.log("Redirecting to ", "/user/");
                     window.location.replace("/user/");
+                    break;
+                case "GROUP_INVITATION_ACCEPTED":
+                    renderGroupMembers(obj.group);
                     break;
                 default:
             }

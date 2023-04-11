@@ -441,8 +441,13 @@ public class GroupController {
             group.setCurrency(curr);
         }
         
-        // Anyone can update their budget update member
+        // check member budget
+        if (budget < 0)
+            throw new BadRequestException();
+
+        group.setTotBudget(group.getTotBudget() - member.getBudget());
         member.setBudget(budget);
+        group.setTotBudget(group.getTotBudget() + budget);
 
         // Send notif
         createAndSendNotifs(NotificationType.GROUP_MODIFIED, user, group);
@@ -681,35 +686,34 @@ public class GroupController {
 
             // notification valid, check if user is not already member
             Member newMember = entityManager.find(Member.class, new MemberID(group.getId(), user.getId()));
-            if(newMember == null){
-                newMember = new Member(new MemberID(group.getId(), user.getId()), true, GroupRole.GROUP_USER, 0, 0, group, user);
-                entityManager.persist(newMember);
-
-                // Update user and group
-                user.getMemberOf().add(newMember);
-                group.getMembers().add(newMember);
-                group.setNumMembers(group.getNumMembers() + 1);
-
-                // Delete notification
+            if(newMember != null && newMember.isEnabled()){
+                // notification should be deleted as it is no longer valid
                 user.getNotifications().remove(invite);
                 entityManager.remove(invite);
-            } else if(!newMember.isEnabled()) {
-                newMember.setEnabled(true);
-            }
-            else {
+
                 return "{\"status\": \"already_in_group\"}";
             }
+            else if(newMember == null){
+                newMember = new Member(new MemberID(group.getId(), user.getId()), true, GroupRole.GROUP_USER, 0, 0, group, user);
+                entityManager.persist(newMember);
+            } else {
+                newMember.setEnabled(true);
+            }            
+            // Update user and group
+            user.getMemberOf().add(newMember);
+            group.getMembers().add(newMember);
+            group.setNumMembers(group.getNumMembers() + 1);
+
+            // Delete notification
+            user.getNotifications().remove(invite);
+            entityManager.remove(invite);
         }
 
         // Send group transfer to user (to render if on /user/)
         notifSender.sendTransfer(group, "/user/" + user.getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_INVITATION_ACCEPTED);
+        notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_INVITATION_ACCEPTED);
 
         return "{\"status\": \"ok\"}";
     }
-
-
-    /*
-     * TODO: Edit member
-     */
 
 }
