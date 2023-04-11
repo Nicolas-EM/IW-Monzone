@@ -21,6 +21,14 @@
 #btn-save {
     border-style: none;
     outline: none;
+    max-width: 50%;
+    background-color: #d19900;
+    margin-bottom: 2vh;
+}
+
+#btn-savePassword {
+    border-style: none;
+    outline: none;
     background-color: #d19900;
 }
 

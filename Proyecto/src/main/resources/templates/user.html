@@ -33,8 +33,13 @@
               <label for="username" class="form-label w-100">Username</label>
               <input id="username" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${session.u.username}">
             </div>
+            <div class="row align-items-center justify-content-center">
+              <button formaction="@{}" type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Save</button>
+            </div>
           </div>
-          <!-- Password -->
+        </form>
+        <!-- Password -->
+        <form method="post" class="col">
           <div class="col-12">
             <div class="row">
               Do you want to change your password?
@@ -51,7 +56,7 @@
           </div>
           <!-- Save Btn -->
           <div class="col-12 d-flex align-items-center justify-content-center">
-            <button formaction="@{{id}(id=${session.u.id})}" type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Save</button>
+            <button formaction="@{}" type="submit" id="btn-savePassword" class="btn btn-primary rounded-pill fw-bold">Save Password</button>
             <!-- Logout Btn -->
             <form id="logoutForm" th:action="@{/logout}" method="post">
               <button type="button" id="btn-logout" class="btn btn-primary rounded-pill fw-bold" onclick="document.getElementById('logoutForm').submit();">Logout</button>
@@ -60,6 +65,7 @@
           </div>
         </div>
       </form>
+     
 
       <input type="file" id="avatar" accept="image/*" name="img[]" class="file">
 

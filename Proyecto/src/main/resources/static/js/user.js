@@ -10,8 +10,8 @@ document.getElementById("btn-save").onclick = (e) => {
     }
     formData.append('name', document.getElementById("name").value);
     formData.append('username', document.getElementById("username").value);
-    formData.append('oldPwd', document.getElementById("oldPwd").value);
-    formData.append('newPwd', document.getElementById("newPwd").value);
+    // formData.append('oldPwd', document.getElementById("oldPwd").value);
+    // formData.append('newPwd', document.getElementById("newPwd").value);
 
     go(b.getAttribute('formaction'), 'POST', formData, {})
         .then(d => {
