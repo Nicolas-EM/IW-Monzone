@@ -257,22 +257,6 @@ public class UserController {
         }
         model.addAttribute("currencies", currencies);
 
-        // calculate amounts for category
-        // ArrayList<float> amounts = new ArrayList<>();
-        // List<Participates> expenses = user.getExpenses();
-        // float amount = 0f;
-        // for(Participates p : expenses){
-        // if(amounts.size() >= (int) p.getExpense().getType().getId()){
-        // amount = amounts.get((int) p.getExpense().getType().getId()) +
-        // p.getExpense().getAmount();
-        // }
-        // else{
-        // amount = p.getExpense().getAmount();
-        // }
-        // amounts.set((int) p.getExpense().getType().getId(), amount);
-        // }
-        // model.addAttribute("amounts", amounts);
-
         return "user";
     }
 
@@ -410,59 +394,90 @@ public class UserController {
      /*
      * Alter or create a user
      */
+    // @ResponseBody
+    // @Transactional
+    // @PostMapping("/{id}")
+    // public String postUser(HttpSession session, @PathVariable long id, Model model, @RequestParam("name") String name,  @RequestParam("username") String username, @RequestParam("oldPwd") String oldPwd, @RequestParam("newPwd") String newPwd,@RequestParam(value = "avatar", required = false) MultipartFile imageFile) {
+       
+    //     User requester = (User) session.getAttribute("u");
+    //     User target = null;
+
+    //     if (id == -1 && requester.hasRole(Role.ADMIN)) {
+    //         // create new user with random password
+    //         target = new User();
+    //         target.setPassword(encodePassword(generateRandomBase64Token(12)));
+    //         entityManager.persist(target);
+    //         entityManager.flush(); // forces DB to add user & assign valid id
+    //         id = target.getId(); // retrieve assigned id from DB
+    //     }
+
+    //     // retrieve requested user
+    //     target = entityManager.find(User.class, id);
+    //     model.addAttribute("user", target);
+
+    //     if (requester.getId() != target.getId() &&
+    //             !requester.hasRole(Role.ADMIN)) {
+    //         throw new NotYourProfileException();
+    //     }
+
+    //     if (newPwd != null) {
+    //         if (!newPwd.equals(oldPwd)) {
+    //             // FIXME: complain
+    //         } else {
+    //             // save encoded version of password
+    //             target.setPassword(encodePassword(newPwd));
+    //         }
+    //     }
+    //     target.setUsername(username);
+    //     target.setName(name);
+
+    //     // save the new user image
+    //     if(imageFile != null){
+    //         File f = localData.getFile("user", "" + id);
+    //         try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
+    //             byte[] imageBytes = imageFile.getBytes();
+    //             stream.write(imageBytes);
+    //             log.info("Uploaded photo for {} into {}!", id, f.getAbsolutePath());
+    //         } catch (Exception e) {
+    //             log.warn("Error uploading image " + id + " ", e);
+    //             throw new ImageSavingFailed();
+    //         }
+    //     }
+
+    //     // update user session so that changes are persisted in the session, too
+    //     if (requester.getId() == target.getId()) {
+    //         session.setAttribute("u", target);
+    //     }
+
+    //     return "{\"action\": \"none\"}";
+    // }
+
+
+    /*
+     * Change data user
+     */
     @ResponseBody
     @Transactional
-    @PostMapping("/{id}")
-    public String postUser(HttpSession session, @PathVariable long id, Model model, @RequestParam("name") String name,  @RequestParam("username") String username, @RequestParam("oldPwd") String oldPwd, @RequestParam("newPwd") String newPwd,@RequestParam(value = "avatar", required = false) MultipartFile imageFile) {
-       
-        User requester = (User) session.getAttribute("u");
-        User target = null;
+    @PostMapping("/ChangeDataUser")
+    public String postUserData(HttpSession session, Model model, @RequestParam("name") String name,  @RequestParam("username") String username, @RequestParam(value = "avatar", required = false) MultipartFile imageFile) {
+        
+        User target = (User) session.getAttribute("u");
+        target = entityManager.find(User.class, target.getId());
 
-        if (id == -1 && requester.hasRole(Role.ADMIN)) {
-            // create new user with random password
-            target = new User();
-            target.setPassword(encodePassword(generateRandomBase64Token(12)));
-            entityManager.persist(target);
-            entityManager.flush(); // forces DB to add user & assign valid id
-            id = target.getId(); // retrieve assigned id from DB
-        }
-
-        // retrieve requested user
-        target = entityManager.find(User.class, id);
-        model.addAttribute("user", target);
-
-        if (requester.getId() != target.getId() &&
-                !requester.hasRole(Role.ADMIN)) {
-            throw new NotYourProfileException();
-        }
-
-        if (newPwd != null) {
-            if (!newPwd.equals(oldPwd)) {
-                // FIXME: complain
-            } else {
-                // save encoded version of password
-                target.setPassword(encodePassword(newPwd));
-            }
-        }
         target.setUsername(username);
         target.setName(name);
 
         // save the new user image
         if(imageFile != null){
-            File f = localData.getFile("user", "" + id);
+            File f = localData.getFile("user", "" + target.getId());
             try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
                 byte[] imageBytes = imageFile.getBytes();
                 stream.write(imageBytes);
-                log.info("Uploaded photo for {} into {}!", id, f.getAbsolutePath());
+                log.info("Uploaded photo for {} into {}!", target.getId(), f.getAbsolutePath());
             } catch (Exception e) {
-                log.warn("Error uploading image " + id + " ", e);
+                log.warn("Error uploading image " + target.getId() + " ", e);
                 throw new ImageSavingFailed();
             }
-        }
-
-        // update user session so that changes are persisted in the session, too
-        if (requester.getId() == target.getId()) {
-            session.setAttribute("u", target);
         }
 
         return "{\"action\": \"none\"}";
