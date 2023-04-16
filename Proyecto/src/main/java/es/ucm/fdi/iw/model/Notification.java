@@ -39,6 +39,7 @@ public class Notification implements Transferable<Notification.Transfer>  {
         EXPENSE_CREATED,
         EXPENSE_MODIFIED,
         EXPENSE_DELETED,
+        DEBT_SETTLED, // With "negative" expense
 
         GROUP_INVITATION,
         GROUP_INVITATION_ACCEPTED,  // When a user accepts an invite
@@ -134,6 +135,11 @@ public class Notification implements Transferable<Notification.Transfer>  {
             case EXPENSE_DELETED:
                 sb.append(" deleted the expense \"");
                 break;
+            case DEBT_SETTLED:
+                sb.append(" settled your debt in group ");
+                sb.append(this.group.getName());
+                this.message = sb.toString();
+                return;
             default: {}                
         }
 
@@ -171,4 +177,3 @@ public class Notification implements Transferable<Notification.Transfer>  {
         return new Transfer(id, message, type, dateReadString, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent), group.getId(), sender.getId(), recipient.getId());
     }
 }
-

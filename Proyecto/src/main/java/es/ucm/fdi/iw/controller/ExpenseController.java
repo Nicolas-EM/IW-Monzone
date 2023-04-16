@@ -11,7 +11,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 
@@ -32,11 +31,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import es.ucm.fdi.iw.LocalData;
@@ -109,7 +106,6 @@ public class ExpenseController {
     }
 
     private void setExpenseAttributes(Group group, long expenseId, Model model, boolean newExpense) {
-
         List<Participates> participants = new ArrayList<>();
         if (!newExpense) {
             entityManager.createNamedQuery("Participates.getParticipants", Participates.class)
@@ -124,7 +120,6 @@ public class ExpenseController {
         model.addAttribute("types", types);
         model.addAttribute("groupId", group.getId());
         model.addAttribute("newExpense", newExpense);
-
     }
 
     /*
@@ -157,7 +152,6 @@ public class ExpenseController {
         model.addAttribute("group", group);
 
         return "expense";
-
     }
 
     /*
@@ -235,7 +229,57 @@ public class ExpenseController {
         model.addAttribute("group", group);
 
         return "expense";
+    }
 
+    /*
+     * Returns the default expense pic
+     * 
+     * @return
+     */
+    private static InputStream defaultExpensePic() {
+        return new BufferedInputStream(Objects.requireNonNull(
+                ExpenseController.class.getClassLoader().getResourceAsStream("static/img/add-image.png")));
+    }
+
+    /**
+     * Downloads a pic for an expense
+     * 
+     * @param id
+     * @return
+     * @throws IOException
+     */
+    @GetMapping("{expenseId}/pic")
+    public StreamingResponseBody expensePic(@PathVariable long groupId, @PathVariable long expenseId, Model model,
+            HttpSession session) throws IOException {
+
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new BadRequestException();
+
+        // check if user belongs to the group
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (member == null || !member.isEnabled())
+            throw new NoMemberException();
+
+        // check if expense exists
+        // If expense == null, its a new expense
+        Expense exp = entityManager.find(Expense.class, expenseId);
+        if (exp != null && !exp.isEnabled())
+            throw new BadRequestException();
+
+        // check if expense belongs to the group
+        if (exp != null && !group.hasExpense(exp))
+            throw new BadRequestException();
+
+        File f = localData.getFile("expense", String.valueOf(expenseId));
+        InputStream in = new BufferedInputStream(
+                f.exists() ? new FileInputStream(f) : ExpenseController.defaultExpensePic());
+        return os -> FileCopyUtils.copy(in, os);
     }
 
     /*
@@ -339,8 +383,8 @@ public class ExpenseController {
     }
 
     @Async
-    private CompletableFuture<Void> createAndSendNotifs(NotificationType type, User sender, List<User> users, Group group, Expense e) {
-        for (User u : users) {
+    private CompletableFuture<Void> createAndSendNotifs(NotificationType type, User sender, List<User> notifRecipients, Group group, Expense e) {
+        for (User u : notifRecipients) {
             // Do not send notification to sender
             if (u.getId() == sender.getId())
                 continue;
@@ -583,54 +627,67 @@ public class ExpenseController {
     }
 
     /*
-     * Returns the default expense pic
-     * 
-     * @return
+     * Settle debt (create negative expense)
      */
-    private static InputStream defaultExpensePic() {
-        return new BufferedInputStream(Objects.requireNonNull(
-                ExpenseController.class.getClassLoader().getResourceAsStream("static/img/add-image.png")));
-    }
+    @PostMapping("/settle")
+    @Transactional
+    @ResponseBody
+    public String settleExpense(HttpSession session, @PathVariable long groupId, @RequestBody JsonNode jsonNode) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        long debtorId = objectMapper.convertValue(jsonNode.get("debtorId"), Long.class);
+        long debtOwnerId = objectMapper.convertValue(jsonNode.get("debtOwnerId"), Long.class);
+        float amount = objectMapper.convertValue(jsonNode.get("amount"), Float.class);
 
-    /**
-     * Downloads a pic for an expense
-     * 
-     * @param id
-     * @return
-     * @throws IOException
-     */
-    @GetMapping("{expenseId}/pic")
-    public StreamingResponseBody expensePic(@PathVariable long groupId, @PathVariable long expenseId, Model model,
-            HttpSession session) throws IOException {
+        // Check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if(group == null || !group.isEnabled())
+            throw new BadRequestException();
 
+        // Check if debtor exists
+        User debtor = entityManager.find(User.class, debtorId);
+        if(debtor == null){
+            throw new BadRequestException();
+        }
+
+        // Check if debtor is member of group
+        Member debtorM = entityManager.find(Member.class, new MemberID(groupId, debtorId));
+        if (debtorM == null || !debtorM.isEnabled())
+            throw new NoMemberException(); // Requester not in group
+
+        // Check if debtOwner exists
+        User debtOwner = entityManager.find(User.class, debtOwnerId);
+        if(debtOwner == null){
+            throw new BadRequestException();
+        }
+
+        // Check if debtOwner is member of group
+        Member debtOwnerM = entityManager.find(Member.class, new MemberID(groupId, debtOwnerId));
+        if (debtOwnerM == null || !debtOwnerM.isEnabled())
+            throw new NoMemberException(); // Requester not in group
+
+        Expense exp = new Expense("Reimbursement", debtor.getUsername() + " settled with " + debtOwner.getUsername(), amount, LocalDate.now(), entityManager.find(Type.class, Long.valueOf(8)), debtor);
+        entityManager.persist(exp);
+        entityManager.flush();
+
+        // Remove debt from debtor
+        debtorM.setBalance(debtorM.getBalance() + amount);
+
+        // Add participates to debtOwner
+        ParticipatesID pId = new ParticipatesID(exp.getId(), debtOwnerId);
+        Participates participates = new Participates(pId, group, debtOwner, exp);
+        entityManager.persist(participates);
+
+        // Remove balance from debtOwner
+        debtOwnerM.setBalance(debtOwnerM.getBalance() - amount);
+
+        // send notification ASYNC
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
+        createAndSendNotifs(NotificationType.DEBT_SETTLED, user, new ArrayList<>(Arrays.asList(debtOwner, debtor)), group, exp);
 
-        // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+        // send expense to group ASYNC
+        notifSender.sendTransfer(exp, "/topic/group/" + groupId, "EXPENSE", NotificationType.EXPENSE_CREATED);
 
-        // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled())
-            throw new NoMemberException();
-
-        // check if expense exists
-        // If expense == null, its a new expense
-        Expense exp = entityManager.find(Expense.class, expenseId);
-        if (exp != null && !exp.isEnabled())
-            throw new BadRequestException();
-
-        // check if expense belongs to the group
-        if (exp != null && !group.hasExpense(exp))
-            throw new BadRequestException();
-
-        File f = localData.getFile("expense", String.valueOf(expenseId));
-        InputStream in = new BufferedInputStream(
-                f.exists() ? new FileInputStream(f) : ExpenseController.defaultExpensePic());
-        return os -> FileCopyUtils.copy(in, os);
+        return "{\"success\": \"ok\"}";
     }
-
 }

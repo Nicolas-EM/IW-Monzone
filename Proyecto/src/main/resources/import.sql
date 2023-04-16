@@ -60,7 +60,8 @@ VALUES
   (4, 'Bills'),
   (5, 'Transport'),
   (6, 'Restaurants&Bars'),
-  (7, 'Others');
+  (7, 'Others'),
+  (8, 'Reimbursement');
 
 -- Generate fixed expense for test
 INSERT INTO IWExpense (ID, enabled, AMOUNT, DATE, DESC, NAME, PAID_BY_ID, TYPE_ID) VALUES (99, true, 99, '2023-03-04', 'Expense desc', 'Expense name', 2, 1);

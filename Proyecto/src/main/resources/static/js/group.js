@@ -22,7 +22,7 @@ if (ws.receive) {
         // If expense destined to current group
         if (obj.type == "EXPENSE" && destination.includes(groupId)) {
             const expense = obj.expense;
-            const expenseHTML =  document.getElementById(`expense-${expense.expenseId}`)
+            const expenseHTML = document.getElementById(`expense-${expense.expenseId}`)
             switch (obj.action) {
                 case "EXPENSE_CREATED":
                     expensesTable.insertAdjacentHTML("afterbegin", renderExpense(expense));
@@ -89,8 +89,12 @@ function renderAllDebts() {
                 debtsTable.insertAdjacentHTML("afterbegin", renderDebt(debt));
             })
 
-            if(debts.length == 0){
+            if (debts.length == 0) {
                 debtsTable.insertAdjacentHTML("afterbegin", renderNoDebts());
+            } else {
+                document.querySelectorAll(".btn-settle").forEach((btn) => {
+                    btn.onclick = (e) => handleSettleExpenseClick(btn, e);
+                });
             }
         }
         );
@@ -98,11 +102,14 @@ function renderAllDebts() {
 
 // Render single debt
 function renderDebt(debt) {
-    // TODO - añadir funcionalidad a botón
     return `<div class="row">
                 <div class="col">
-                    <form method="post" action="">
-                        <button type="submit">Mark as paid</button>
+                    <form method="post" action="/group/${groupId}/settle">
+                        <input type="hidden" name="_csrf" value="${config.csrf.value}">
+                        <input type="hidden" name="debtorId" value="${debt.debtorId}">
+                        <input type="hidden" name="debtOwnerId" value="${debt.debtOwnerId}">
+                        <input type="hidden" name="amount" value="${debt.amount}">
+                        <button type="button" class="btn-settle">Mark as paid</button>
                     </form>
                 </div>
                 <div class="col">
@@ -112,7 +119,7 @@ function renderDebt(debt) {
 }
 
 // Render no debts message
-function renderNoDebts(){
+function renderNoDebts() {
     return `<div class="row">
                 <div class="col">
                     There are no debts to settle :D
@@ -123,14 +130,14 @@ function renderNoDebts(){
 // Render member balances
 function renderAllBalances() {
     balancesTable.innerHTML = '';  // clear debts table
-    
+
     go(`${config.rootUrl}/group/${groupId}/getMembers`, "GET")
-    .then(members => {
-        members.forEach(member => {
-            balancesTable.insertAdjacentHTML("beforeend", renderMemberBalance(member));
-        })
-    }
-    );
+        .then(members => {
+            members.forEach(member => {
+                balancesTable.insertAdjacentHTML("beforeend", renderMemberBalance(member));
+            })
+        }
+        );
 }
 
 function renderMemberBalance(member) {
@@ -164,4 +171,24 @@ function renderMemberBalance(member) {
                     </div>                                
                 </div>`;
     }
+}
+
+// Mark debt as settled
+function handleSettleExpenseClick(btn, e) {
+    e.preventDefault();
+    console.log("Settling expense");
+
+    const debtorId = btn.parentNode.querySelector('input[name="debtorId"]').value;
+    const debtOwnerId = btn.parentNode.querySelector('input[name="debtOwnerId"]').value;
+    const amount = btn.parentNode.querySelector('input[name="amount"]').value;
+
+    go(btn.parentNode.action, "POST", {
+        debtorId,
+        debtOwnerId,
+        amount,
+    })
+        .then((d) => {
+            console.log("Settle: success", d);
+        })
+        .catch((e) => console.log("Error settling debt", e));
 }
