@@ -11,8 +11,9 @@ if (ws.receive) {
             console.log(group.id, `group-${group.id}`, document.getElementById(`group-${group.id}`));
             if(document.getElementById(`group-${group.id}`) === null){
                 groupsTable.insertAdjacentHTML("afterbegin", renderIncomingGroup(group));
+                ws.subscribe(`/topic/group/${group.id}`);
             }
-            ws.subscribe(`/topic/group/${group.id}`);
+            
         }
     }
 }

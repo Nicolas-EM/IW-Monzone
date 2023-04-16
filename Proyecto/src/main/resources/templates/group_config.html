@@ -72,16 +72,11 @@
                     <!-- Invite / Leave buttons -->
                     <div class="row pt-4 pb-4">
                         <button id="inviteBtn" th:if="${isGroupAdmin}" class="btn btn-func btn-primary rounded-pill fw-bold w-25" data-bs-toggle="modal" data-bs-target="#inviteModal" formaction="">Invite a Friend</button>
-                        <button type="submit" form="leaveGroupForm" formmethod="post" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Leave Group</button>
+                        <button id="btn-leave" th:data-userid="${userId}" type="submit" th:formaction="@{/group/{groupId}/delMember(groupId=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Leave Group</button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Hidden form -->
-        <form id="leaveGroupForm" method="post" th:action="@{/group/{groupId}/delMember(groupId=${group?.getId()})}">
-            <input type="hidden" name="removeId" th:value="${userId}">
-        </form>
 
         <th:block th:if="${group} != null">
             <!-- Invite Member Modal -->

@@ -42,6 +42,7 @@ public class Notification implements Transferable<Notification.Transfer>  {
 
         GROUP_INVITATION,
         GROUP_INVITATION_ACCEPTED,  // When a user accepts an invite
+        GROUP_MEMBER_REMOVED,
         GROUP_MODIFIED,
         GROUP_DELETED
     }
@@ -102,6 +103,12 @@ public class Notification implements Transferable<Notification.Transfer>  {
                 break;
             case GROUP_DELETED:
                 sb.append(" has deleted \"");
+                break;
+            case GROUP_INVITATION_ACCEPTED:
+                sb.append(" has joined \"");
+                break;
+            case GROUP_MEMBER_REMOVED:
+                sb.append(" no longer belongs to \"");
                 break;
             default: {}                
         }

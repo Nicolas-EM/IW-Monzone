@@ -312,7 +312,7 @@ public class GroupController {
         
         for (Member m : group.getMembers()) {
             // Do not send notification to sender
-            if (m.getUser().getId() == sender.getId())
+            if (m.getUser().getId() == sender.getId() || !m.isEnabled())
                 continue;
 
             Notification notif = new Notification(type, sender, m.getUser(), group);
@@ -582,6 +582,13 @@ public class GroupController {
 
         log.warn("Removed user from group {}", group);
 
+        // Send notification to members
+        createAndSendNotifs(NotificationType.GROUP_MEMBER_REMOVED, removeMember.getUser(), group);
+
+        // Send group transfer to user (to render if on /user/)
+        notifSender.sendTransfer(group, "/user/" + user.getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_MEMBER_REMOVED);
+        notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_MEMBER_REMOVED);
+
         if (user.getId() == removeId)
             return "{\"action\": \"redirect\",\"redirect\": \"/user/\"}";
 
@@ -708,6 +715,9 @@ public class GroupController {
             user.getNotifications().remove(invite);
             entityManager.remove(invite);
         }
+
+        // Send notification
+        createAndSendNotifs(NotificationType.GROUP_INVITATION_ACCEPTED, user, group);
 
         // Send group transfer to user (to render if on /user/)
         notifSender.sendTransfer(group, "/user/" + user.getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_INVITATION_ACCEPTED);

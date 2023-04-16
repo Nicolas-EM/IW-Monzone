@@ -160,6 +160,29 @@ if(document.getElementById("btn-delete") != null){
     };
 }
 
+// Submit Button (LEAVE GROUP)
+document.getElementById("btn-leave").onclick = (e) => {
+    e.preventDefault();
+    console.log('Leaving group');
+    const b = document.getElementById("btn-leave");
+    const removeId = b.dataset.userid;
+
+    go(b.getAttribute('formaction'), 'POST', {
+        removeId
+    })
+        .then(d => {
+            console.log("Group: success", d);
+            if (d.action === "redirect") {
+                console.log("Redirecting to ", d.redirect);
+                window.location.replace(d.redirect);
+            }
+            else {
+                console.log("Error leaving group");
+            }
+        })
+        .catch(e => console.log("Error leaving group", e))
+};
+
 // Render INCOMING updates of group
 if (ws.receive) {
     const oldFn = ws.receive; // guarda referencia a manejador anterior
@@ -183,7 +206,25 @@ if (ws.receive) {
                 case "GROUP_INVITATION_ACCEPTED":
                     renderGroupMembers(obj.group);
                     break;
+                case "GROUP_MEMBER_REMOVED":
+                    renderGroupMembers(obj.group);
+                    break;
                 default:
+                    break;
+            }
+        }
+
+        // if receiving an expense
+        else if (obj.type == "EXPENSE") {
+            // get groupId from destination
+            const expGroupId = parseInt(destination.split("/")[3]);
+            // if on that group
+            if (expGroupId == groupId) {
+                go(`${config.rootUrl}/group/${expGroupId}/getGroupConfig`, "GET")
+                    .then(group => {
+                        console.log("Updating group view");
+                        renderGroupMembers(group);
+                    })
             }
         }
     }
