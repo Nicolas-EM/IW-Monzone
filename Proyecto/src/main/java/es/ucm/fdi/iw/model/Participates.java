@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Entity
 @NamedQueries({
     @NamedQuery(name = "Participates.getParticipants", query = "SELECT obj FROM Participates obj WHERE obj.group.id = :groupId AND obj.expense.id = :expenseId"),
-    @NamedQuery(name = "Participates.getUniqueExpensesByGroup", query = "SELECT DISTINCT obj.expense FROM Participates obj WHERE obj.group.id = :groupId")
+    @NamedQuery(name = "Participates.getUniqueExpensesByGroup", query = "SELECT DISTINCT obj.expense FROM Participates obj WHERE obj.group.id = :groupId ORDER BY obj.expense.date")
 })
 @Table(name="IWParticipates")
 public class Participates {

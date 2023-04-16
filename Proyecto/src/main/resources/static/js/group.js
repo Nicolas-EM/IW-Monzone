@@ -59,7 +59,7 @@ function renderExpense(expense) {
                                 <div class="card-title">${expense.name}</div>
                             </div>
                             <div class="row card-text-row">
-                                <div class="card-subtitle">${expense.desc}</div>
+                                <div class="card-subtitle" style="min-height: 1.5em;">${expense.desc}</div>
                             </div>
                         </div>
                         <!-- Date -->
