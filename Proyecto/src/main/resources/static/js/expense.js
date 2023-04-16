@@ -30,9 +30,9 @@ window.addEventListener("load", (event) => {
     e.preventDefault();
     console.log('Saving expense');
     const b = document.getElementById("btn-save");
-  
+
     const formData = new FormData();
-    if(document.getElementById("imgFileInput").files[0] !== undefined){
+    if (document.getElementById("imgFileInput").files[0] !== undefined) {
       formData.append('imageFile', document.getElementById("imgFileInput").files[0]);
     }
     formData.append('name', document.getElementById("name").value);
@@ -42,17 +42,20 @@ window.addEventListener("load", (event) => {
     formData.append('paidById', document.getElementById("paidById").value);
     formData.append('participateIds', Array.from(document.querySelectorAll('input[name="participateIds"]:checked')).map(cb => cb.value));
     formData.append('typeId', document.getElementById("typeId").value);
-  
+
     go(b.getAttribute('formaction'), 'POST', formData, {})
       .then(d => {
         console.log("Expense: success", d);
-        if(d.action === "redirect"){
+        if (d.action === "redirect") {
           console.log("Redirecting to ", d.redirect);
           window.location.replace(d.redirect);
         }
       })
-      .catch(e => console.log("Error creating expense", e))
-  }  
+      .catch(e => {
+        console.log("Error creating expense", e);
+        alert(JSON.parse(e.text).message);
+      })
+  }
 });
 
 /* Changes value pero user */
@@ -69,5 +72,5 @@ function onChangeAmount(amount) {
     else {
       values[i].innerHTML = '';
     }
-  }  
+  }
 }
