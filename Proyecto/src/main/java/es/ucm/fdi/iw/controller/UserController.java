@@ -414,7 +414,7 @@ public class UserController {
     @Transactional
     @PostMapping("/{id}")
     public String postUser(HttpSession session, @PathVariable long id, Model model, @RequestParam("name") String name,  @RequestParam("username") String username, @RequestParam("oldPwd") String oldPwd, @RequestParam("newPwd") String newPwd,@RequestParam(value = "avatar", required = false) MultipartFile imageFile) {
-        
+       
         User requester = (User) session.getAttribute("u");
         User target = null;
 
@@ -468,6 +468,32 @@ public class UserController {
         return "{\"action\": \"none\"}";
     }
 
+
+     /*
+     * Change Password
+     */
+    @ResponseBody
+    @Transactional
+    @PostMapping("/ChangePassword")
+    public String postChangePassword(HttpSession session, @RequestBody JsonNode jsonNode, Model model) {
+        
+        String oldPwd = jsonNode.get("oldPwd").asText();
+        String newPwd = jsonNode.get("newPwd").asText();
+    
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        if (newPwd != null && newPwd != oldPwd) {
+            if (!newPwd.equals(oldPwd)) { 
+                // Mostrar por pantalla algo que diga que no son iguales las contraseñas
+            } 
+            else{ // Comprobar que la contraseña actual del user es igual a oldPwd  if (passwordEncoder.matches(user.getPassword(), encodePassword(oldPwd)))
+                user.setPassword(encodePassword(newPwd)); // save encoded version of password
+            }
+        }    
+       
+        return "{\"action\": \"none\"}";
+    }
 
 
     // /**
