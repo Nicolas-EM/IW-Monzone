@@ -12,9 +12,6 @@ import javax.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
-import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,14 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.client.HttpClientErrorException.BadRequest;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
@@ -47,6 +39,8 @@ import es.ucm.fdi.iw.NotificationSender;
 import es.ucm.fdi.iw.model.DebtCalculator;
 import es.ucm.fdi.iw.model.DebtCalculator.Debt;
 import es.ucm.fdi.iw.model.Transferable;
+
+import es.ucm.fdi.iw.exception.*;
 
 /**
  * Group (and expenses) management.
@@ -66,34 +60,6 @@ public class GroupController {
 	private NotificationSender notifSender;
 
     private static final Logger log = LogManager.getLogger(GroupController.class);
-
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request") // 400
-    public static class BadRequestException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You don't belong to this group") // 403
-    public static class NoMemberException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not the moderator of this group") // 403
-    public static class NoModeratorException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The expense does not exist or has been removed") // 403
-    public static class ExpenseNotExistException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The expense does not belong to this group") // 403
-    public static class ExpenseNotBelongException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You cannot leave a group if your balance is not 0.") // 403
-    public static class BalanceNotZero extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error with DB") // 500
-    public static class BadDataInDB extends RuntimeException {
-    }
 
     /*
      * 
@@ -137,13 +103,13 @@ public class GroupController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
         }
 
         model.addAttribute("groupId", groupId);
@@ -163,13 +129,13 @@ public class GroupController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
         }
 
         // Get budget
@@ -207,43 +173,16 @@ public class GroupController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
         }
 
         return group.toTransfer();
-    }
-
-    /*
-     * Get group members
-     */
-    @ResponseBody
-    @GetMapping("{groupId}/getGroupMembers")
-    public List<Member.Transfer> getGroupMembers(@PathVariable long groupId, HttpSession session) {
-
-        User user = (User) session.getAttribute("u");
-        user = entityManager.find(User.class, user.getId());
-
-        // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new BadRequestException();
-
-        // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new NoMemberException();
-        }
-
-        List<Member> members = group.getMembers();
-        return members.stream().map(Transferable::toTransfer).collect(Collectors.toList());
-
     }
 
     /*
@@ -258,13 +197,13 @@ public class GroupController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
         }
 
         // get members
@@ -285,13 +224,13 @@ public class GroupController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
         }
 
         // get debts
@@ -328,27 +267,6 @@ public class GroupController {
     }
 
     /*
-     * Send group
-     */
-    // @Async
-    // private CompletableFuture<Void> sendGroup(NotificationType type, Group group) {
-    //     try{
-    //         ObjectMapper mapper = new ObjectMapper();
-    //         String jsonGroup = mapper.writeValueAsString(group.toTransfer());
-    //         log.info("Sending group to {} with contents '{}'", group, jsonGroup);
-    
-    //         String json = "{\"type\" : \"GROUP\", \"action\" : \"" + type + "\",\"group\" : " + jsonGroup + "}";
-    
-    //         messagingTemplate.convertAndSend("/topic/group/" + group.getId(), json);
-    //     } catch (JsonProcessingException exception) {
-    //         log.error("Failed to parse group {}", group);
-    //         log.error("Exception {}", exception);
-    //     }
-
-    //     return CompletableFuture.completedFuture(null);
-    // }
-
-    /*
      * Creates group
      */
     @ResponseBody
@@ -366,11 +284,11 @@ public class GroupController {
 
         // parse budget
         if (budget < 0)
-            throw new BadRequestException();
+            throw new BadRequestException(-7);
 
         // parse curr
         if (currId < 0 || currId >= Currency.values().length)
-            throw new BadRequestException();
+            throw new BadRequestException(-20);
         Currency curr = Currency.values()[currId];
 
         // create group
@@ -412,13 +330,13 @@ public class GroupController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled()) {
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
         }
 
         String name = jsonNode.get("name").asText();
@@ -430,7 +348,7 @@ public class GroupController {
         if (member.getRole() == GroupRole.GROUP_MODERATOR) {
             // parse curr
             if (currId < 0 || currId >= Currency.values().length)
-                throw new BadRequestException();
+                throw new BadRequestException(-20);
             Currency curr = Currency.values()[currId];
 
             // update group
@@ -443,7 +361,7 @@ public class GroupController {
         
         // check member budget
         if (budget < 0)
-            throw new BadRequestException();
+            throw new BadRequestException(-7);
 
         group.setTotBudget(group.getTotBudget() - member.getBudget());
         member.setBudget(budget);
@@ -472,25 +390,25 @@ public class GroupController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled()) {
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
         }
 
         // only moderators can delete group
         if (member.getRole() != GroupRole.GROUP_MODERATOR) {
-            throw new NoModeratorException();
+            throw new ForbiddenException(-2);
         }
 
         // check all balances = 0 and remove member from the group
         List<Member> members = group.getMembers();
         for (Member m : members) {
             if (m.getBalance() != 0)
-                throw new BadRequestException();
+                throw new BadRequestException(-10);
             m.setEnabled(false);
             ;
         }
@@ -531,26 +449,26 @@ public class GroupController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if requesting user belongs to the group
         MemberID mId = new MemberID(groupId, user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled()) {
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
         }
 
         // check if member to remove belongs to group (only if not leaving group)
         Member removeMember = entityManager.find(Member.class, new MemberID(groupId, removeId));
         if (removeId != user.getId()){
             if (removeMember == null || !removeMember.isEnabled()) {
-                throw new BadRequestException();
+                throw new ForbiddenException(-7);
             }
         }
 
         // only moderators can remove other members
         if (user.getId() != removeId && member.getRole() != GroupRole.GROUP_MODERATOR) {
-            throw new NoModeratorException();
+            throw new ForbiddenException(-2);
         }
 
         // if only member, delete group
@@ -566,12 +484,12 @@ public class GroupController {
         if (user.getId() == removeId && member.getRole() == GroupRole.GROUP_MODERATOR) {
             List<Member> moderators = entityManager.createNamedQuery("Member.getGroupAdmins",Member.class).setParameter("groupId", groupId).getResultList();
             if(moderators.size() == 1)
-                throw new BadRequestException();
+                throw new BadRequestException(-12);
         }
 
         // balance must be 0
         if (removeMember.getBalance() != 0) {
-            throw new BadRequestException();
+            throw new BadRequestException(-11);
         }
 
         // remove member
@@ -610,26 +528,26 @@ public class GroupController {
         // check if group exists
         Group group = entityManager.find(Group.class, id);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if sender belongs to the group
         MemberID mId = new MemberID(group.getId(), sender.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled()) 
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
 
         // only moderators can invite new members
         if (member.getRole() != GroupRole.GROUP_MODERATOR) 
-            throw new NoModeratorException();
+            throw new ForbiddenException(-2);
 
         // Check invited user
         List<User> userList = entityManager.createNamedQuery("User.byUsername", User.class).setParameter("username", username).getResultList();
 
-        if (userList.isEmpty())
-            throw new BadRequestException();
+        if (userList.isEmpty() || !userList.get(0).isEnabled())
+            throw new BadRequestException(-4);
 
         if (userList.size() > 1)
-            throw new BadDataInDB();
+            throw new InternalServerException(-1);
         
         User user = userList.get(0);
         mId = new MemberID(group.getId(), user.getId());
@@ -668,16 +586,16 @@ public class GroupController {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
-        // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if(group == null)
-            throw new BadRequestException();
-        
         // check if an invite for user exists
         List<Notification> invites = entityManager.createNamedQuery("Notification.byUserAndGroup", Notification.class).setParameter("userId", user.getId()).setParameter("groupId", groupId).getResultList();
 
         if(invites.size() < 1)
-            throw new BadRequestException();
+            throw new ForbiddenException(-8);
+
+        // check if group still exists
+        Group group = entityManager.find(Group.class, groupId);
+        if(group == null || !group.isEnabled())
+            throw new BadRequestException(-15);
 
         for(Notification invite : invites){
             // Check if sender is an admin in group

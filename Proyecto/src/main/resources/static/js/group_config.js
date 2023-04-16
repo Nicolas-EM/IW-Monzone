@@ -51,7 +51,7 @@ function renderGroupMembers(group) {
 
     const membersTable = document.getElementById('membersTable');
 
-    go(`${config.rootUrl}/group/${groupId}/getGroupMembers`, "GET")
+    go(`${config.rootUrl}/group/${groupId}/getMembers`, "GET")
         .then(members => {
             membersTable.innerHTML = '';
             Array.from(members).forEach(member => {

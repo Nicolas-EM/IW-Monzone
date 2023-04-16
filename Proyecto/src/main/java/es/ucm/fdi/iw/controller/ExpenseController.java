@@ -51,6 +51,8 @@ import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
 import es.ucm.fdi.iw.model.User.Role;
 
+import es.ucm.fdi.iw.exception.*;
+
 /**
  * Group (and expenses) management.
  *
@@ -73,38 +75,10 @@ public class ExpenseController {
 
     private static final Logger log = LogManager.getLogger(AdminController.class);
 
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request") // 400
-    public static class BadRequestException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You don't belong to this group") // 403
-    public static class NoMemberException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not the moderator of this group") // 403
-    public static class NoModeratorException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The expense does not exist or has been removed") // 403
-    public static class ExpenseNotExistException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "The expense does not belong to this group") // 403
-    public static class ExpenseNotBelongException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You cannot leave a group if your balance is not 0.") // 403
-    public static class BalanceNotZero extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Error with DB") // 500
-    public static class NoTransactionException extends RuntimeException {
-    }
-
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Failed to save image") // 500
     public static class ImageSavingFailed extends RuntimeException {
     }
-
+    
     private void setExpenseAttributes(Group group, long expenseId, Model model, boolean newExpense) {
         List<Participates> participants = new ArrayList<>();
         if (!newExpense) {
@@ -140,13 +114,13 @@ public class ExpenseController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled())
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
 
         setExpenseAttributes(group, 0, model, true);
         model.addAttribute("group", group);
@@ -167,13 +141,13 @@ public class ExpenseController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null)
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
         }
 
         // get expenses
@@ -194,22 +168,22 @@ public class ExpenseController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled()))
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
 
         // check if expense exists
         Expense expense = entityManager.find(Expense.class, expenseId);
         if (expense == null || !expense.isEnabled())
-            throw new ExpenseNotExistException();
+            throw new ForbiddenException(-6);
 
         // check if expense belongs to the group
         if (!group.hasExpense(expense))
-            throw new ExpenseNotBelongException();
+            throw new ForbiddenException(-6);
 
         setExpenseAttributes(group, expenseId, model, false);
         model.addAttribute("expense", expense);
@@ -258,23 +232,23 @@ public class ExpenseController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled())
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
 
         // check if expense exists
         // If expense == null, its a new expense
         Expense exp = entityManager.find(Expense.class, expenseId);
         if (exp != null && !exp.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-6);
 
         // check if expense belongs to the group
         if (exp != null && !group.hasExpense(exp))
-            throw new BadRequestException();
+            throw new ForbiddenException(-6);
 
         File f = localData.getFile("expense", String.valueOf(expenseId));
         InputStream in = new BufferedInputStream(
@@ -310,32 +284,32 @@ public class ExpenseController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
         validated.group = group;
 
         // check if user belongs to the group
         MemberID requesterMemberId = new MemberID(group.getId(), user.getId());
         Member requesterMember = entityManager.find(Member.class, requesterMemberId);
         if (requesterMember == null || !requesterMember.isEnabled())
-            throw new NoMemberException(); // Requester not in group
+            throw new ForbiddenException(-1); // Requester not in group
 
         // check if user who paid exists
         User paidBy = entityManager.find(User.class, paidById);
         if (paidBy == null || !paidBy.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-7);
         validated.paidBy = paidBy;
 
         // check if user who paid belongs to the group
         MemberID paidByMemberId = new MemberID(groupId, paidById);
         Member paidByMember = entityManager.find(Member.class, paidByMemberId);
         if (paidByMember == null || !paidByMember.isEnabled())
-            throw new NoMemberException();
+            throw new ForbiddenException(-7);
         validated.paidByMember = paidByMember;
 
         // check if type exists
         Type type = entityManager.find(Type.class, typeId);
         if (type == null)
-            throw new BadRequestException();
+            throw new BadRequestException(-22);
         validated.type = type;
 
         // check date format
@@ -344,21 +318,21 @@ public class ExpenseController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             date = LocalDate.parse(dateString, formatter);
         } catch (Exception e) {
-            throw new BadRequestException();
+            throw new BadRequestException(-21);
         }
         validated.date = date;
 
         // check it has participants
         if (participateIds.isEmpty())
-            throw new BadRequestException();
+            throw new BadRequestException(-18);
 
         // check participants exist
         List<User> participateUsers = new ArrayList<>();
         for (String idString : participateIds) {
             long pId = Long.parseLong(idString);
             User pUser = entityManager.find(User.class, pId);
-            if (pUser == null)
-                throw new BadRequestException();
+            if (pUser == null || !pUser.isEnabled())
+                throw new ForbiddenException(-7);
             participateUsers.add(pUser);
         }
         validated.participateUsers = participateUsers;
@@ -369,14 +343,14 @@ public class ExpenseController {
             MemberID participateMemberId = new MemberID(groupId, u.getId());
             Member participateMember = entityManager.find(Member.class, participateMemberId);
             if (participateMember == null || !participateMember.isEnabled())
-                throw new BadRequestException();
+                throw new ForbiddenException(-7);
             participateMembers.add(participateMember);
         }
         validated.participateMembers = participateMembers;
 
         // check amount is not negative
         if (amount <= 0)
-            throw new BadRequestException();
+            throw new BadRequestException(-17);
 
         validated.valid = true;
         return validated;
@@ -409,9 +383,6 @@ public class ExpenseController {
     public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestParam("name") String name, @RequestParam("desc") String desc, @RequestParam("dateString") String dateString, @RequestParam("amount") float amount, @RequestParam("paidById") long paidById, @RequestParam("participateIds") List<String> participateIds, @RequestParam("typeId") long typeId, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
-
-        if (!params.valid)
-            throw new BadRequestException();
 
         /*
          * 
@@ -473,17 +444,14 @@ public class ExpenseController {
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
-        if (!params.valid)
-            throw new BadRequestException();
-
         // check if expense exists
         Expense exp = entityManager.find(Expense.class, expenseId);
         if (exp == null || !exp.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-6);
 
         // check if expense belongs to the group
         if (!params.group.hasExpense(exp))
-            throw new BadRequestException();
+            throw new ForbiddenException(-6);
 
         // delete debts of balances
         List<Participates> participants = exp.getBelong();
@@ -568,22 +536,22 @@ public class ExpenseController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // check if user belongs to the group
         MemberID mId = new MemberID(group.getId(), user.getId());
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled())
-            throw new NoMemberException();
+            throw new ForbiddenException(-1);
 
         // check if expense exists
         Expense exp = entityManager.find(Expense.class, expenseId);
         if (exp == null || !exp.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-6);
 
         // check if expense belongs to the group
         if (!group.hasExpense(exp))
-            throw new BadRequestException();
+            throw new ForbiddenException(-6);
 
         // List of users to notify
         List<User> notifyUsers = new ArrayList<>();
@@ -641,29 +609,29 @@ public class ExpenseController {
         // Check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if(group == null || !group.isEnabled())
-            throw new BadRequestException();
+            throw new ForbiddenException(-1);
 
         // Check if debtor exists
         User debtor = entityManager.find(User.class, debtorId);
-        if(debtor == null){
-            throw new BadRequestException();
+        if(debtor == null || !debtor.isEnabled()){
+            throw new ForbiddenException(-7);
         }
 
         // Check if debtor is member of group
         Member debtorM = entityManager.find(Member.class, new MemberID(groupId, debtorId));
         if (debtorM == null || !debtorM.isEnabled())
-            throw new NoMemberException(); // Requester not in group
+            throw new ForbiddenException(-7); // Requester not in group
 
         // Check if debtOwner exists
         User debtOwner = entityManager.find(User.class, debtOwnerId);
-        if(debtOwner == null){
-            throw new BadRequestException();
+        if(debtOwner == null || !debtOwner.isEnabled()){
+            throw new ForbiddenException(-7);
         }
 
         // Check if debtOwner is member of group
         Member debtOwnerM = entityManager.find(Member.class, new MemberID(groupId, debtOwnerId));
         if (debtOwnerM == null || !debtOwnerM.isEnabled())
-            throw new NoMemberException(); // Requester not in group
+            throw new ForbiddenException(-7); // Requester not in group
 
         Expense exp = new Expense("Reimbursement", debtor.getUsername() + " settled with " + debtOwner.getUsername(), amount, LocalDate.now(), entityManager.find(Type.class, Long.valueOf(8)), debtor);
         entityManager.persist(exp);
