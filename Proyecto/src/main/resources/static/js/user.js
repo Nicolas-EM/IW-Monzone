@@ -11,10 +11,8 @@ document.getElementById("btn-save").onclick = (e) => {
     formData.append('name', document.getElementById("name").value);
     formData.append('username', document.getElementById("username").value);
 
-    go(b.getAttribute('formaction'), 'POST', {}, formData)
+    go(b.getAttribute('formaction'), 'POST', formData, {})
         .then(d => {
-            console.log("name: ", formData.get("name"));
-            console.log("username: ", formData.get("username"));
             console.log("User: success", d);
             if (d.action === "redirect") {
                 console.log("Redirecting to ", d.redirect);

@@ -237,7 +237,10 @@ public class UserController {
 
     @GetMapping("/config")
     public String home(Model model, HttpSession session) {
+        
         User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
         model.addAttribute("user", user);
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
         model.addAttribute("types", types);
@@ -328,12 +331,12 @@ public class UserController {
     /**
      * Downloads a profile pic for a user id
      * 
-     * @param id
      * @return
      * @throws IOException
      */
     @GetMapping("/{id}/pic")
-    public StreamingResponseBody getPic(@PathVariable long id) throws IOException {
+    public StreamingResponseBody getPic(HttpSession session) throws IOException {
+        long id = ((User) session.getAttribute("u")).getId();
         File f = localData.getFile("user", "" + id);
         InputStream in = new BufferedInputStream(f.exists() ? new FileInputStream(f) : UserController.defaultPic());
         return os -> FileCopyUtils.copy(in, os);
@@ -459,8 +462,8 @@ public class UserController {
     @ResponseBody
     @Transactional
     @PostMapping("/ChangeDataUser")
-    public String postUserData(HttpSession session, Model model, @RequestParam("name") String name,  @RequestParam("username") String username, @RequestParam(value = "avatar", required = false) MultipartFile imageFile) {
-        
+    public String postUserData(HttpSession session, Model model, @RequestParam("name") String name,  @RequestParam("username") String username, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+
         User target = (User) session.getAttribute("u");
         target = entityManager.find(User.class, target.getId());
 
@@ -480,6 +483,8 @@ public class UserController {
             }
         }
 
+        session.setAttribute("u", target);
+
         return "{\"action\": \"none\"}";
     }
 
@@ -494,7 +499,7 @@ public class UserController {
         
         String oldPwd = jsonNode.get("oldPwd").asText();
         String newPwd = jsonNode.get("newPwd").asText();
-    
+
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
@@ -567,7 +572,7 @@ public class UserController {
      */
     @PostMapping("{id}/pic")
     @ResponseBody
-    public String setPic(@RequestParam("f_avatar") MultipartFile photo, @PathVariable long id,
+    public String setPic(@RequestParam("avatar") MultipartFile photo, @PathVariable long id,
             HttpServletResponse response, HttpSession session, Model model) throws IOException {
 
         User target = entityManager.find(User.class, id);
