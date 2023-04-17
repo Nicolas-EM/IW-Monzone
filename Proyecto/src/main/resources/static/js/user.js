@@ -11,10 +11,8 @@ document.getElementById("btn-save").onclick = (e) => {
     formData.append('name', document.getElementById("name").value);
     formData.append('username', document.getElementById("username").value);
 
-    go(b.getAttribute('formaction'), 'POST', {}, formData)
+    go(b.getAttribute('formaction'), 'POST', formData, {})
         .then(d => {
-            console.log("name: ", formData.get("name"));
-            console.log("username: ", formData.get("username"));
             console.log("User: success", d);
             if (d.action === "redirect") {
                 console.log("Redirecting to ", d.redirect);
@@ -45,5 +43,8 @@ document.getElementById("btn-savePassword").onclick = (e) => {
                 window.location.replace(d.redirect);
             }
         })
-        .catch(e => console.log("Error saving user password", e))
+        .catch(e => { 
+            console.log("Error saving user password", e);
+            alert(JSON.parse(e.text).message);
+        })
 };

@@ -566,12 +566,12 @@ public class GroupController {
 
                 return "{\"status\":\"invited\"}";
             } else {
-                return "{\"status\":\"duplicate_invitation\"}";
+                throw new BadRequestException(-23);
             }
         } else {
             // user is already in a group
             log.info("User {} cannot join group {}", member.getUser().getUsername(), group.getName());
-            return "{\"status\":\"already_in_group\"}";
+            throw new BadRequestException(-14);
         }
     }
 

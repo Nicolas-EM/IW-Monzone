@@ -11,16 +11,28 @@ let b = document.getElementById("confirmInviteBtn");
 if (b != null) {  // NO para /group/new
     b.onclick = (e) => {
         e.preventDefault();
+        const username = document.getElementById("inviteUsername").value;
         go(b.parentNode.action, 'POST', {
-            username: document.getElementById("inviteUsername").value
+            username
         })
-            .then(d => console.log("happy", d))
+            .then(d => {
+                console.log("happy", d);
+                createToastNotification(`invite-${groupId}-${username}`, `Invite sent to ${username}`);
+            })
             .catch(e => {
                 console.log("sad", e);
                 alert(JSON.parse(e.text).message);
             })
     }
 }
+
+let modal = document.getElementById('inviteModal');
+if (modal != null) { // NO para /group/new
+    modal.addEventListener('hidden.bs.modal', event => {
+        document.getElementById("inviteUsername").value = "";
+    })
+}
+  
 
 // Render current info group
 if (groupId) {
