@@ -190,5 +190,8 @@ function handleSettleExpenseClick(btn, e) {
         .then((d) => {
             console.log("Settle: success", d);
         })
-        .catch((e) => console.log("Error settling debt", e));
+        .catch(e => {
+            console.log("Error settling debt", e);
+            alert(JSON.parse(e.text).message);
+        })
 }

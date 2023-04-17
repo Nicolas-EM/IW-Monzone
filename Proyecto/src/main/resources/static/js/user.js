@@ -43,5 +43,8 @@ document.getElementById("btn-savePassword").onclick = (e) => {
                 window.location.replace(d.redirect);
             }
         })
-        .catch(e => console.log("Error saving user password", e))
+        .catch(e => { 
+            console.log("Error saving user password", e);
+            alert(JSON.parse(e.text).message);
+        })
 };
