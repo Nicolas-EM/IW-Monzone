@@ -53,6 +53,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.ArrayList;
 
+import es.ucm.fdi.iw.exception.*;
+
 /**
  * User management.
  *
@@ -72,23 +74,7 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-
  
-    
-    /**
-     * Exception to use when denying access to unauthorized users.
-     * 
-     * In general, admins are always authorized, but users cannot modify
-     * each other's profiles.
-     */
-    @ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "You're not an admin, and this is not your profile") // 403
-    public static class NotYourProfileException extends RuntimeException {
-    }
-
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request") // 400
-    public static class BadRequestException extends RuntimeException {
-    }
 
     /**
      * Encodes a password, so that it can be saved for future checking. Notice
@@ -158,12 +144,12 @@ public class UserController {
         try {
             formDate = LocalDate.parse(dateString + "-01");
         } catch (Exception e) {
-            throw new BadRequestException();
+            throw new BadRequestException(-21);
         }
 
         // check currency 
         if (currId < 0 || currId >= Group.Currency.values().length)
-        throw new BadRequestException();
+        throw new BadRequestException(-20);
         Group.Currency newCurr = Group.Currency.values()[currId];
 
         float total = 0f;
@@ -174,7 +160,7 @@ public class UserController {
             try {
                 eDate = LocalDate.parse(exp.getDate());
             } catch (Exception e) {
-                throw new BadRequestException();
+                throw new BadRequestException(-21);
             }
             
             if (eDate.getMonthValue() == formDate.getMonthValue() && eDate.getYear() == formDate.getYear())
@@ -213,7 +199,7 @@ public class UserController {
                 
         // check currency 
         if (currId < 0 || currId >= Group.Currency.values().length)
-        throw new BadRequestException();
+        throw new BadRequestException(-20);
         Group.Currency newCurr = Group.Currency.values()[currId];
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes",Type.class).getResultList();
@@ -354,11 +340,11 @@ public class UserController {
         // Check notification exists
         Notification notif = entityManager.find(Notification.class, notifId);
         if (notif == null)
-            throw new BadRequestException();
+            throw new ForbiddenException(-8);
 
         // Check notification belongs to user
         if (notif.getRecipient().getId() != userId)
-            throw new BadRequestException();
+            throw new ForbiddenException(-8);
 
         notif.setDateRead(LocalDateTime.now());
 
@@ -378,11 +364,11 @@ public class UserController {
         // Check notification exists
         Notification notif = entityManager.find(Notification.class, notifId);
         if (notif == null)
-            throw new BadRequestException();
+            throw new ForbiddenException(-8);
 
         // Check notification belongs to user
         if (notif.getRecipient().getId() != user.getId())
-            throw new BadRequestException();
+            throw new ForbiddenException(-8);
 
         // delete notification
         user.getNotifications().remove(notif);
@@ -498,13 +484,20 @@ public class UserController {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
-        if (newPwd != null && newPwd != oldPwd) {
-            if (!newPwd.equals(oldPwd)) { 
-                // Mostrar por pantalla algo que diga que no son iguales las contraseñas
-            } 
-            else{ // Comprobar que la contraseña actual del user es igual a oldPwd  if (passwordEncoder.matches(user.getPassword(), encodePassword(oldPwd)))
-                user.setPassword(encodePassword(newPwd)); // save encoded version of password
+        if (newPwd != null && oldPwd != null) {
+
+            if (passwordEncoder.matches(oldPwd, user.getPassword())) { // Comprobar que la contraseña actual del user es igual a oldPwd  
+                if(newPwd.equals(oldPwd)){ // Si la contraseña antigua y la nueva coinciden
+                    throw new BadRequestException(-19);
+                }
+                else{
+            user.setPassword(encodePassword(newPwd)); //save encoded version of password
+                }
             }
+            else{ // Old password incorrecta
+                throw new BadRequestException(-5);
+            }
+
         }    
        
         return "{\"action\": \"none\"}";
@@ -576,7 +569,7 @@ public class UserController {
         // check permissions
         User requester = (User) session.getAttribute("u");
         if (requester.getId() != target.getId() && !requester.hasRole(Role.ADMIN)) {
-            throw new NotYourProfileException();
+            // throw new NotYourProfileException();
         }
 
         log.info("Updating photo for user {}", id);
