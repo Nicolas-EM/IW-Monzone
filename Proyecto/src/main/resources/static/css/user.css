@@ -11,11 +11,18 @@
     margin-right: 2vh;
 }
 
+.separator2 {
+    padding-top: 3vh;
+}
+
+.separator3 {
+    margin-top: 3vh;
+}
+
 .groups {
-    max-height: 35vh;
+    max-height: 15vh;
     overflow-y: scroll;
     overflow-x: hidden;
-    border: 1px white solid;
 }
 
 #btn-save {
@@ -51,7 +58,6 @@
     text-align: center;
 }
 
-
 #date {
     margin-top: 2vh;
     margin-bottom: 3vh;
@@ -81,6 +87,8 @@
 
 .card {
     background-color: var(--bs-orange);
+    margin-top: 2%; 
+    margin-bottom: 2%; 
 }
 
 #indicator {

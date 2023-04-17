@@ -15,6 +15,12 @@
     border-radius: 12px;
 }
 
+.group-desc{
+    overflow: hidden; /* Oculta el texto que no cabe */
+    text-overflow: ellipsis; /* Agrega puntos suspensivos al final del texto truncado */
+    white-space: nowrap; /* Evita que el texto se desborde */
+}
+
 .colscroll{
     overflow-y: scroll;
 }

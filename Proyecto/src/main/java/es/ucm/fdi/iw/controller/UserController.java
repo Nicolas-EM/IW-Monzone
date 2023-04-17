@@ -229,7 +229,8 @@ public class UserController {
 
         List<Group> groups = new ArrayList<>();
         for (Member m : memberOf) {
-            groups.add(m.getGroup());
+            if (m.isEnabled())
+                groups.add(m.getGroup());
         }
         model.addAttribute("groups", groups);
 
