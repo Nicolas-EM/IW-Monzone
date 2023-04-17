@@ -24,6 +24,8 @@ public class ForbiddenException extends RuntimeException {
                 return "FORBIDDEN: User doesn't exist or doesn't belong to the group.";
             case -8:
                 return "FORBIDDEN: Group doesn't exist or you are not invited to it.";
+            case -9:
+                return "FORBIDDEN: Unabled to settle debt";
             default:
                 return "Unknown error";
         }

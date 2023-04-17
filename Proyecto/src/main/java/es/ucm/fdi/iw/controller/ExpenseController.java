@@ -36,8 +36,11 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import es.ucm.fdi.iw.DebtCalculator;
 import es.ucm.fdi.iw.LocalData;
 import es.ucm.fdi.iw.NotificationSender;
+import es.ucm.fdi.iw.model.Debt;
+import es.ucm.fdi.iw.model.DebtID;
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
@@ -69,6 +72,9 @@ public class ExpenseController {
 
     @Autowired
     private LocalData localData;
+
+    @Autowired
+    private DebtCalculator debtCalculator;
 
     @Autowired
     private NotificationSender notifSender;
@@ -106,7 +112,7 @@ public class ExpenseController {
      * View: create group expense
      */
     @GetMapping("/new")
-    public String newExpense(@PathVariable long groupId, Model model, HttpSession session) {
+    public String newExpenseView(@PathVariable long groupId, Model model, HttpSession session) {
 
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
@@ -380,7 +386,7 @@ public class ExpenseController {
     @PostMapping("/newExpense")
     @Transactional
     @ResponseBody
-    public String createExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestParam("name") String name, @RequestParam("desc") String desc, @RequestParam("dateString") String dateString, @RequestParam("amount") float amount, @RequestParam("paidById") long paidById, @RequestParam("participateIds") List<String> participateIds, @RequestParam("typeId") long typeId, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+    public String newExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestParam("name") String name, @RequestParam("desc") String desc, @RequestParam("dateString") String dateString, @RequestParam("amount") float amount, @RequestParam("paidById") long paidById, @RequestParam("participateIds") List<String> participateIds, @RequestParam("typeId") long typeId, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
@@ -425,6 +431,17 @@ public class ExpenseController {
             }
         }
 
+        // recalculate debts
+        List<Debt> oldDebts = params.group.getDebts();
+        for (Debt d : oldDebts) {
+            entityManager.remove(d);
+        }
+
+        List<Debt> newDebts = debtCalculator.calculateDebts(params.group.getMembers(), params.group);
+        for (Debt d : newDebts) {
+            entityManager.persist(d);
+        }
+
         // send notification ASYNC
         createAndSendNotifs(NotificationType.EXPENSE_CREATED, params.currUser, params.participateUsers, params.group, exp);
 
@@ -440,7 +457,7 @@ public class ExpenseController {
     @PostMapping("{expenseId}/updateExpense")
     @Transactional
     @ResponseBody
-    public String editExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session, @RequestParam("name") String name, @RequestParam("desc") String desc, @RequestParam("dateString") String dateString, @RequestParam("amount") float amount, @RequestParam("paidById") long paidById, @RequestParam("participateIds") List<String> participateIds, @RequestParam("typeId") long typeId, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+    public String updateExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session, @RequestParam("name") String name, @RequestParam("desc") String desc, @RequestParam("dateString") String dateString, @RequestParam("amount") float amount, @RequestParam("paidById") long paidById, @RequestParam("participateIds") List<String> participateIds, @RequestParam("typeId") long typeId, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
 
         PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
 
@@ -511,6 +528,17 @@ public class ExpenseController {
             MemberID memberID = new MemberID(params.group.getId(), u.getId());
             m = entityManager.find(Member.class, memberID);
             m.setBalance(m.getBalance() - amount / params.participateUsers.size());
+        }
+
+        // recalculate debts
+        List<Debt> oldDebts = params.group.getDebts();
+        for (Debt d : oldDebts) {
+            entityManager.remove(d);
+        }
+
+        List<Debt> newDebts = debtCalculator.calculateDebts(params.group.getMembers(), params.group);
+        for (Debt d : newDebts) {
+            entityManager.persist(d);
         }
 
         // create notification ASYNC
@@ -585,6 +613,17 @@ public class ExpenseController {
         // disable expense
         exp.setEnabled(false);
 
+        // recalculate debts
+        List<Debt> oldDebts = group.getDebts();
+        for (Debt d : oldDebts) {
+            entityManager.remove(d);
+        }
+
+        List<Debt> newDebts = debtCalculator.calculateDebts(group.getMembers(), group);
+        for (Debt d : newDebts) {
+            entityManager.persist(d);
+        }
+
         // create notification ASYNC
         createAndSendNotifs(NotificationType.EXPENSE_DELETED, user, notifyUsers, group, exp);
 
@@ -600,7 +639,7 @@ public class ExpenseController {
     @PostMapping("/settle")
     @Transactional
     @ResponseBody
-    public String settleExpense(HttpSession session, @PathVariable long groupId, @RequestBody JsonNode jsonNode) {
+    public String settleDebt(HttpSession session, @PathVariable long groupId, @RequestBody JsonNode jsonNode) {
         ObjectMapper objectMapper = new ObjectMapper();
         long debtorId = objectMapper.convertValue(jsonNode.get("debtorId"), Long.class);
         long debtOwnerId = objectMapper.convertValue(jsonNode.get("debtOwnerId"), Long.class);
@@ -611,33 +650,19 @@ public class ExpenseController {
         if(group == null || !group.isEnabled())
             throw new ForbiddenException(-1);
 
-        // Check if debtor exists
-        User debtor = entityManager.find(User.class, debtorId);
-        if(debtor == null || !debtor.isEnabled()){
-            throw new ForbiddenException(-7);
-        }
-
-        // Check if debtor is member of group
-        Member debtorM = entityManager.find(Member.class, new MemberID(groupId, debtorId));
-        if (debtorM == null || !debtorM.isEnabled())
-            throw new ForbiddenException(-7); // Requester not in group
-
-        // Check if debtOwner exists
-        User debtOwner = entityManager.find(User.class, debtOwnerId);
-        if(debtOwner == null || !debtOwner.isEnabled()){
-            throw new ForbiddenException(-7);
-        }
-
-        // Check if debtOwner is member of group
-        Member debtOwnerM = entityManager.find(Member.class, new MemberID(groupId, debtOwnerId));
-        if (debtOwnerM == null || !debtOwnerM.isEnabled())
-            throw new ForbiddenException(-7); // Requester not in group
+        // Check if debt exists
+        Debt debt = entityManager.find(Debt.class, new DebtID(groupId, debtorId, debtOwnerId));
+        if (debt == null)
+            throw new ForbiddenException(-9);
+        User debtor = debt.getDebtor();
+        User debtOwner = debt.getDebtOwner();
 
         Expense exp = new Expense("Reimbursement", debtor.getUsername() + " settled with " + debtOwner.getUsername(), amount, LocalDate.now(), entityManager.find(Type.class, Long.valueOf(8)), debtor);
         entityManager.persist(exp);
         entityManager.flush();
 
         // Remove debt from debtor
+        Member debtorM = entityManager.find(Member.class, new MemberID(groupId, debtor.getId()));
         debtorM.setBalance(debtorM.getBalance() + amount);
 
         // Add participates to debtOwner
@@ -646,6 +671,7 @@ public class ExpenseController {
         entityManager.persist(participates);
 
         // Remove balance from debtOwner
+        Member debtOwnerM = entityManager.find(Member.class, new MemberID(groupId, debtOwner.getId()));
         debtOwnerM.setBalance(debtOwnerM.getBalance() - amount);
 
         // send notification ASYNC

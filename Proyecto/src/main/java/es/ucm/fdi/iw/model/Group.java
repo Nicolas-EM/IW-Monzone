@@ -63,6 +63,9 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
     @OneToMany(mappedBy = "group")
     private List<Participates> owns = new ArrayList<>();
 
+    @OneToMany(mappedBy = "group")
+    private List<Debt> debts = new ArrayList<>();
+
     public Group(String name, String desc, Currency currency){
         this.enabled = true;
         this.name = name;

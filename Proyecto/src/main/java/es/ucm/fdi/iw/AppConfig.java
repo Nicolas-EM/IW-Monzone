@@ -51,4 +51,9 @@ public class AppConfig {
 	public NotificationSender getNotifSender() {
 		return new NotificationSender();
 	}
+
+	@Bean(name="debtCalculator")
+	public DebtCalculator getDebtCalculator() {
+		return new DebtCalculator();
+	}
 }

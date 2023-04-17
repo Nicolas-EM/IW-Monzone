@@ -52,6 +52,8 @@ public class BadRequestException extends RuntimeException {
                 return "Invalid format date. Please choose from the calendar.";
             case -22:
                 return "Invalid data. Type must be one of the available.";
+            case -23:
+                return "Invalid user. User already invited.";
             default:
                 return "Unknown error.";
         }

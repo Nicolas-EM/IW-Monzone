@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import es.ucm.fdi.iw.model.Debt;
 import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
@@ -35,9 +36,8 @@ import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Group.Currency;
 import es.ucm.fdi.iw.model.Member.GroupRole;
+import es.ucm.fdi.iw.DebtCalculator;
 import es.ucm.fdi.iw.NotificationSender;
-import es.ucm.fdi.iw.model.DebtCalculator;
-import es.ucm.fdi.iw.model.DebtCalculator.Debt;
 import es.ucm.fdi.iw.model.Transferable;
 
 import es.ucm.fdi.iw.exception.*;
@@ -71,7 +71,7 @@ public class GroupController {
      * View: new group
      */
     @GetMapping("/new")
-    public String newGroup(HttpSession session, Model model) {
+    public String newGroupView(HttpSession session, Model model) {
 
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
@@ -234,8 +234,7 @@ public class GroupController {
         }
 
         // get debts
-        DebtCalculator dc = new DebtCalculator(group.getMembers());
-        List<DebtCalculator.Debt> debts = dc.calculateDebts();
+        List<Debt> debts = group.getDebts();
         
         return debts.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
