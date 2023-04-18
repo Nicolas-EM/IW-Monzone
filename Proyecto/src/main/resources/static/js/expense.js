@@ -90,3 +90,11 @@ function onChangeAmount(amount) {
     }
   }
 }
+
+// PARA QUE LA FECHA DE UN EXPENSE NO SEA SUPERIOR A LA ACTUAL
+// Obtiene el elemento input de fecha
+const fechaInput = document.getElementById('dateString');
+// Obtiene la fecha actual en formato ISO (YYYY-MM-DD)
+const fechaActual = new Date().toISOString().split('T')[0];
+// Establece la fecha máxima en el input de fecha
+fechaInput.max = fechaActual;
