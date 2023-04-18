@@ -38,7 +38,7 @@
             </div>
           </div>
         </form>
-        <input id="avatar" type="file" class="file" accept="image/*">
+        
         <!-- Password -->
         <form method="post">
           <div class="col-12">
@@ -73,7 +73,7 @@
         </div>
         <!-- Monthly Expenses -->
         <div class="row">
-          <h4>Monthly Expenses</h4>
+          <h4 class="separator2">Monthly Expenses</h4>
           <div class="col-6">
             <input id="date" type="month" name="dateString" class="rounded-corners w-100" value="2023-03">
           </div>
@@ -86,7 +86,6 @@
             </select>
           </div>
           <div class="col-3">
-            <!--esto tiene que ser el resultado de la query que te da lo que se ha gastado en todo ese mes-->
             <label id="total-exp" class="rounded-corners align-items-center w-100 bg-white"> </label>
           </div>
         </div>
@@ -94,10 +93,10 @@
         <form method="post" th:action="@{/group/{groupId}/{action}(groupId=${groupId}, action=${expense != null} ? ${expense?.getId()} : 'new')}">
         <div class="row">
           <div class="col-8">
-            <h4>How much do you spend in each category?</h4>
+            <h4 class="separator2">How much do you spend in each category?</h4>
           </div>
           <div class="col-4">
-            <select id="currType" class="form-select rounded-corners" required name="currId">
+            <select id="currType" class="form-select rounded-corners separator3" required name="currId">
               <option th:unless="${group != null}" selected disabled hidden value="">Currency</option>
               <div th:each="curr,i : ${currencies}">
                 <option id="curValue2"  th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
@@ -118,7 +117,7 @@
       </form>
         <!-- Groups -->
         <div class="row">
-          <h4>Your Groups</h4>
+          <h4 class="separator2">Your Groups</h4>
         </div>
         <div class="groups p-2">
           <div th:each="member: ${memberOf}">
@@ -147,6 +146,8 @@
       </div>
     </div>
   </main>
+
+  <input id="avatar" type="file" class="file" accept="image/*">
     
   <th:block th:replace="fragments/footer.html :: footer" />
   <!--Ajax para cambio de campos-->

@@ -1,15 +1,4 @@
-// cómo pintar 1 notificacion (devuelve html que se puede insertar en un div)
-function renderNotif(notif) {
-    console.log("rendering: ", notif);
-
-    let action = `/user/${notif.id}/read`;
-    let button = `<button onclick="markNotifRead(event, this, ${notif.id})" type="submit">Mark Read</button>`;
-
-    if(notif.type == "GROUP_INVITATION"){
-        action = `/group/${notif.idGroup}/acceptInvite`;
-        button = `<button onclick="acceptInvite(event, this, ${notif.id})">Accept</button>`;
-    }
-
+function renderReadNotif(notif) {
     return `<div id="notif-${notif.id}" class="row my-2">
                 <div class="card text-white" role="button">
                     <div class="card-body">
@@ -17,11 +6,50 @@ function renderNotif(notif) {
                             <h5>${notif.message}</h5>
                         </div>
                         <div class="row mt-2">
-                            <form class="col" method="post" action="${action}">
-                                ${button}
+                            <div class="col invisible">
+                            </div>
+                            <form class="col" method="post" action="/user/${notif.id}/delete">
+                                <button class="btn btn-delete btn-primary rounded-pill fw-bold" onclick="deleteNotif(event, this, ${notif.id})">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>`
+}
+
+function renderUnreadNotif(notif) {
+    return `<div id="notif-${notif.id}" class="row my-2">
+                <div class="card text-white" role="button">
+                    <div class="card-body">
+                        <div class="row">
+                            <h5>${notif.message}</h5>
+                        </div>
+                        <div class="row mt-2">
+                            <form id="notifReadBtn-${notif.id}" class="col" method="post" action="/user/${notif.id}/read">
+                                <button class="btn btn-func btn-primary rounded-pill fw-bold" onclick="markNotifRead(event, this, ${notif.id})" type="submit">Mark Read</button>
                             </form>
                             <form class="col" method="post" action="/user/${notif.id}/delete">
-                                <button onclick="deleteNotif(event, this, ${notif.id})">Delete</button>
+                                <button class="btn btn-delete btn-primary rounded-pill fw-bold" onclick="deleteNotif(event, this, ${notif.id})">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>`
+}
+
+function renderInvitation(notif) {
+    return `<div id="notif-${notif.id}" class="row my-2">
+                <div class="card text-white" role="button">
+                    <div class="card-body">
+                        <div class="row">
+                            <h5>${notif.message}</h5>
+                        </div>
+                        <div class="row mt-2">
+                            <form id="notifReadBtn-${notif.id}" class="col" method="post" action="/group/${notif.idGroup}/acceptInvite">
+                            <button class="btn btn-func btn-primary rounded-pill fw-bold" onclick="acceptInvite(event, this, ${notif.id})">Accept</button>
+                            </form>
+                            <form class="col" method="post" action="/user/${notif.id}/delete">
+                                <button class="btn btn-delete btn-primary rounded-pill fw-bold" onclick="deleteNotif(event, this, ${notif.id})">Delete</button>
                             </form>
                         </div>
                     </div>
@@ -37,9 +65,14 @@ go(config.rootUrl + "/user/receivedNotifs", "GET")
 
     notifs.forEach(notif => {
         if(notif.type == "GROUP_INVITATION"){
-            actionNotifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
+            actionNotifsDiv.insertAdjacentHTML("beforeend", renderInvitation(notif));
         } else {
-            notifsDiv.insertAdjacentHTML("beforeend", renderNotif(notif));
+            if(notif.dateRead === ""){
+                notifsDiv.insertAdjacentHTML("beforeend", renderUnreadNotif(notif));
+            }
+            else {
+                notifsDiv.insertAdjacentHTML("beforeend", renderReadNotif(notif));
+            }
         }
     })
     }
@@ -63,10 +96,10 @@ if (ws.receive) {
             let notifsDiv = document.getElementById("notifs-tab-pane");
 
             if(notif.type == 'GROUP_INVITATION'){
-                actionNotifsDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));
+                actionNotifsDiv.insertAdjacentHTML("afterbegin", renderInvitation(notif));
             }
             else {
-                notifsDiv.insertAdjacentHTML("afterbegin", renderNotif(notif));
+                notifsDiv.insertAdjacentHTML("afterbegin", renderUnreadNotif(notif));
             }
 
             createToastNotification(notif.id, notif.message);
@@ -91,6 +124,8 @@ function markNotifRead(event, btn, notifId) {
     event.preventDefault();
     go(btn.parentNode.action, 'POST', {})
     .then(d => {
+        document.getElementById(`notifReadBtn-${notifId}`).classList.add('invisible');
+
         let p = document.querySelector("#nav-unread");
         if (p) {
             p.textContent = +p.textContent - 1;

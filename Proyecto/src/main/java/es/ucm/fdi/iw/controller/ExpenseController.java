@@ -661,6 +661,9 @@ public class ExpenseController {
         entityManager.persist(exp);
         entityManager.flush();
 
+        // Delete debt from group
+        entityManager.remove(debt);
+
         // Remove debt from debtor
         Member debtorM = entityManager.find(Member.class, new MemberID(groupId, debtor.getId()));
         debtorM.setBalance(debtorM.getBalance() + amount);

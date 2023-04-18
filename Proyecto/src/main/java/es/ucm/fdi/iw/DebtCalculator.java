@@ -9,10 +9,8 @@ import es.ucm.fdi.iw.model.Debt;
 import es.ucm.fdi.iw.model.DebtID;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
-import es.ucm.fdi.iw.model.Transferable;
 import es.ucm.fdi.iw.model.User;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 
 /*
  * Calculates debts given the members of a group

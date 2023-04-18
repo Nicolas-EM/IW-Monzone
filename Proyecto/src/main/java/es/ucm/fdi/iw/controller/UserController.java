@@ -15,26 +15,21 @@ import es.ucm.fdi.iw.model.Transferable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletResponse;
@@ -45,12 +40,11 @@ import java.io.*;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.ArrayList;
 
 import es.ucm.fdi.iw.exception.*;
@@ -164,7 +158,7 @@ public class UserController {
             }
             
             if (eDate.getMonthValue() == formDate.getMonthValue() && eDate.getYear() == formDate.getYear())
-                total += changeCurrency(exp.getAmount(), p.getGroup().getCurrency(), newCurr);
+                total += changeCurrency(exp.getAmount() / exp.getBelong().size(), p.getGroup().getCurrency(), newCurr);
         }
         float totalRounded = (float) Math.round(total * 100) / 100;
         return totalRounded;
@@ -193,7 +187,7 @@ public class UserController {
      */
     @ResponseBody
     @GetMapping("/getByType/{currId}")
-        public float [] getByType(Model model, HttpSession session, @PathVariable int currId) {
+        public List<Float> getByType(Model model, HttpSession session, @PathVariable int currId) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
                 
@@ -203,20 +197,19 @@ public class UserController {
         Group.Currency newCurr = Group.Currency.values()[currId];
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes",Type.class).getResultList();
-        float[] totals = new float[types.size()];
+        List<Float> totals = new ArrayList<>(types.size());
         
-        // Inicializar los valores de las catergorías a 0
-        for (int i = 0; i < totals.length; i++)
-            totals[i] = 0.0f;
+        Collections.fill(totals, 0.0f);
 
         List<Participates> participates = user.getExpenses();
         for (Participates p : participates) {
             Expense e = p.getExpense();
-            totals[(int)e.getType().getId()] += changeCurrency(e.getAmount(), p.getGroup().getCurrency(), newCurr);
+            int index = (int)e.getType().getId();
+            totals.set(index, totals.get(index) + changeCurrency(e.getAmount() / e.getBelong().size(), p.getGroup().getCurrency(), newCurr));
         }
 
-        for (int i = 0; i < totals.length; i++)
-            totals[i] = (float) Math.round(totals[i] * 100) / 100;
+        for (int i = 0; i < totals.size(); i++)
+            totals.set(i, (float) Math.round(totals.get(i) * 100) / 100);
 
         return totals;
     }
@@ -236,7 +229,7 @@ public class UserController {
 
         List<Group> groups = new ArrayList<>();
         for (Member m : memberOf) {
-            if(m.getGroup().isEnabled())
+            if (m.isEnabled())
                 groups.add(m.getGroup());
         }
         model.addAttribute("groups", groups);

@@ -46,6 +46,7 @@ if (ws.receive) {
 
 // Render single expense
 function renderExpense(expense) {
+    const truncatedAmount = Number(expense.amount).toFixed(2);
     return `<div id="expense-${expense.expenseId}" class="col">
                 <div class="card border-light text-white mb-3 mx-auto" role="button" onclick="location.href='/group/${groupId}/${expense.expenseId}'">
                     <div class="row row-cols-2 row-cols-md-4 g-0">
@@ -68,7 +69,7 @@ function renderExpense(expense) {
                         </div>
                         <!-- Amount -->
                         <div class="col-md-3 d-flex align-items-center justify-content-center expense-amount">
-                            <div class="card-text">${expense.amount} ${currencyString}</div>
+                            <div class="card-text">${truncatedAmount} ${currencyString}</div>
                         </div>
                     </div>
                 </div>
@@ -102,18 +103,19 @@ function renderAllDebts() {
 
 // Render single debt
 function renderDebt(debt) {
+    const truncatedAmount = Number(debt.amount).toFixed(2);
     return `<div class="row">
                 <div class="col">
                     <form method="post" action="/group/${groupId}/settle">
                         <input type="hidden" name="_csrf" value="${config.csrf.value}">
-                        <input type="hidden" name="debtorId" value="${debt.debtorId}">
-                        <input type="hidden" name="debtOwnerId" value="${debt.debtOwnerId}">
+                        <input type="hidden" name="debtorId" value="${debt.idDebtor}">
+                        <input type="hidden" name="debtOwnerId" value="${debt.idDebtOwner}">
                         <input type="hidden" name="amount" value="${debt.amount}">
                         <button type="button" class="btn-settle">Mark as paid</button>
                     </form>
                 </div>
                 <div class="col">
-                    <label>${debt.debtorName} owes ${debt.debtOwnerName} ${debt.amount} ${currencyString}</label>
+                    <label>${debt.debtorName} owes ${debt.debtOwnerName} ${truncatedAmount} ${currencyString}</label>
                 </div>
             </div>`
 }
@@ -141,23 +143,24 @@ function renderAllBalances() {
 }
 
 function renderMemberBalance(member) {
-    if (member.balance < 0) {
+    const truncatedAmount = Number(member.balance).toFixed(2);
+    if (truncatedAmount < 0) {
         return `<div class="row">
                     <div class="col text-center">
-                        <h5 class="back_balance_neg">${member.balance}${currencyString}</h5>
+                        <h5 class="back_balance_neg">${truncatedAmount}${currencyString}</h5>
                     </div>   
                     <div class="col text-center">
                         <h5>${member.username}</h5>
                     </div>                             
                 </div>`;
     }
-    else if (member.balance > 0) {
+    else if (truncatedAmount > 0) {
         return `<div class="row">
                     <div class="col text-center">
                         <h5>${member.username}</h5>
                     </div>
                     <div class="col text-center">
-                        <h5 class="back_balance_pos">${member.balance}${currencyString}</h5>
+                        <h5 class="back_balance_pos">${truncatedAmount}${currencyString}</h5>
                     </div>                                
                 </div>`;
     }
@@ -167,7 +170,7 @@ function renderMemberBalance(member) {
                         <h5>${member.username}</h5>
                     </div>
                     <div class="col text-center">
-                        <h5>${member.balance}${currencyString}</h5>
+                        <h5>0.00 ${currencyString}</h5>
                     </div>                                
                 </div>`;
     }
