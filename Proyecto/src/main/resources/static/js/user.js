@@ -10,7 +10,7 @@ document.getElementById("btn-save").onclick = (e) => {
     }
     formData.append('name', document.getElementById("name").value);
     formData.append('username', document.getElementById("username").value);
-
+    console.log(formData.get("username"))
     go(b.getAttribute('formaction'), 'POST', formData, {})
         .then(d => {
             console.log("User: success", d);
@@ -19,7 +19,10 @@ document.getElementById("btn-save").onclick = (e) => {
                 window.location.replace(d.redirect);
             }
         })
-        .catch(e => console.log("Error saving user", e))
+        .catch(e => { 
+            console.log("Error saving user", e);
+            alert(JSON.parse(e.text).message);
+        })
 };
 
 // Submit Button (SAVE PASSWORD)

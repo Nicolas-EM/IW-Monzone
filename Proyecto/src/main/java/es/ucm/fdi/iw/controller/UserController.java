@@ -446,6 +446,13 @@ public class UserController {
         User target = (User) session.getAttribute("u");
         target = entityManager.find(User.class, target.getId());
 
+        if(name == null){ // No name
+            throw new BadRequestException(-6);
+        }
+        else if(username == null){ // No username
+            throw new BadRequestException(-13);
+        }
+
         target.setUsername(username);
         target.setName(name);
 
