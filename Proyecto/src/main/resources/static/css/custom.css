@@ -67,9 +67,35 @@ img.preview {
 }
 
 #notifsTabContent .card {
-    background-color: var(--bs-orange);
+    background-color: #2A2E34;
 }
 
-#notifsTabContent .card.disabled {
-    background-color: var(--bs-grey);
+/* Nav customization end */
+
+
+/* All buttons */
+
+.btn-func {
+    border-style: none;
+    outline: none;
+    min-height: 10%;
+    background-color: #d19900;
+    float: left;
+    margin-left: 15px;
+}
+
+.btn-func:hover {
+    background-color: #b68500;
+}
+
+.btn-delete {
+    border-style: none;
+    outline: none;
+    min-height: 10%;
+    background-color: #610000;
+    margin-left: 40%;
+}
+
+.btn-delete:hover {
+    background-color: #460101;
 }

@@ -23,31 +23,6 @@
     color: black;
 }
 
-.btn-func {
-    border-style: none;
-    outline: none;
-    height: 10%;
-    background-color: #d19900;
-    float: left;
-    margin-left: 15px;
-}
-
-.btn-func:hover {
-    background-color: #b68500;
-}
-
-.btn-delete {
-    border-style: none;
-    outline: none;
-    height: 10%;
-    background-color: #610000;
-    margin-left: 40%;
-}
-
-.btn-delete:hover {
-    background-color: #460101;
-}
-
 /* Remove arrows from budget selector */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
