@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  * A group of shared expenses
  */
@@ -26,8 +23,6 @@ import org.apache.logging.log4j.Logger;
 })
 @Table(name = "IWGroup")
 public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
-    
-    private static final Logger log = LogManager.getLogger(Group.class);
 
     public enum Currency {
         EUR,

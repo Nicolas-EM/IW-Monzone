@@ -36,7 +36,6 @@ import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Group.Currency;
 import es.ucm.fdi.iw.model.Member.GroupRole;
-import es.ucm.fdi.iw.DebtCalculator;
 import es.ucm.fdi.iw.NotificationSender;
 import es.ucm.fdi.iw.model.Transferable;
 

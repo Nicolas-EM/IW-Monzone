@@ -6,6 +6,10 @@
     background-color: var(--bs-orange);
 }
 
+.row {
+    max-width: 100%;
+}
+
 .card-text-row {
     text-align: center !important;
 }
@@ -46,7 +50,7 @@
 }
 
 .colscroll{
-    height: 300px;
+    max-height: 35vh;
 }
 
 #description{
