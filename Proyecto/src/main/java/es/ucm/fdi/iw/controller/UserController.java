@@ -236,7 +236,8 @@ public class UserController {
 
         List<Group> groups = new ArrayList<>();
         for (Member m : memberOf) {
-            groups.add(m.getGroup());
+            if(m.getGroup().isEnabled())
+                groups.add(m.getGroup());
         }
         model.addAttribute("groups", groups);
 
@@ -295,8 +296,7 @@ public class UserController {
 
         List<Long> groupIds = new ArrayList<>();
         for (Member m : u.getMemberOf()) {
-            if (m.isEnabled())
-                groupIds.add(m.getGroup().getId());
+            groupIds.add(m.getGroup().getId());
         }
 
         log.info("Generating group list for user {} ({} groups)", u.getUsername(), groupIds.size());
