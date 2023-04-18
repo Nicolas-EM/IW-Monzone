@@ -259,3 +259,16 @@ if (ws.receive) {
         }
     }
 }
+
+document.getElementById('budget').addEventListener('input', function() {
+    const value = this.value.replace(/[^\d.]/g, ''); // remove any non-digit or non-decimal point characters
+    const decimalIndex = value.indexOf('.');
+    if (decimalIndex !== -1) {
+      const decimalPlaces = value.length - decimalIndex - 1;
+      if (decimalPlaces > 2) {
+        this.value = value.substring(0, decimalIndex + 3); // truncate to 2 decimal places
+        return;
+      }
+    }
+    this.value = value;
+  });
