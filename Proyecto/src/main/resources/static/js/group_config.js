@@ -100,6 +100,7 @@ function renderGroupMembers(group) {
 }
 
 function renderMember(member, group) {
+    const truncatedAmount = Number(member.balance).toFixed(2);
     let memberHTML = `<div class="row p-2 member">`;
     if (isGroupAdmin === 'true') {
         memberHTML = `${memberHTML}
@@ -123,10 +124,10 @@ function renderMember(member, group) {
                     Budget: ${member.budget}
                 </div>
                 <div id="indicator">
-                    <span class="dot" style="${member.balance} >= 0 ? 'background: green' : 'background: red'"></span>
+                    <span class="dot" style="${truncatedAmount} >= 0 ? 'background: green' : 'background: red'"></span>
                 </div>
                 <div class="balance col d-flex align-items-center">
-                    ${member.balance} ${group.currencyString}
+                    ${truncatedAmount} ${group.currencyString}
                 </div>
             </div>`;
     return memberHTML;
