@@ -4,7 +4,7 @@ document.getElementById("currMonth").addEventListener('change', function () {
     const totalTextMonth = document.getElementById('total-exp');
     const dateString = document.getElementById("date").value;
     const currId = parseInt(document.getElementById("currMonth").value);
-    
+
     // Cambiar el tipo de moneda según la seleccionada
     let currencyString = "";
     currencyString = getCurrencyString(currId, currencyString);
@@ -22,7 +22,7 @@ document.getElementById("date").addEventListener('change', function () {
     const totalTextMonth = document.getElementById('total-exp');
     const dateString = document.getElementById("date").value;
     const currId = parseInt(document.getElementById("currMonth").value);
-    
+
     // Cambiar el tipo de moneda según la seleccionada
     let currencyString = "";
     currencyString = getCurrencyString(currId, currencyString);
@@ -53,8 +53,10 @@ document.getElementById("currType").addEventListener('change', function () {
         currId: document.getElementById("currType").value
     })
         .then(totals => {
-            for (let i = 0; i < amounts.length; i++) {
-                amounts[i].innerHTML = totals[i] + currencyString;;
+
+            for (const [clave, valor] of Object.entries(totals)) {
+                document.getElementById("type-" + clave.toString()).innerHTML = valor.toString() + currencyString;
+                console.log(`La clave ${clave} tiene el valor ${valor}`);
             }
         });
 });
@@ -62,21 +64,21 @@ document.getElementById("currType").addEventListener('change', function () {
 // Cargar imagen de perfil
 window.addEventListener("load", (event) => {
     console.log("page is fully loaded");
-  
+
     document.getElementById('img-profile').addEventListener('click', function () {
-      document.getElementById('avatar').click();
+        document.getElementById('avatar').click();
     });
-  
+
     document.getElementById('avatar').addEventListener("change", function (e) {
-      console.log("change detected");
-  
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        // get loaded data and render thumbnail.
-        document.getElementById("img-profile").src = e.target.result;
-      };
-      // read the image file as a data URL.
-      reader.readAsDataURL(this.files[0]);
+        console.log("change detected");
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            // get loaded data and render thumbnail.
+            document.getElementById("img-profile").src = e.target.result;
+        };
+        // read the image file as a data URL.
+        reader.readAsDataURL(this.files[0]);
     });
 });
 
@@ -92,7 +94,7 @@ function getCurrencyString(valueSelected, currencyString) {
             currencyString = "£";
             break;
         default:
-            currencyString = "nada";
+            currencyString = " ";
             break;
     }
     return currencyString;

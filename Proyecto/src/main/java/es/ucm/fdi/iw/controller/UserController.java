@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import es.ucm.fdi.iw.exception.*;
 
@@ -187,7 +189,7 @@ public class UserController {
      */
     @ResponseBody
     @GetMapping("/getByType/{currId}")
-        public List<Float> getByType(Model model, HttpSession session, @PathVariable int currId) {
+        public Map<Long, Float> getByType(Model model, HttpSession session, @PathVariable int currId) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
                 
@@ -197,21 +199,24 @@ public class UserController {
         Group.Currency newCurr = Group.Currency.values()[currId];
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes",Type.class).getResultList();
-        List<Float> totals = new ArrayList<>(types.size());
-        
-        Collections.fill(totals, 0.0f);
 
+        Map<Long, Float> dictionary = new HashMap<>();
+        for (Type type : types) {
+            dictionary.put(type.getId(), 0.0f);
+        }
+    
         List<Participates> participates = user.getExpenses();
         for (Participates p : participates) {
             Expense e = p.getExpense();
-            int index = (int)e.getType().getId();
-            totals.set(index, totals.get(index) + changeCurrency(e.getAmount() / e.getBelong().size(), p.getGroup().getCurrency(), newCurr));
+            Type type = e.getType();
+            float amount = changeCurrency(e.getAmount() / e.getBelong().size(), p.getGroup().getCurrency(), newCurr);
+            dictionary.put(type.getId(), dictionary.get(type.getId()) + amount);
         }
 
-        for (int i = 0; i < totals.size(); i++)
-            totals.set(i, (float) Math.round(totals.get(i) * 100) / 100);
+        for (Type type : types)
+            dictionary.put(type.getId(), (float) Math.round(dictionary.get(type.getId()) * 100) / 100);
 
-        return totals;
+        return dictionary;
     }
 
     @GetMapping("/config")
@@ -221,6 +226,7 @@ public class UserController {
         user = entityManager.find(User.class, user.getId());
 
         model.addAttribute("user", user);
+
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
         model.addAttribute("types", types);
 
