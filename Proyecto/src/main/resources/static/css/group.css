@@ -78,3 +78,7 @@
     color: white;
     background-color: var(--bs-orange);
 }
+
+h7 {
+    word-wrap: break-word;
+  }

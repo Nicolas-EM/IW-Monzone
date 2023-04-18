@@ -289,8 +289,7 @@ public class UserController {
 
         List<Long> groupIds = new ArrayList<>();
         for (Member m : u.getMemberOf()) {
-            if (m.isEnabled())
-                groupIds.add(m.getGroup().getId());
+            groupIds.add(m.getGroup().getId());
         }
 
         log.info("Generating group list for user {} ({} groups)", u.getUsername(), groupIds.size());
