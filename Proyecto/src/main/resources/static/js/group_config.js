@@ -186,7 +186,7 @@ if (document.getElementById("btn-delete") != null) {
 }
 
 // Submit Button (LEAVE GROUP)
-if (document.getElementById("btn-delete") != null) {
+if (document.getElementById("btn-leave") != null) {
     document.getElementById("btn-leave").onclick = (e) => {
         e.preventDefault();
         console.log('Leaving group');

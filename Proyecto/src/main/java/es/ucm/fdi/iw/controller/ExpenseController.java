@@ -380,6 +380,34 @@ public class ExpenseController {
         return CompletableFuture.completedFuture(null);
     }
 
+    @Async
+    private CompletableFuture<Void> checkBudgetsAndSendNotifs(List<Member> participateMembers) {
+        for(Member m : participateMembers) {
+            if(m.getBudget() > 0){
+                Float percentage = -1 * m.getBalance() / m.getBudget();
+                if(percentage >= 0.5f){
+                    log.info("User {} has used {} of their budget", m.getUser().getUsername(), percentage);
+                    String percentageString = "50%";
+                    if (percentage >= 0.75f) {
+                        percentageString =  "75%";
+                    } else if (percentage >= 1f) {
+                        percentageString =  "100%";
+                    }
+
+                    Notification notif = new Notification(NotificationType.BUDGET_WARNING, m.getUser(), m.getGroup(), percentageString);
+                    entityManager.persist(notif);
+                    entityManager.flush();
+                    
+                    // Send notification
+                    notifSender.sendNotification(notif, "/user/" + m.getUser().getUsername() + "/queue/notifications");
+                }
+                log.info("User {} has not used more than 50% of their budget - {}", m.getUser().getUsername(), percentage);
+            }
+        }
+
+        return CompletableFuture.completedFuture(null);
+    }
+
     /*
      * Add expense to group
      */
@@ -444,6 +472,9 @@ public class ExpenseController {
 
         // send notification ASYNC
         createAndSendNotifs(NotificationType.EXPENSE_CREATED, params.currUser, params.participateUsers, params.group, exp);
+
+        // check if budget exceeded
+        checkBudgetsAndSendNotifs(params.participateMembers);
 
         // send expense to group ASYNC
         notifSender.sendTransfer(exp, "/topic/group/" + params.group.getId(), "EXPENSE", NotificationType.EXPENSE_CREATED);

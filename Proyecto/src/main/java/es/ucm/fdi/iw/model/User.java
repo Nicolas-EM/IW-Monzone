@@ -60,9 +60,6 @@ public class User implements Transferable<User.Transfer> {
     @OneToMany(mappedBy = "recipient")
     private List<Notification> notifications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "sender")
-    private List<Notification> sentNotifications = new ArrayList<>();
-
     @OneToMany(mappedBy = "user")
     private List<Participates> expenses = new ArrayList<>();
 

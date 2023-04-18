@@ -80,6 +80,16 @@ public class Notification implements Transferable<Notification.Transfer>  {
         messageBuilder();
     }
 
+    // Budget notification
+    public Notification(NotificationType type, User recipient, Group group, String percentage) {
+        this.type = type;
+        this.dateSent = LocalDateTime.now();
+        this.recipient = recipient;
+        this.group = group;
+
+        messageBuilder(percentage);
+    }
+
     // Expense notifications
     public Notification(NotificationType type, User sender, User recipient, Group group, Expense e){
         this.type = type;
@@ -114,6 +124,19 @@ public class Notification implements Transferable<Notification.Transfer>  {
             default: {}                
         }
 
+        sb.append(this.group.getName());
+        sb.append("\"");
+
+        this.message = sb.toString();
+    }
+
+    // Budget message builder
+    private void messageBuilder(String percentage) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("You have used up ");
+        sb.append(percentage);
+        sb.append(" of your budget in \"");
         sb.append(this.group.getName());
         sb.append("\"");
 
@@ -166,6 +189,16 @@ public class Notification implements Transferable<Notification.Transfer>  {
         private long idGroup;
         private long idSender;
         private long idRecipient;
+
+        public Transfer(long id, String message, NotificationType type, String dateRead, String dateSent, long idGroup, long idRecipient){
+            this.id = id;
+            this.message = message;
+            this.type = type;
+            this.dateRead = dateRead;
+            this.dateSent = dateSent;
+            this.idGroup = idGroup;
+            this.idRecipient = idRecipient;
+        }
     }
 
     @Override
@@ -173,6 +206,11 @@ public class Notification implements Transferable<Notification.Transfer>  {
         String dateReadString = "";
         if(dateRead != null)
             dateReadString = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateRead);
+
+        if (sender == null){
+            // System generated notification
+            return new Transfer(id, message, type, dateReadString, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent), group.getId(), recipient.getId());
+        }
 
         return new Transfer(id, message, type, dateReadString, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent), group.getId(), sender.getId(), recipient.getId());
     }
