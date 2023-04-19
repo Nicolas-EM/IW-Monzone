@@ -9,10 +9,10 @@ window.addEventListener("load", (event) => {
     console.log("change detected");
 
     var reader = new FileReader();
-    reader.onload = function (e) {
+    reader.addEventListener('load', () => function (e) {
       // get loaded data and render thumbnail.
       document.getElementById("imgBtn").src = e.target.result;
-    };
+    });
     // read the image file as a data URL.
     reader.readAsDataURL(this.files[0]);
   });
@@ -22,44 +22,48 @@ window.addEventListener("load", (event) => {
     checkboxes[i].addEventListener('change', function () {
       const amount = document.getElementById('amount').value;
       onChangeAmount(amount);
-    })
+    });
   }
 
   // Submit Button
-  document.getElementById("btn-save").onclick = (e) => {
+  document.getElementById("expenseForm").addEventListener('submit', (e) => {
     e.preventDefault();
-    console.log('Saving expense');
-    const b = document.getElementById("btn-save");
+    if (validateCheckboxes()) {
+      document.getElementById("expenseForm").reportValidity();
 
-    const formData = new FormData();
-    if (document.getElementById("imgFileInput").files[0] !== undefined) {
-      formData.append('imageFile', document.getElementById("imgFileInput").files[0]);
+      console.log('Saving expense');
+      const b = document.getElementById("btn-save");
+
+      const formData = new FormData();
+      if (document.getElementById("imgFileInput").files[0] !== undefined) {
+        formData.append('imageFile', document.getElementById("imgFileInput").files[0]);
+      }
+      formData.append('name', document.getElementById("name").value);
+      formData.append('desc', document.getElementById("desc").value);
+      formData.append('dateString', document.getElementById("dateString").value);
+      formData.append('amount', document.getElementById("amount").value);
+      formData.append('paidById', document.getElementById("paidById").value);
+      formData.append('participateIds', Array.from(document.querySelectorAll('input[name="participateIds"]:checked')).map(cb => cb.value));
+      formData.append('typeId', document.getElementById("typeId").value);
+
+      go(b.getAttribute('formaction'), 'POST', formData, {})
+        .then(d => {
+          console.log("Expense: success", d);
+          if (d.action === "redirect") {
+            console.log("Redirecting to ", d.redirect);
+            window.location.replace(d.redirect);
+          }
+        })
+        .catch(e => {
+          console.log("Error creating expense", e);
+          alert(JSON.parse(e.text).message);
+        })
     }
-    formData.append('name', document.getElementById("name").value);
-    formData.append('desc', document.getElementById("desc").value);
-    formData.append('dateString', document.getElementById("dateString").value);
-    formData.append('amount', document.getElementById("amount").value);
-    formData.append('paidById', document.getElementById("paidById").value);
-    formData.append('participateIds', Array.from(document.querySelectorAll('input[name="participateIds"]:checked')).map(cb => cb.value));
-    formData.append('typeId', document.getElementById("typeId").value);
-
-    go(b.getAttribute('formaction'), 'POST', formData, {})
-      .then(d => {
-        console.log("Expense: success", d);
-        if (d.action === "redirect") {
-          console.log("Redirecting to ", d.redirect);
-          window.location.replace(d.redirect);
-        }
-      })
-      .catch(e => {
-        console.log("Error creating expense", e);
-        alert(JSON.parse(e.text).message);
-      })
-  }
+  });
 });
 
 
-document.getElementById('amount').addEventListener('input', function() {
+document.getElementById('amount').addEventListener('input', function () {
   const value = this.value.replace(/[^\d.]/g, ''); // remove any non-digit or non-decimal point characters
   const decimalIndex = value.indexOf('.');
   if (decimalIndex !== -1) {
@@ -70,13 +74,26 @@ document.getElementById('amount').addEventListener('input', function() {
     }
   }
   this.value = value;
-  onChangeAmount(value);
+  this.setCustomValidity("");
+  if (value === "") {
+    this.setCustomValidity("Please fill out this field");
+  }
+  else if (value <= 0) {
+    this.setCustomValidity("Amount must be larger than 0");
+  } else {
+    onChangeAmount(value);
+  }
 });
 
 
 /* Changes value pero user */
 function onChangeAmount(amount) {
   console.log(`onChangeAmount(${amount}) called`);
+
+  if (amount === "") {
+    return;
+  }
+
   const checkboxes = document.getElementsByClassName('participateCheckbox');
   const numChecked = document.querySelectorAll('input:checked').length;
   const values = document.getElementsByClassName('amountPerMember');
@@ -98,3 +115,20 @@ const fechaInput = document.getElementById('dateString');
 const fechaActual = new Date().toISOString().split('T')[0];
 // Establece la fecha máxima en el input de fecha
 fechaInput.max = fechaActual;
+
+// Validate at least 1 participant
+function validateCheckboxes() {
+  const checkboxes = document.querySelectorAll('input[name="participateIds"]:checked');
+
+  const firstCheckbox = document.querySelector('input[name="participateIds"]');
+  firstCheckbox.setCustomValidity("");
+  if (checkboxes.length === 0) {
+    firstCheckbox.setCustomValidity("Please select a participant");
+    firstCheckbox.reportValidity();
+    return false;
+  }
+  firstCheckbox.reportValidity();
+  return true;
+}
+
+// Validate image size

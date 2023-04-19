@@ -13,7 +13,7 @@
   <header th:replace="fragments/nav.html :: nav"></header>
 
   <div class="container justify-content-center my-4">
-    <form method="post" th:action="@{/group/{groupId}/{action}(groupId=${groupId}, action=${expense != null} ? ${expense?.getId()} : 'new')}">
+    <form id="expenseForm" method="post" th:action="@{/group/{groupId}/{action}(groupId=${groupId}, action=${expense != null} ? ${expense?.getId()} : 'new')}">
       <div class="row">
         <h1 th:if="${newExpense}">New Expense</h1>
         <h1 th:unless="${newExpense}">Edit Expense</h1>
@@ -60,7 +60,7 @@
                 <th:block th:if="${member.isEnabled()}" th:with="user=${member.getUser()}">
                   <li>
                     <div class="form-check">
-                      <input id="participateIds" class="check-box form-check-input participateCheckbox" type="checkbox" name="participateIds" th:value="${user.getId()}" th:checked="${participateIds != null ? participateIds.contains(user?.getId()) ? true : false : true}">
+                      <input class="check-box form-check-input participateCheckbox" type="checkbox" name="participateIds" th:value="${user.getId()}" th:checked="${participateIds != null ? participateIds.contains(user?.getId()) ? true : false : true}">
                       <label class="form-check-label" for="flexCheckDefault">[[${user.getUsername()}]]</label>
                       <label class="split amountPerMember">[[${expense != null ? participateIds.contains(user?.getId()) ? expense?.getAmount() / participateIds?.size() : '' : ''}]]</label>
                     </div>
@@ -76,6 +76,7 @@
             <label for="picture" class="form-label w-100">Picture (optional)</label>
           </div>
           <div class="row">
+            <input id="imgFileInput" type="file" name="img[]" class="file" accept="image/*">
             <img id="imgBtn" th:src="@{/group/{groupId}/{expenseId}/pic(groupId=${groupId}, expenseId=${expense}?${expense.getId()}:0)}" class="border border-secondary ms-2 p-2" role="button">
           </div>
           <!-- Submit button -->
@@ -87,8 +88,6 @@
       </div>
     </form>
   </div>
-
-  <input id="imgFileInput" type="file" name="img[]" class="file" accept="image/*">
 
   <th:block th:replace="fragments/footer.html :: footer" />
   <script th:src="@{/js/expense.js}" src="/js/expense.js"></script>
