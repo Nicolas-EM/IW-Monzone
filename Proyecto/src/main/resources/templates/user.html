@@ -13,34 +13,36 @@
   <main class="container align-items-center my-4">
     <div class="row row-cols-1 row-cols-lg-2 gx-5 gy-2">
       <!-- User info -->
-      <form method="post">
-        <div class="row gy-2">
-          <!-- Title -->
-          <div class="col-12">
-            <h2>Your Profile</h2>
-          </div>
-          <!-- Profile Pic -->
-          <div class="col-3 d-flex align-items-center justify-content-center">
-            <img id="img-profile" th:src="@{/user/{id}/pic(id=${session.u.id})}" class="rounded-circle border border-secondary" role="button" title="Click to change your picture">
-          </div>
-          <!-- Displayname + username -->
-          <div class="col-9">
-            <div class="row">
-              <label for="name" class="form-label w-100">Name</label>
-              <input id="name" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${session.u.name}">
+      <div class="col">
+        <form id="profileForm" method="post">
+          <div class="row gy-2">
+            <!-- Title -->
+            <div class="col-12">
+              <h2>Your Profile</h2>
             </div>
-            <div class="row">
-              <label for="username" class="form-label w-100">Username</label>
-              <input id="username" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${session.u.username}">
+            <!-- Profile Pic -->
+            <div class="col-3 d-flex align-items-center justify-content-center">
+              <img id="img-profile" th:src="@{/user/{id}/pic(id=${session.u.id})}" class="rounded-circle border border-secondary" role="button" title="Click to change your picture">
             </div>
-            <div class="row align-items-center justify-content-center">
-              <button th:formaction="@{/user/ChangeDataUser}"  type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Save</button>
+            <!-- Displayname + username -->
+            <div class="col-9">
+              <div class="row">
+                <label for="name" class="form-label w-100">Name</label>
+                <input id="name" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${session.u.name}">
+              </div>
+              <div class="row">
+                <label for="username" class="form-label w-100">Username</label>
+                <input id="username" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${session.u.username}">
+              </div>
+              <div class="row align-items-center justify-content-center">
+                <button th:formaction="@{/user/ChangeDataUser}" type="submit" id="btn-save" class="btn btn-primary rounded-pill fw-bold">Save</button>
+              </div>
             </div>
           </div>
         </form>
         <input id="avatar" type="file" class="file" accept="image/*">
         <!-- Password -->
-        <form method="post">
+        <form id="passwordForm" method="post">
           <div class="col-12">
             <div class="row">
               Do you want to change your password?
@@ -48,23 +50,23 @@
             <hr>
             <div class="row">
               <label for="oldPwd" class="form-label w-100">Old Password</label>
-              <input id="oldPwd" type="text" class="rounded-corners mb-4 w-100">
+              <input id="oldPwd" type="password" class="rounded-corners mb-4 w-100" required>
             </div>
             <div class="row">
               <label for="newPwd" class="form-label w-100">New Password</label>
-              <input id="newPwd" type="text" class="rounded-corners mb-4 w-100">
+              <input id="newPwd" type="password" class="rounded-corners mb-4 w-100" required>
             </div>
           </div>
           <!-- Save Btn -->
           <div class="col-12 d-flex align-items-center justify-content-center">
             <button th:formaction="@{/user/ChangePassword}" type="submit" id="btn-savePassword" class="btn btn-primary rounded-pill fw-bold">Save Password</button>
-          </form>
-            <!-- Logout Btn -->
-            <form id="logoutForm" th:action="@{/logout}" method="post">
-              <button type="button" id="btn-logout" class="btn btn-primary rounded-pill fw-bold" onclick="document.getElementById('logoutForm').submit();">Logout</button>
-            </form>
           </div>
-        </div>
+        </form>
+        <!-- Logout Btn -->
+        <form id="logoutForm" th:action="@{/logout}" method="post">
+          <button type="button" id="btn-logout" class="btn btn-primary rounded-pill fw-bold" onclick="document.getElementById('logoutForm').submit();">Logout</button>
+        </form>
+      </div>
 
       <!-- Stats -->
       <div class="col">
@@ -86,35 +88,35 @@
             </select>
           </div>
           <div class="col-3">
-            <label id="total-exp" class="rounded-corners align-items-center w-100 bg-white"> </label>
+            <input type="text" id="total-exp" class="form-control rounded-corners align-items-center w-100" disabled>
           </div>
         </div>
         <!-- Categories -->
         <form method="post" th:action="@{/group/{groupId}/{action}(groupId=${groupId}, action=${expense != null} ? ${expense?.getId()} : 'new')}">
-        <div class="row">
-          <div class="col-8">
-            <h4 class="separator2">How much do you spend in each category?</h4>
-          </div>
-          <div class="col-4">
-            <select id="currType" class="form-select rounded-corners separator3" required name="currId">
-              <option th:unless="${group != null}" selected disabled hidden value="">Currency</option>
-              <div th:each="curr,i : ${currencies}">
-                <option id="curValue2"  th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
-              </div>
-            </select>
-          </div>
+          <div class="row">
+            <div class="col-8">
+              <h4 class="separator2">How much do you spend in each category?</h4>
+            </div>
+            <div class="col-4">
+              <select id="currType" class="form-select rounded-corners separator3" required name="currId">
+                <option th:unless="${group != null}" selected disabled hidden value="">Currency</option>
+                <div th:each="curr,i : ${currencies}">
+                  <option id="curValue2" th:value="${i.index}" th:selected="${group?.getCurrency()?.toString()?.equals(curr)}? true : false">[[${curr}]]</option>
+                </div>
+              </select>
+            </div>
 
-        </div>
-        <!-- Thymeleaf categories -->
-        <div class="row row-cols-1 row-cols-lg-auto justify-content-center">
-          <div th:each="type: ${types}">
-            <div class="col align-items-center justify-content-center">
-              <img class="separator" th:src="@{/img/type/{id}.png(id=${type.getId()})}" src="/img/type/error.png" alt="Category Icon" width="auto" height="50">
-              <p class="amount"  th:id="'type-' + ${type.getId()}">-<span class="curr"></span></p>
+          </div>
+          <!-- Thymeleaf categories -->
+          <div class="row row-cols-1 row-cols-lg-auto justify-content-center">
+            <div th:each="type: ${types}">
+              <div class="col align-items-center justify-content-center">
+                <img class="separator" th:src="@{/img/type/{id}.png(id=${type.getId()})}" src="/img/type/error.png" alt="Category Icon" width="auto" height="50">
+                <p class="amount" th:id="'type-' + ${type.getId()}">-<span class="curr"></span></p>
+              </div>
             </div>
           </div>
-        </div>
-      </form>
+        </form>
         <!-- Groups -->
         <div class="row">
           <h4 class="separator2">Your Groups</h4>
@@ -133,7 +135,7 @@
                     </div>
                     <div id="indicator" class="col-2">
                       <span class="dot" th:style="${member.getBalance()} >= 0 ? 'background: green' : 'background: red'"></span>
-                     
+
                       [[${member.getBalance()}]][[${member.getGroup().getCurrencyText()}]]
 
                     </div>
@@ -146,7 +148,7 @@
       </div>
     </div>
   </main>
-    
+
   <th:block th:replace="fragments/footer.html :: footer" />
   <!--Ajax para cambio de campos-->
   <script th:src="@{/js/ajax-userQueries.js}"></script>

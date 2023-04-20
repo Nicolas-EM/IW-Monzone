@@ -12,7 +12,7 @@ document.getElementById("currMonth").addEventListener('change', function () {
     go(`${config.rootUrl}/user/getMonthly/${dateString}/${currId}`, "GET", {
     })
         .then(data => {
-            totalTextMonth.innerHTML = data + currencyString;
+            totalTextMonth.value = data + currencyString;
         })
 });
 
@@ -30,7 +30,7 @@ document.getElementById("date").addEventListener('change', function () {
     go(`${config.rootUrl}/user/getMonthly/${dateString}/${currId}`, "GET", {
     })
         .then(data => {
-            totalTextMonth.innerHTML = data + currencyString;
+            totalTextMonth.value = data + currencyString;
         })
 });
 

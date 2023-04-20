@@ -1,11 +1,11 @@
-// Submit Button (SAVE USER)
-document.getElementById("btn-save").onclick = (e) => {
+// Profile form
+document.getElementById("profileForm").addEventListener('submit', (e) => {
     e.preventDefault();
     console.log('Saving user');
     const b = document.getElementById("btn-save");
 
     const formData = new FormData();
-    if(document.getElementById("avatar").files[0] !== undefined){
+    if (document.getElementById("avatar").files[0] !== undefined) {
         formData.append('imageFile', document.getElementById("avatar").files[0]);
     }
     formData.append('name', document.getElementById("name").value);
@@ -19,21 +19,21 @@ document.getElementById("btn-save").onclick = (e) => {
                 window.location.replace(d.redirect);
             }
         })
-        .catch(e => { 
+        .catch(e => {
             console.log("Error saving user", e);
             alert(JSON.parse(e.text).message);
         })
-};
+});
 
-// Submit Button (SAVE PASSWORD)
-document.getElementById("btn-savePassword").onclick = (e) => {
+// Password form
+document.getElementById("passwordForm").addEventListener('submit', (e) => {
     e.preventDefault();
     console.log('Saving user password');
     const b = document.getElementById("btn-savePassword");
     const oldPwd = document.getElementById("oldPwd").value;
     const newPwd = document.getElementById("newPwd").value;
 
-    go(b.getAttribute('formaction'), 'POST',{
+    go(b.getAttribute('formaction'), 'POST', {
         oldPwd,
         newPwd
     })
@@ -46,8 +46,8 @@ document.getElementById("btn-savePassword").onclick = (e) => {
                 window.location.replace(d.redirect);
             }
         })
-        .catch(e => { 
+        .catch(e => {
             console.log("Error saving user password", e);
             alert(JSON.parse(e.text).message);
         })
-};
+});
