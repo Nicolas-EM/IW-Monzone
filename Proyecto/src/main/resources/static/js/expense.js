@@ -29,7 +29,6 @@ window.addEventListener("load", (event) => {
   document.getElementById("expenseForm").addEventListener('submit', (e) => {
     e.preventDefault();
     if (validateCheckboxes()) {
-      document.getElementById("expenseForm").reportValidity();
 
       console.log('Saving expense');
       const b = document.getElementById("btn-save");

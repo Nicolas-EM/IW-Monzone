@@ -280,6 +280,10 @@ public class GroupController {
         Float budget = Float.parseFloat(jsonNode.get("budget").asText());
         Integer currId = jsonNode.get("currId").asInt();       
 
+        // Check group name
+        if(name == "")
+            throw new BadRequestException(-6);
+
         // parse budget
         if (budget < 0)
             throw new BadRequestException(-7);
@@ -344,6 +348,10 @@ public class GroupController {
 
         // only moderators can edit group settings
         if (member.getRole() == GroupRole.GROUP_MODERATOR) {
+            // check name
+            if(name == "")
+                throw new BadRequestException(-6);
+
             // parse curr
             if (currId < 0 || currId >= Currency.values().length)
                 throw new BadRequestException(-20);

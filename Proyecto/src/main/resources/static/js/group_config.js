@@ -136,7 +136,6 @@ function renderMember(member, group) {
 // Submit Button (SAVE)
 document.getElementById('groupForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    document.getElementById('groupForm').reportValidity();
     console.log('Saving group');
     const b = document.getElementById("btn-save");
     const name = document.getElementById("name").value;
