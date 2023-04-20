@@ -134,8 +134,9 @@ function renderMember(member, group) {
 }
 
 // Submit Button (SAVE)
-document.getElementById("btn-save").onclick = (e) => {
+document.getElementById('groupForm').addEventListener('submit', (e) => {
     e.preventDefault();
+    document.getElementById('groupForm').reportValidity();
     console.log('Saving group');
     const b = document.getElementById("btn-save");
     const name = document.getElementById("name").value;
@@ -160,6 +161,10 @@ document.getElementById("btn-save").onclick = (e) => {
             console.log("Error creating/updating group", e);
             alert(JSON.parse(e.text).message);
         })
+});
+
+document.getElementById("btn-save").onclick = (e) => {
+    
 };
 
 // Submit Button (DELETE GROUP)
