@@ -51,17 +51,31 @@ input[type=number] {
     padding-top: 7px;
 }
 
-.btn-remove {
-    max-width: 10%;
-}
-
 #trash:hover {
     fill: #adadad;
 }
 
-#name-col {
-    max-width: 25%;
-}
+/* Estilos para dispositivos grandes */
+@media screen and (min-width: 768px) {
+    #name-col {
+      max-width: 25%;
+    }
+  
+    .btn-remove {
+      max-width: 20%;
+    }
+  }
+  
+  /* Estilos para dispositivos pequeños */
+  @media screen and (max-width: 767px) {
+    #name-col {
+      max-width: 50%;
+    }
+  
+    .btn-remove {
+      max-width: 20%;
+    }
+  }
 
 #indicator {
     display: flex;
@@ -80,7 +94,6 @@ input[type=number] {
 
 .balance {
     float: right;
-    max-width: 16%;
     justify-content: end;
     padding-right: 5%;
 }

@@ -73,7 +73,6 @@
 #total-exp {
     margin-top: 2vh;
     margin-bottom: 2vh;
-    max-width: 80%;
     display: flex;
     height: 5vh;
     color: black;
@@ -92,8 +91,11 @@
     margin-bottom: 2%; 
 }
 
-#indicator {
-    margin-left: 15vh;
+.groupName{
+    width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .dot {

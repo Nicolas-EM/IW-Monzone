@@ -105,17 +105,17 @@ function renderAllDebts() {
 function renderDebt(debt) {
     const truncatedAmount = Number(debt.amount).toFixed(2);
     return `<div class="row">
-                <div class="col">
+                <div class="col-4">
                     <form method="post" action="/group/${groupId}/settle">
                         <input type="hidden" name="_csrf" value="${config.csrf.value}">
                         <input type="hidden" name="debtorId" value="${debt.idDebtor}">
                         <input type="hidden" name="debtOwnerId" value="${debt.idDebtOwner}">
                         <input type="hidden" name="amount" value="${debt.amount}">
-                        <button type="button" class="btn-settle">Mark as paid</button>
+                        <button type="button" class="btn-settle markPaid"><strong>Mark as paid</Strong></button>
                     </form>
                 </div>
-                <div class="col">
-                    <label>${debt.debtorName} owes ${debt.debtOwnerName} ${truncatedAmount} ${currencyString}</label>
+                <div class="col-8 debsText">
+                    <label><strong>${debt.debtorName} owes ${debt.debtOwnerName} ${truncatedAmount} ${currencyString}</strong></label>
                 </div>
             </div>`
 }
@@ -123,9 +123,9 @@ function renderDebt(debt) {
 // Render no debts message
 function renderNoDebts() {
     return `<div class="row">
-                <div class="col">
+                <div class="col debsText"><strong>
                     There are no debts to settle :D
-                </div>
+                </strong></div>
             </div>`
 }
 

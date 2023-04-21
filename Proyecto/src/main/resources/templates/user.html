@@ -76,10 +76,10 @@
         <!-- Monthly Expenses -->
         <div class="row">
           <h4 class="separator2">Monthly Expenses</h4>
-          <div class="col-6">
-            <input id="date" type="month" name="dateString" class="rounded-corners w-100" value="2023-03">
+          <div class="col-4">
+            <input id="date" type="month" name="dateString" class="rounded-corners" value="2023-03">
           </div>
-          <div class="col-3">
+          <div class="col-4">
             <select id="currMonth" class="form-select rounded-corners" required name="currId">
               <option th:unless="${group != null}" selected disabled hidden value="">Currency</option>
               <div th:each="curr,i : ${currencies}">
@@ -87,8 +87,8 @@
               </div>
             </select>
           </div>
-          <div class="col-3">
-            <input type="text" id="total-exp" class="form-control rounded-corners align-items-center w-100" disabled>
+          <div class="col-4">
+            <input type="text" id="total-exp" class="form-control rounded-corners align-items-center" disabled>
           </div>
         </div>
         <!-- Categories -->
@@ -127,17 +127,15 @@
               <div class="card text-white h-100 mx-auto">
                 <label class="rounded-corners align-items-center w-100">
                   <div class="row">
-                    <div class="col-3">
+                    <div class="groupName col-3">
                       [[${groupName}]]
                     </div>
                     <div class="col-4">
                       Your budget: [[${member.getBudget()}]][[${member.getGroup().getCurrencyText()}]]
                     </div>
-                    <div id="indicator" class="col-2">
+                    <div class="col-5">
                       <span class="dot" th:style="${member.getBalance()} >= 0 ? 'background: green' : 'background: red'"></span>
-
                       [[${member.getBalance()}]][[${member.getGroup().getCurrencyText()}]]
-
                     </div>
                   </div>
                 </label>

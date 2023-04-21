@@ -126,7 +126,7 @@ function renderMember(member, group) {
                 <div id="indicator">
                     <span class="dot" style="${truncatedAmount} >= 0 ? 'background: green' : 'background: red'"></span>
                 </div>
-                <div class="balance col d-flex align-items-center">
+                <div class="balance col>
                     ${truncatedAmount} ${group.currencyString}
                 </div>
             </div>`;
