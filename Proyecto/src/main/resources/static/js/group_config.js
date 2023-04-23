@@ -98,7 +98,7 @@ function renderGroupMembers(group) {
             })
         })
 }
-
+ // <!--/*th:if="${session.u.username != member.username}"*/--> comprobar que el usuario y un miembro son el mismo
 function renderMember(member, group) {
     const truncatedAmount = Number(member.balance).toFixed(2);
     let memberHTML = `<div class="row p-2 member">`;

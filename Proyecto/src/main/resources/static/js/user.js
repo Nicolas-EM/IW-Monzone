@@ -8,12 +8,13 @@ document.getElementById("profileForm").addEventListener('submit', (e) => {
     if (document.getElementById("avatar").files[0] !== undefined) {
         formData.append('imageFile', document.getElementById("avatar").files[0]);
     }
-    formData.append('name', document.getElementById("name").value);
-    formData.append('username', document.getElementById("username").value);
+    const name = formData.append('name', document.getElementById("name").value);
+    const username = formData.append('username', document.getElementById("username").value);
     console.log(formData.get("username"))
     go(b.getAttribute('formaction'), 'POST', formData, {})
         .then(d => {
             console.log("User: success", d);
+            createToastNotification(`user success-${name}-${username}`, `User changes changed successfully`);
             if (d.action === "redirect") {
                 console.log("Redirecting to ", d.redirect);
                 window.location.replace(d.redirect);
@@ -41,6 +42,7 @@ document.getElementById("passwordForm").addEventListener('submit', (e) => {
             console.log("oPass: ", oldPwd);
             console.log("nPass: ", newPwd);
             console.log("User change password: success", d);
+            createToastNotification(`change password success-${oldPwd}-${newPwd}`, `Password changed successfully`);
             if (d.action === "redirect") {
                 console.log("Redirecting to ", d.redirect);
                 window.location.replace(d.redirect);

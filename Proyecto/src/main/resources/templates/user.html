@@ -63,9 +63,12 @@
           </div>
         </form>
         <!-- Logout Btn -->
+        <div class="col-12 d-flex align-items-center justify-content-center separator2">
         <form id="logoutForm" th:action="@{/logout}" method="post">
           <button type="button" id="btn-logout" class="btn btn-primary rounded-pill fw-bold" onclick="document.getElementById('logoutForm').submit();">Logout</button>
         </form>
+        </div>
+
       </div>
 
       <!-- Stats -->

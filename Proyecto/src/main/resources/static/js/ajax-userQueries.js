@@ -99,3 +99,17 @@ function getCurrencyString(valueSelected, currencyString) {
     }
     return currencyString;
 }
+
+// FECHA DE LOS GASTOS DEL MES NO SEA SUPERIOR A LA ACTUAL
+// Obtener la fecha actual
+const today = new Date();
+
+// Establecer la fecha máxima
+const maxDate = new Date(today.getFullYear(), today.getMonth() + 1);
+
+// Convertir la fecha a formato ISO para establecer como valor de "max" del input
+const maxDateISO = maxDate.toISOString().slice(0, 7);
+
+// Establecer la fecha máxima en el campo de entrada
+const myMonthInput = document.getElementById("date");
+myMonthInput.setAttribute("max", maxDateISO);

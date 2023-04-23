@@ -164,13 +164,13 @@ function createToastNotification(notifId, body) {
 }
 
 function renderToastNofif(notifId, body){
-    return `<div id="toast-${notifId}" class="toast bg-dark" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header bg-dark">
+    return `<div id="toast-${notifId}" class="toast bg-dark my-toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-dark my-toast">
                     <img src="/img/icon.png" class="rounded me-2" alt="Monzone Icon" width="auto" height="50">
                     <strong class="me-auto text-light">Monzone</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-                <div class="toast-body text-light">
+                <div class="toast-body my-toast text-light">
                     ${body}
                 </div>
             </div>`

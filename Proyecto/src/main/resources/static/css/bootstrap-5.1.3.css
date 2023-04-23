@@ -5403,6 +5403,10 @@ textarea.form-control-lg {
   filter: invert(1) grayscale(100%) brightness(200%);
 }
 
+.my-toast {
+  z-index: 10000;
+}
+
 .toast {
   width: 350px;
   max-width: 100%;
