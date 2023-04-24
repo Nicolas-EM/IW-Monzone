@@ -102,7 +102,9 @@ function renderGroupMembers(group) {
 function renderMember(member, group) {
     const truncatedAmount = Number(member.balance).toFixed(2);
     let memberHTML = `<div class="row p-2 member">`;
-    if (isGroupAdmin === 'true') {
+    const b = document.getElementById("btn-leave");
+    const userId = b.dataset.userid;
+    if (isGroupAdmin === 'true' && member.idUser != userId) {
         memberHTML = `${memberHTML}
                     <div class="col btn-remove">
                     <form method="post" action="/group/${groupId}/delMember">
@@ -115,6 +117,10 @@ function renderMember(member, group) {
                         </button>
                     </form>
                 </div>`;
+    }
+    else if(isGroupAdmin === 'true' && member.idUser == userId){
+        memberHTML = `${memberHTML}
+                <div class="col btn-remove"></div>`;
     }
     memberHTML = `${memberHTML}
                 <div id="name-col" class="col d-flex align-items-center border-end border-light-subtle">
