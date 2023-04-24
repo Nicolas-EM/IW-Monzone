@@ -48,6 +48,7 @@ window.addEventListener("load", (event) => {
       go(b.getAttribute('formaction'), 'POST', formData, {})
         .then(d => {
           console.log("Expense: success", d);
+          createToastNotification(`expense success`, `Expense changes changed successfully`);
           if (d.action === "redirect") {
             console.log("Redirecting to ", d.redirect);
             window.location.replace(d.redirect);
@@ -61,6 +62,27 @@ window.addEventListener("load", (event) => {
   });
 });
 
+
+ // Delete Button
+ document.getElementById("btn-delete").onclick = (e) => {
+  e.preventDefault();
+
+  console.log('Deleting expense');
+  const b = document.getElementById("btn-delete");
+
+  go(b.getAttribute('formaction'), 'POST', {})
+    .then(d => {
+      console.log("Expense delete: success", d);
+      if (d.action === "redirect") {
+        console.log("Redirecting to ", d.redirect);
+        window.location.replace(d.redirect);
+      }
+    })
+    .catch(e => {
+      console.log("Error creating expense", e);
+      alert(JSON.parse(e.text).message);
+    })
+};
 
 document.getElementById('amount').addEventListener('input', function () {
   const value = this.value.replace(/[^\d.]/g, ''); // remove any non-digit or non-decimal point characters

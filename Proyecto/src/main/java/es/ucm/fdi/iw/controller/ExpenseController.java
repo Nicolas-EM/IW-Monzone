@@ -586,6 +586,7 @@ public class ExpenseController {
      */
     @PostMapping("{expenseId}/delExpense")
     @Transactional
+    @ResponseBody
     public String deleteExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model,
             HttpSession session) throws IOException {
 
@@ -660,8 +661,7 @@ public class ExpenseController {
 
         // send expense to group ASYNC
         notifSender.sendTransfer(exp, "/topic/group/" + group.getId(), "EXPENSE", NotificationType.EXPENSE_DELETED);
-
-        return "redirect:/group/" + groupId;
+        return "{\"action\": \"redirect\",\"redirect\": \"/group/" + groupId + "\"}";
     }
 
     /*
