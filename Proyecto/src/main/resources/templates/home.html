@@ -14,37 +14,12 @@
     <!-- Body - Group cards -->
     <main class="container-fluid my-4">
         <!-- Dynamic groups with Thymeleaf -->
-        <div id="home_groups" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-5 align-items-center">
-            <th:block th:each="member: ${memberOf}">
-                <div class="col" th:with="group=${member.getGroup()}">
-                    <div class="card text-white" role="button" th:onclick="|location.href='/group/${group.getId()}'|" tabindex="0">
-                        <div class="card-header">
-                            <h5>[[${group.getName()}]]</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row height">
-                                <div class="group-desc">[[${group.getDesc()}]]</div>
-                            </div>
-                            <div class="row">
-                                <div class="balance col-9 w-auto ms-3">[[${member.getBalance()}]] [[${group.getCurrencyText()}]] </div>
-                                <div class="col-3 col-num-members">
-                                    <div class="icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-                                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                                        </svg>
-                                    </div>
-                                    <div class="num-members">[[${group.getNumMembers()}]]</div>
-                            </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </th:block>
+        <div id="groupsTable" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-5 align-items-center ms-3 mt-3 ">
             <!-- newGroupBtn -->
             <div class="col text-center">
-                <button class="btn-lg" th:onclick="|location.href='/group/new'|"><i class="fa fa-plus"></i></button></h3>
+                <button class="btn-lg" th:onclick="|location.href='/group/new'|"><i class="fa fa-plus"></i></button>
             </div>
-        </div>
+        </div>        
     </main>
 
     <th:block th:replace="fragments/footer.html :: footer" />

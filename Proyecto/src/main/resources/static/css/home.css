@@ -8,7 +8,7 @@
     row-gap: 4vh;
 }
 
-#home_groups .card {
+#groupsTable .card {
     max-width: 20rem;
     max-height: 15rem;
     background-color: var(--bs-orange);

@@ -286,20 +286,21 @@ public class UserController {
     /**
      * Returns JSON with ids of groups that user belongs to
      */
-    @GetMapping(path = "groups", produces = "application/json")
+    @GetMapping(path = "getGroups", produces = "application/json")
     @Transactional // para no recibir resultados inconsistentes
     @ResponseBody // para indicar que no devuelve vista, sino un objeto (jsonizado)
-    public List<Long> getGroups(HttpSession session) {
+    public List<Group.Transfer> getGroups(HttpSession session) {
         long userId = ((User) session.getAttribute("u")).getId();
         User u = entityManager.find(User.class, userId);
 
-        List<Long> groupIds = new ArrayList<>();
+        List<Group> groups = new ArrayList<>();
         for (Member m : u.getMemberOf()) {
-            groupIds.add(m.getGroup().getId());
+            if (m.isEnabled())
+                groups.add(m.getGroup());
         }
 
-        log.info("Generating group list for user {} ({} groups)", u.getUsername(), groupIds.size());
-        return groupIds;
+        log.info("Generating group list for user {} ({} groups)", u.getUsername(), groups.size());
+        return groups.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
 
     /**

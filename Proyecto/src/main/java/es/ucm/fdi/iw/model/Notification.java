@@ -22,8 +22,8 @@ import java.time.format.DateTimeFormatter;
 @NamedQueries({
 	@NamedQuery(name="Notification.countUnread",
 	query="SELECT COUNT(*) FROM Notification n WHERE n.recipient.id = :userId AND n.dateRead = null"),
-    @NamedQuery(name="Notification.byUserAndGroup",
-    query="SELECT n FROM Notification n WHERE recipient.id = :userId AND group.id = :groupId")
+    @NamedQuery(name="Invite.byUserAndGroup",
+    query="SELECT n FROM Notification n WHERE recipient.id = :userId AND group.id = :groupId AND n.type = :type")
 })
 @Table(name="IWNotification")
 public class Notification implements Transferable<Notification.Transfer>  {

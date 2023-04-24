@@ -239,6 +239,52 @@ public class GroupController {
     }
 
     /*
+     * Get balance of a user in a group
+     */
+    @ResponseBody
+    @GetMapping("/{groupId}/getBalance")
+    public float getBalance(HttpSession session, @PathVariable long groupId) {
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new ForbiddenException(-1);
+
+        // check if user belongs to the group
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
+            throw new ForbiddenException(-1);
+        }
+
+        return member.getBalance();        
+    }
+
+    /*
+     * Get balance of a user in a group
+     */
+    @ResponseBody
+    @GetMapping("/{groupId}/isMember")
+    public boolean isMember(HttpSession session, @PathVariable long groupId) {
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null || !group.isEnabled())
+            throw new ForbiddenException(-1);
+
+        MemberID mId = new MemberID(group.getId(), user.getId());
+        Member member = entityManager.find(Member.class, mId);
+        if (member == null || !member.isEnabled()) 
+            return false;
+        else
+            return true;       
+    }
+
+    /*
      * 
      * POST MAPPINGS
      * 
@@ -279,10 +325,6 @@ public class GroupController {
         String desc = jsonNode.get("desc").asText();
         Float budget = Float.parseFloat(jsonNode.get("budget").asText());
         Integer currId = jsonNode.get("currId").asInt();       
-
-        // Check group name
-        if(name == "")
-            throw new BadRequestException(-6);
 
         // parse budget
         if (budget < 0)
@@ -348,10 +390,6 @@ public class GroupController {
 
         // only moderators can edit group settings
         if (member.getRole() == GroupRole.GROUP_MODERATOR) {
-            // check name
-            if(name == "")
-                throw new BadRequestException(-6);
-
             // parse curr
             if (currId < 0 || currId >= Currency.values().length)
                 throw new BadRequestException(-20);
@@ -480,8 +518,7 @@ public class GroupController {
         // if only member, delete group
         if(group.getMembers().size() == 1){
             log.warn("Deleting EMPTY group {}", group);
-            delGroup(session, groupId);
-            return "{\"action\": \"redirect\",\"redirect\": \"/user/\"}";
+            return delGroup(session, groupId);
         }
 
         /*
@@ -509,12 +546,13 @@ public class GroupController {
         // Send notification to members
         createAndSendNotifs(NotificationType.GROUP_MEMBER_REMOVED, removeMember.getUser(), group);
 
-        // Send group transfer to user (to render if on /user/)
-        notifSender.sendTransfer(group, "/user/" + user.getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_MEMBER_REMOVED);
+        // Send group to members and particularly to the member removed
+        notifSender.sendTransfer(group, "/user/" + removeMember.getUser().getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_MEMBER_REMOVED);
         notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_MEMBER_REMOVED);
 
-        if (user.getId() == removeId)
+        if (user.getId() == removeId) {
             return "{\"action\": \"redirect\",\"redirect\": \"/user/\"}";
+        }
 
         return "{\"action\": \"none\"}";
     }
@@ -561,7 +599,11 @@ public class GroupController {
         // check user not already member
         if (member == null || !member.isEnabled()) {
             // check user not already invited
-            List<Notification> invites = entityManager.createNamedQuery("Notification.byUserAndGroup", Notification.class).setParameter("userId", user.getId()).setParameter("groupId", group.getId()).getResultList();
+            List<Notification> invites = entityManager.createNamedQuery("Invite.byUserAndGroup", Notification.class)
+                .setParameter("userId", user.getId())
+                .setParameter("groupId", group.getId())
+                .setParameter("type", NotificationType.GROUP_INVITATION)
+                .getResultList();
 
             if(invites.isEmpty()){
                 Notification invite = new Notification(NotificationType.GROUP_INVITATION, sender, user, group);
@@ -593,7 +635,11 @@ public class GroupController {
         user = entityManager.find(User.class, user.getId());
 
         // check if an invite for user exists
-        List<Notification> invites = entityManager.createNamedQuery("Notification.byUserAndGroup", Notification.class).setParameter("userId", user.getId()).setParameter("groupId", groupId).getResultList();
+        List<Notification> invites = entityManager.createNamedQuery("Invite.byUserAndGroup", Notification.class)
+            .setParameter("userId", user.getId())
+            .setParameter("groupId", groupId)
+            .setParameter("type", NotificationType.GROUP_INVITATION)
+            .getResultList();
 
         if(invites.size() < 1)
             throw new ForbiddenException(-8);
@@ -636,7 +682,6 @@ public class GroupController {
             group.setNumMembers(group.getNumMembers() + 1);
 
             // Delete notification
-            user.getNotifications().remove(invite);
             entityManager.remove(invite);
         }
 

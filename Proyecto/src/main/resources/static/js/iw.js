@@ -194,9 +194,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (config.socketUrl) {
         let subs = config.admin ? ["/topic/admin", "/user/queue/notifications"] : ["/user/queue/notifications"]
 
-        go(`${config.rootUrl}/user/groups`, "GET")
-        .then(groupIds => {
-            subs = subs.concat(groupIds.map(groupId => `/topic/group/${groupId}`));
+        go(`${config.rootUrl}/user/getGroups`, "GET")
+        .then(groups => {
+            subs = subs.concat(groups.map(group => `/topic/group/${group.id}`));
             ws.initialize(config.socketUrl, subs);
         })
         .catch(error => {
