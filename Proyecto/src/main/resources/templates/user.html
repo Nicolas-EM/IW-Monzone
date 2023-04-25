@@ -124,27 +124,8 @@
         <div class="row">
           <h4 class="separator2">Your Groups</h4>
         </div>
-        <div class="groups p-2">
-          <div th:each="member: ${memberOf}">
-            <th:block th:with="groupName=${member.getGroup().getName()}">
-              <div class="card text-white h-100 mx-auto">
-                <label class="rounded-corners align-items-center w-100">
-                  <div class="row">
-                    <div class="groupName col-3">
-                      [[${groupName}]]
-                    </div>
-                    <div class="col-4">
-                      Your budget: [[${member.getBudget()}]][[${member.getGroup().getCurrencyText()}]]
-                    </div>
-                    <div class="col-5">
-                      <span class="dot" th:style="${member.getBalance()} >= 0 ? 'background: green' : 'background: red'"></span>
-                      [[${member.getBalance()}]][[${member.getGroup().getCurrencyText()}]]
-                    </div>
-                  </div>
-                </label>
-              </div>
-            </th:block>
-          </div>
+
+        <div class="groups p-2" id="groupsTable">
         </div>
       </div>
     </div>
