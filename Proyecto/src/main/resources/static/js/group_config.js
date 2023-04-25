@@ -118,7 +118,7 @@ function renderMember(member, group) {
                     </form>
                 </div>`;
     }
-    else if(isGroupAdmin === 'true' && member.idUser == userId){
+    else if (isGroupAdmin === 'true' && member.idUser == userId){
         memberHTML = `${memberHTML}
                 <div class="col btn-remove"></div>`;
     }
@@ -130,9 +130,9 @@ function renderMember(member, group) {
                     Budget: ${member.budget}
                 </div>
                 <div id="indicator">
-                    <span class="dot" style="${truncatedAmount} >= 0 ? 'background: green' : 'background: red'"></span>
+                    <span class="dot" style="${truncatedAmount >= 0 ? 'background: green' : 'background: red'}"></span>
                 </div>
-                <div class="balance col>
+                <div class="balance col">
                     ${truncatedAmount} ${group.currencyString}
                 </div>
             </div>`;
