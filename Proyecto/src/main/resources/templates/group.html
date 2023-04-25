@@ -50,6 +50,12 @@
                     <!-- CARTAS GASTOS -->
                     <div id="expensesTable" th:data-groupid="${groupId}" th:data-currency="${group.getCurrencyText()}" class="row row-cols-1 row-cols-lg-2">
                     </div>
+                      <!-- newExpenseBtn -->
+                    <div class="row text-center">
+                        <div class="col align-self-center">
+                            <button id="addExpense" class="btn button-add-expense btn-outline-warning" type="button" th:onclick="|location.href='/group/${groupId}/new'|"><i class="fa fa-plus fa-2x"></i></button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Balance -->
@@ -71,12 +77,7 @@
                     </div>
                 </div>
             </div>
-            <!-- newExpenseBtn -->
-            <div class="row text-center">
-                <div class="col align-self-center">
-                    <button id="addExpense" class="btn button-add-expense btn-outline-warning" type="button" th:onclick="|location.href='/group/${groupId}/new'|"><i class="fa fa-plus fa-2x"></i></button>
-                </div>
-            </div>
+          
         </div>
     </main>
 

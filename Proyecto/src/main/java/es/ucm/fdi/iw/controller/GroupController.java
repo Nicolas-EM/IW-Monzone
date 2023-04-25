@@ -138,7 +138,10 @@ public class GroupController {
         }
 
         // Get budget
-        model.addAttribute("budget", member.getBudget());
+        if(user.hasRole(Role.ADMIN))
+            model.addAttribute("budget", 0);
+        else
+            model.addAttribute("budget", member.getBudget());
 
         // get members
         List<Member> members = group.getMembers();
@@ -149,14 +152,17 @@ public class GroupController {
             currencies.add(g.name());
         }
         
+        if(user.hasRole(Role.ADMIN))
+            model.addAttribute("isGroupAdmin", member.getRole() == GroupRole.GROUP_MODERATOR);
+        else
+            model.addAttribute("isGroupAdmin", false);
+        
         model.addAttribute("currencies", currencies);
         model.addAttribute("group", group);
         model.addAttribute("userId", user.getId());
-        model.addAttribute("isGroupAdmin", member.getRole() == GroupRole.GROUP_MODERATOR);
         model.addAttribute("members", members);
 
         return "group_config";
-
     }
 
     /*
@@ -259,6 +265,9 @@ public class GroupController {
             throw new ForbiddenException(-1);
         }
 
+        if (user.hasRole(Role.ADMIN)) // Si eres admin y no perteneces al grupo devolver 0
+            return 0.0f;
+        
         return member.getBalance();        
     }
 

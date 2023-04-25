@@ -25,7 +25,7 @@
                         <th:block th:if="${session.u}">
                             <!-- Admin button -->
                             <li class="nav-item align-self-center mx-3">
-                                <a class="nav-link" th:if="${session.u.hasRole('ADMIN')}" th:href="@{/admin/}">
+                                <a class="nav-link" id="btn-admin" th:if="${session.u.hasRole('ADMIN')}" th:href="@{/admin/}">
                                     <button type="button" class="btn btn-outline-secondary">Admin</button>
                                 </a>
                             </li>

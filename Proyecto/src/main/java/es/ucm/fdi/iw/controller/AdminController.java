@@ -4,15 +4,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 
 import java.util.List;
 
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.User;
+import es.ucm.fdi.iw.model.Transferable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,4 +45,12 @@ public class AdminController {
         return "home";
     }
 
+    @ResponseBody
+    @Transactional
+    @GetMapping("/getAllGroups")
+    public List<Group.Transfer> getAllGroups(HttpSession session) {
+
+        List<Group> groups = entityManager.createNamedQuery("Group.getAllGroups", Group.class).getResultList();
+        return groups.stream().map(Transferable::toTransfer).collect(Collectors.toList());
+    }
 }

@@ -18,6 +18,25 @@ function getGroups() {
         })
 }
 
+
+function getAllGroups() {
+    go(`${config.rootUrl}/admin/getAllGroups`, "GET")
+        .then(groups => {
+            Array.from(groups).forEach(group => {
+                const elem = document.getElementById(`group-${group.id}`);
+                if (elem != null)
+                    groupsTable.removeChild(elem);
+                go(`${config.rootUrl}/group/${group.id}/getBalance`, "GET")
+                    .then(balance => {
+                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
+                    })
+            })
+        })
+        .catch(e => {
+            console.log("Error retrieving group", e);
+        })
+}
+
 // Render current groups
 getGroups();
 
@@ -112,3 +131,12 @@ function renderGroup(group, balance) {
                 </div>
             </div>`
 }
+
+let btnAdmin = document.getElementById("btn-admin");
+if (btnAdmin != null){ // Si no existe al estar en una cuenta no ADMIN
+    btnAdmin.onclick = (e) => {
+        e.preventDefault();
+        // Render all groups
+        getAllGroups();
+}     
+};
