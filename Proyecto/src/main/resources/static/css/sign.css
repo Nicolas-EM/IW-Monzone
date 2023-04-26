@@ -9,6 +9,10 @@ body {
     background-attachment: fixed;
 }
 
+.error {
+    color: var(--bs-red);
+}
+
 /* ------------ PANEL GENERAL ------------*/
 
 .general-box {
