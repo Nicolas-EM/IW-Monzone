@@ -28,15 +28,10 @@
 - Revisar actualizaciones por websockets en user
 - [!!!] Refactorizar ADMIN (ahora tiene una funcionalidad rara)
 
-## Fallos [!!!]
-- New/Edit expense: si no seleccionas ningún participant, pulsas Save (sale error
-  "selecciona algún usuario") y seleccionas alguno, ya no deja de salir el error
-  y no deja guardar
-
 ## Mejoras vistas
 - Hovers en home (sobre las cards y sobre el botón de añadir)
 - Añadir orden a los grupos en home
-- [!!] Los errores se están mostrando de manera muy cutre
+- [!!] Los errores se están mostrando de manera muy cutre (hacerlo con toast notification)
 - [!!] Al adjuntar una foto en un expense no se muestra, sólo cuando se guarda
 - [!] Los toast notification en perfil se muestran detrás de los divs
 - [!] Ajustar decimales en perfil y en home

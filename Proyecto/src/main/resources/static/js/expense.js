@@ -22,14 +22,13 @@ window.addEventListener("load", (event) => {
     checkboxes[i].addEventListener('change', function () {
       const amount = document.getElementById('amount').value;
       onChangeAmount(amount);
+      validateCheckboxes();
     });
   }
 
   // Submit Button
   document.getElementById("expenseForm").addEventListener('submit', (e) => {
     e.preventDefault();
-    if (validateCheckboxes()) {
-
       console.log('Saving expense');
       const b = document.getElementById("btn-save");
 
@@ -58,7 +57,6 @@ window.addEventListener("load", (event) => {
           console.log("Error creating expense", e);
           alert(JSON.parse(e.text).message);
         })
-    }
   });
 });
 
