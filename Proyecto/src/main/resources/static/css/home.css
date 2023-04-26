@@ -13,6 +13,11 @@
     max-height: 15rem;
     background-color: var(--bs-orange);
     border-radius: 12px;
+    box-shadow: 0 2px 8px #1a1a1b;
+}   
+
+#groupsTable .card:hover {
+    background-color: var(--bs-brown);
 }
 
 .group-desc{
@@ -66,4 +71,9 @@
     font-size: 2em;
     width: 70px;
     height: 70px;
+    box-shadow: 0 2px 8px #1a1a1b;
+}
+
+.btn-lg:hover {
+    background-color: var(--bs-brown);
 }

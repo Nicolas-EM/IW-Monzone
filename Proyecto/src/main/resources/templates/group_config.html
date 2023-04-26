@@ -7,15 +7,15 @@
     <title>Monzone</title>
 </head>
 
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column">
     <header th:replace="fragments/nav.html :: nav"></header>
 
     <main class="container my-4">
         <div class="row">
             <h1>Group Settings</h1>
         </div>
-        <div class="row row-cols-1 row-cols-md-2 mt-3">
-            <form id="groupForm" method="post">
+        <div class="row row-cols-1 row-cols-md-2 mt-3 gx-4">
+            <form id="groupForm" method="post" class="col-md-5">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <!-- Col details -->
                 <div id="info-group" class="col mb-3" th:data-groupid="${group?.getId()}" th:data-budget="${budget}" th:data-isgroupadmin="${isGroupAdmin}" th:data-currencies="${currencies}">
@@ -52,7 +52,7 @@
                 </div>
             </form>
             <!-- Col members -->
-            <div th:if="${group != null}" class="col">
+            <div th:if="${group != null}" class="col-md-7">
                 <div class="row">
                     <div class="col">
                         <h3 class="mb-3">Members</h3>

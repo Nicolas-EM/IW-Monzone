@@ -29,7 +29,7 @@
 - [!!!] Refactorizar ADMIN (ahora tiene una funcionalidad rara)
 
 ## Fallos [!!!]
-- New expense: si no seleccionas ningún participant, pulsas Save (sale error
+- New/Edit expense: si no seleccionas ningún participant, pulsas Save (sale error
   "selecciona algún usuario") y seleccionas alguno, ya no deja de salir el error
   y no deja guardar
 
