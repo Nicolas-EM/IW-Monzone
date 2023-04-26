@@ -81,11 +81,12 @@ public class Expense implements Transferable<Expense.Transfer>, Comparator<Expen
         private String date;
         private long typeID;
         private long paidByID;
+        private String paidByName;
     }
 
 	@Override
     public Transfer toTransfer() {
-		return new Transfer(id,	enabled, name, desc, amount, getDate(), type.getId(), paidBy.getId());
+		return new Transfer(id,	enabled, name, desc, amount, getDate(), type.getId(), paidBy.getId(), paidBy.getUsername());
 	}
 	
 	@Override

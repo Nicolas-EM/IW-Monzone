@@ -48,10 +48,10 @@ if (ws.receive) {
 function renderExpense(expense) {
     const truncatedAmount = Number(expense.amount).toFixed(2);
     return `<div id="expense-${expense.expenseId}" class="col">
-                <div class="card border-light text-white mb-3 mx-auto" role="button" onclick="location.href='/group/${groupId}/${expense.expenseId}'">
+                <div class="card justify-content-center border-light text-white mb-3 mx-auto" role="button" onclick="location.href='/group/${groupId}/${expense.expenseId}'">
                     <div class="row row-cols-2 row-cols-md-4 g-0">
                         <!-- Icon -->
-                        <div class="col-5 col-md-2 d-flex align-items-center justify-content-center">
+                        <div class="icon-card me-3 col-4 col-md-2 d-flex align-items-center justify-content-center">
                             <img src="/img/type/${expense.typeID}.png" alt="Category Icon" class="icon">
                         </div>
                         <!-- Text Info -->
@@ -60,7 +60,7 @@ function renderExpense(expense) {
                                 <div class="card-title">${expense.name}</div>
                             </div>
                             <div class="row card-text-row">
-                                <div class="card-subtitle" style="min-height: 1.5em;">${expense.desc}</div>
+                                <div class="card-subtitle">Paid by ${expense.paidByName}</div>
                             </div>
                         </div>
                         <!-- Date -->
@@ -68,7 +68,7 @@ function renderExpense(expense) {
                             <div class="card-text">${expense.date}</div>
                         </div>
                         <!-- Amount -->
-                        <div class="col-md-3 d-flex align-items-center justify-content-center expense-amount">
+                        <div class="col-md-2 d-flex align-items-center justify-content-center expense-amount">
                             <div class="card-text">${truncatedAmount} ${currencyString}</div>
                         </div>
                     </div>
@@ -95,7 +95,7 @@ function renderAllDebts() {
             } else {
                 document.querySelectorAll(".btn-settle").forEach((btn) => {
                     btn.onclick = (e) => handleSettleExpenseClick(btn, e);
-                });
+                });renderDebt
             }
         }
         );

@@ -36,7 +36,6 @@
 ## Mejoras vistas
 - Hovers en home (sobre las cards y sobre el botón de añadir)
 - Añadir orden a los grupos en home
-- Colores en group
 - [!!] Los errores se están mostrando de manera muy cutre
 - [!!] Al adjuntar una foto en un expense no se muestra, sólo cuando se guarda
 - [!] Los toast notification en perfil se muestran detrás de los divs

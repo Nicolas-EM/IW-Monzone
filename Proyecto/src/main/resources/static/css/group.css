@@ -10,6 +10,12 @@
     max-width: 100%;
 }
 
+.icon-card {
+    background-color: var(--bs-yellow);
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+}
+
 .card-text-row {
     text-align: center !important;
 }
@@ -21,11 +27,12 @@
 }
 
 .back_balance_pos{
-    background-color:#F5A300
+    background-color:#F5A300;
 }
 
 .back_balance_neg{
-    background-color:#AF7302
+    background-color:#AF7302;
+    border-radius: 2px;
 }
 
 .button-add-expense{
@@ -39,22 +46,24 @@
     border-color: #886402;
 }
 
-.icon{
+.icon {
     filter: invert(1);
     width: 40%;
     height: auto;
 }
 
-.card-title{
+.card-title {
     float: left;
+    padding-top: 1vh;
+}
+
+.card-subtitle {
+    font-size:small;
+    padding-bottom: 1vh;
 }
 
 .colscroll{
     max-height: 35vh;
-}
-
-#description{
-    margin-left: 4rem;
 }
 
 .button_config{

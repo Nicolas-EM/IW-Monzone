@@ -14,18 +14,18 @@
 
     <main class="container my-4">
         <!-- Title -->
-        <div class="row">
-            <div class="col align-self-center text-center">
+        <div class="row mb-2">
+            <div class="col align-items-center d-flex justify-content-center">
                 <h3><strong>[[${group.getName()}]]</strong></h3>
+                <button id="groupConfigBtn" class="btn button_config btn-outline-warning" type="button" th:onclick="|location.href='/group/${groupId}/config'|"><i class="fa fa-cog fa-2x"></i></button>            
             </div>
         </div>
         <div class="row">
             <div class="col align-self-center text-center">
-                <h7 id="description">[[${group.getDesc()}]]</h7>
-                <button id="groupConfigBtn" class="btn button_config btn-outline-warning" type="button" th:onclick="|location.href='/group/${groupId}/config'|"><i class="fa fa-cog fa-2x"></i></button>
-                <hr>
-            </div>
+                <h7>[[${group.getDesc()}]]</h7>
+            </div>            
         </div>
+        <hr>
 
         <!-- Body -->
         <div class="body">
@@ -48,10 +48,10 @@
                 <!-- Expenses -->
                 <div class="tab-pane fade show active" id="pills-expenses" role="tabpanel" aria-labelledby="pills-expenses-tab">
                     <!-- CARTAS GASTOS -->
-                    <div id="expensesTable" th:data-groupid="${groupId}" th:data-currency="${group.getCurrencyText()}" class="row row-cols-1 row-cols-lg-2">
+                    <div id="expensesTable" th:data-groupid="${groupId}" th:data-currency="${group.getCurrencyText()}" class="row row-cols-1 row-cols-lg-2 mx-auto">
                     </div>
                       <!-- newExpenseBtn -->
-                    <div class="row text-center">
+                    <div class="row text-center mx-auto">
                         <div class="col align-self-center">
                             <button id="addExpense" class="btn button-add-expense btn-outline-warning" type="button" th:onclick="|location.href='/group/${groupId}/new'|"><i class="fa fa-plus fa-2x"></i></button>
                         </div>
