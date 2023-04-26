@@ -41,7 +41,6 @@ import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -383,68 +382,6 @@ public class UserController {
         return "{\"success\": \"ok\"}";
     }
 
-     /*
-     * Alter or create a user
-     */
-    // @ResponseBody
-    // @Transactional
-    // @PostMapping("/{id}")
-    // public String postUser(HttpSession session, @PathVariable long id, Model model, @RequestParam("name") String name,  @RequestParam("username") String username, @RequestParam("oldPwd") String oldPwd, @RequestParam("newPwd") String newPwd,@RequestParam(value = "avatar", required = false) MultipartFile imageFile) {
-       
-    //     User requester = (User) session.getAttribute("u");
-    //     User target = null;
-
-    //     if (id == -1 && requester.hasRole(Role.ADMIN)) {
-    //         // create new user with random password
-    //         target = new User();
-    //         target.setPassword(encodePassword(generateRandomBase64Token(12)));
-    //         entityManager.persist(target);
-    //         entityManager.flush(); // forces DB to add user & assign valid id
-    //         id = target.getId(); // retrieve assigned id from DB
-    //     }
-
-    //     // retrieve requested user
-    //     target = entityManager.find(User.class, id);
-    //     model.addAttribute("user", target);
-
-    //     if (requester.getId() != target.getId() &&
-    //             !requester.hasRole(Role.ADMIN)) {
-    //         throw new NotYourProfileException();
-    //     }
-
-    //     if (newPwd != null) {
-    //         if (!newPwd.equals(oldPwd)) {
-    //             // FIXME: complain
-    //         } else {
-    //             // save encoded version of password
-    //             target.setPassword(encodePassword(newPwd));
-    //         }
-    //     }
-    //     target.setUsername(username);
-    //     target.setName(name);
-
-    //     // save the new user image
-    //     if(imageFile != null){
-    //         File f = localData.getFile("user", "" + id);
-    //         try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
-    //             byte[] imageBytes = imageFile.getBytes();
-    //             stream.write(imageBytes);
-    //             log.info("Uploaded photo for {} into {}!", id, f.getAbsolutePath());
-    //         } catch (Exception e) {
-    //             log.warn("Error uploading image " + id + " ", e);
-    //             throw new ImageSavingFailed();
-    //         }
-    //     }
-
-    //     // update user session so that changes are persisted in the session, too
-    //     if (requester.getId() == target.getId()) {
-    //         session.setAttribute("u", target);
-    //     }
-
-    //     return "{\"action\": \"none\"}";
-    // }
-
-
     /*
      * Change data user
      */
@@ -517,54 +454,6 @@ public class UserController {
        
         return "{\"action\": \"none\"}";
     }
-
-
-    // /**
-    //  * Alter or create a user
-    //  */
-    // @PostMapping("/{id}")
-    // @Transactional
-    // public String postUser(HttpServletResponse response, @PathVariable long id, @ModelAttribute User edited,
-    //         @RequestParam(required = false) String pass2, Model model, HttpSession session) throws IOException {
-        
-    //     User requester = (User) session.getAttribute("u");
-    //     User target = null;
-    //     if (id == -1 && requester.hasRole(Role.ADMIN)) {
-    //         // create new user with random password
-    //         target = new User();
-    //         target.setPassword(encodePassword(generateRandomBase64Token(12)));
-    //         entityManager.persist(target);
-    //         entityManager.flush(); // forces DB to add user & assign valid id
-    //         id = target.getId(); // retrieve assigned id from DB
-    //     }
-
-    //     // retrieve requested user
-    //     target = entityManager.find(User.class, id);
-    //     model.addAttribute("user", target);
-
-    //     if (requester.getId() != target.getId() &&
-    //             !requester.hasRole(Role.ADMIN)) {
-    //         throw new NotYourProfileException();
-    //     }
-
-    //     if (edited.getPassword() != null) {
-    //         if (!edited.getPassword().equals(pass2)) {
-    //             // FIXME: complain
-    //         } else {
-    //             // save encoded version of password
-    //             target.setPassword(encodePassword(edited.getPassword()));
-    //         }
-    //     }
-    //     target.setUsername(edited.getUsername());
-    //     target.setName(edited.getName());
-
-    //     // update user session so that changes are persisted in the session, too
-    //     if (requester.getId() == target.getId()) {
-    //         session.setAttribute("u", target);
-    //     }
-
-    //     return "user";
-    // }
 
     /**
      * Uploads a profile pic for a user id

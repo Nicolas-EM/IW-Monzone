@@ -1,6 +1,7 @@
 # Funcionalidades:
 - Navegación por todas las vistas
 - Login-Logout
+- Registro
 - Todas las funcionalidades principales
   - CRUD Grupo
   - CRUD Gasto
@@ -18,8 +19,7 @@
 # Lo que falta:
 ## General
 - [!!!] Refactorizar transfers para reducir nº de peticiones
-- [!!!] Registro de usuario
-- [!!!] Mostrar errores en login
+- [!] Validación en cliente en SignUp
 - Un reimbursement no debería poder editarlo el usuario
 - Arreglar el import.sql
 - Hacer el README.md
@@ -33,7 +33,6 @@
 - Añadir orden a los grupos en home
 - [!!] Los errores se están mostrando de manera muy cutre (hacerlo con toast notification)
 - [!!] Al adjuntar una foto en un expense no se muestra, sólo cuando se guarda
-- [!] Los toast notification en perfil se muestran detrás de los divs
 - [!] Ajustar decimales en perfil y en home
 - La profile pic no se ajusta a un círculo
 - En las cards de grupos (home) debería mostrarse el circulito rojo/verde del balance
