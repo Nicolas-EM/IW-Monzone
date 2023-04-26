@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NamedQueries({
     @NamedQuery(name="Type.getAllTypes",
-                query="SELECT obj FROM Type obj")}
+                query="SELECT obj FROM Type obj WHERE obj.name != 'Reimbursement'")}
 )
 @Table(name="IWType")
 public class Type implements Transferable<Type.Transfer> {

@@ -98,7 +98,7 @@ function renderGroupMembers(group) {
             })
         })
 }
- // <!--/*th:if="${session.u.username != member.username}"*/--> comprobar que el usuario y un miembro son el mismo
+
 function renderMember(member, group) {
     const truncatedAmount = Number(member.balance).toFixed(2);
     let memberHTML = `<div class="row p-2 member">`;
@@ -233,8 +233,6 @@ if (ws.receive) {
         if (obj.type == "GROUP" && obj.group.id == groupId) {
             console.log("Updating group view");
             switch (obj.action) {
-                case "GROUP_CREATED":
-                    break;
                 case "GROUP_MODIFIED":
                     renderGroupData(obj.group);
                     renderGroupMembers(obj.group);

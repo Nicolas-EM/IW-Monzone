@@ -108,16 +108,16 @@ if (ws.receive) {
             const group = obj.group;
             const elem = document.getElementById(`group-${group.id}`);
             switch (obj.action) {
+                case "GROUP_INVITATION_ACCEPTED": {
+                    if (elem === null) {
+                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, 0.0));
+                    }
+                } break;
                 case "GROUP_MEMBER_REMOVED": {
                     go(`${config.rootUrl}/group/${group.id}/isMember`, "GET")
                         .then(isMember => {
-                            elem.parentElement.removeChild(elem);
-                            if (isMember) {
-                                go(`${config.rootUrl}/group/${group.id}/getBalance`, "GET")
-                                    .then(balance => {
-                                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
-                                    })
-                            }
+                            if (!isMember)
+                                elem.parentElement.removeChild(elem);
                         })
                 } break;
                 case "GROUP_MODIFIED": {

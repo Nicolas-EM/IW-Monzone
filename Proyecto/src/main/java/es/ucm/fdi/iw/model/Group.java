@@ -40,7 +40,7 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
 
     private String desc;
     
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
     
     @Column(nullable = false)

@@ -18,7 +18,7 @@
             <form id="groupForm" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <!-- Col details -->
-                <div id="info-group" class="col mb-3" th:data-groupid="${group?.getId()}" th:data-budget="${budget}" th:data-isGroupAdmin="${isGroupAdmin}" th:data-currencies="${currencies}">
+                <div id="info-group" class="col mb-3" th:data-groupid="${group?.getId()}" th:data-budget="${budget}" th:data-isgroupadmin="${isGroupAdmin}" th:data-currencies="${currencies}">
                     <label for="name" class="form-label w-100">Name</label>
                     <input id="name" name="name" type="text" class="form-control rounded-corners mb-4" required="required" th:value="${group?.getName()}" th:disabled="${isGroupAdmin == null ? false : isGroupAdmin ? false : true}">
                     <label for="desc" class="form-label w-100">Description (optional)</label>

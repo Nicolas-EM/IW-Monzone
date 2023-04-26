@@ -1,51 +1,48 @@
 # Funcionalidades:
 - Navegación por todas las vistas
 - Login-Logout
-- Crear, Editar, Eliminar Grupo (Excepto imagen)
-- Crear, Editar, Eliminar Gasto (Excepto imagen)
-- Calculo balances y método de repago
-- Eliminar a usuarios de grupos
-- Notificationes de gastos e invitaciones
-- Cuando se añade un gasto al grupo, se muestra en /group/ por WebSocket
-
+- Todas las funcionalidades principales
+  - CRUD Grupo
+  - CRUD Gasto
+  - Cálculo deudas
+  - Pago de deudas
+  - Invitar miembros
+  - Eliminar miembros, salir del grupo
+- Notificaciones de gastos y grupos
+- Notificaciones de invitaciones
+- Actualizaciones por websockets en:
+  - home
+  - group (tanto expenses como balances)
+  - expense
 
 # Lo que falta:
 ## General
-- Guardar imágenes de Gasto/Grupo
-- Registro de usuario
-- Error en login
-- Crear logs info en todo lo que se pueda
-- Gestionar errores de AJAX (e.j. fallo al aceptar invitación)
-- Validación de campos en cliente (Javascript)
-- Al aceptar invitación, que te pida budget
+- [!!!] Refactorizar transfers para reducir nº de peticiones
+- [!!!] Registro de usuario
+- [!!!] Mostrar errores en login
+- Un reimbursement no debería poder editarlo el usuario
+- Arreglar el import.sql
+- Hacer el README.md
+- Logs
+- TESTS
+- Revisar actualizaciones por websockets en user
+- [!!!] Refactorizar ADMIN (ahora tiene una funcionalidad rara)
 
-## /group/
-- Hacer vista de balances
+## Fallos [!!!]
+- New expense: si no seleccionas ningún participant, pulsas Save (sale error
+  "selecciona algún usuario") y seleccionas alguno, ya no deja de salir el error
+  y no deja guardar
 
-## /user/config
-- Calcular gastos mensuales (ALBERTO->HECHO)
-- Calcular gastos por categoría (ALBERTO->HECHO)
-- Arreglar vista de grupos
-
-## AJAX + Websockets
-- Eliminar usuario de grupo
-  - Al eliminar, por websocket (/topic/group/{groupId}) se borre en todas las pantallas
-- Cambiar presupuesto de grupo
-- Cambios dentro del perfil
-- Marcar notificaciones como leidas
-- Eliminar invitación
-- Aceptar invitación
-  - A usuario que aceptó --> Mostrar grupo si está en /user/
-  - A otros usuarios del grupo --> Actualizar /group/id/config si están en esa vista
-
-
-# Mejoras visuales
-## NAV
-- Botones en panel de notificaciones
-- Botones de invitación
-  
-## /group/
-- Mejora en vista de deudas
-
-## /user/
-- Refactorizar para que las cartas se vean bien si no tienen descripción
+## Mejoras vistas
+- Hovers en home (sobre las cards y sobre el botón de añadir)
+- Añadir orden a los grupos en home
+- Colores en group
+- [!!] Los errores se están mostrando de manera muy cutre
+- [!!] Al adjuntar una foto en un expense no se muestra, sólo cuando se guarda
+- [!] Los toast notification en perfil se muestran detrás de los divs
+- [!] Ajustar decimales en perfil y en home
+- La profile pic no se ajusta a un círculo
+- En las cards de grupos (home) debería mostrarse el circulito rojo/verde del balance
+- [!] El mark as read debería cambiar el color de la notif
+- [!!] Añadir botón ir atrás en vista expense
+- [!] En group_config y en perfil sale scrollbar vertical, no se ajusta

@@ -51,10 +51,8 @@ if (ws.receive) {
             const elem = document.getElementById(`group-${group.id}`);
             switch (obj.action) {
                 case "GROUP_INVITATION_ACCEPTED": {
-                    console.log(group.id, `group-${group.id}`, document.getElementById(`group-${group.id}`));
                     if (elem === null) {
                         groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, 0.0));
-                        ws.subscribe(`/topic/group/${group.id}`);
                     }
                     else {
                         go(`${config.rootUrl}/group/${group.id}/getBalance`, "GET")

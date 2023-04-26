@@ -159,7 +159,8 @@ public class UserController {
                 throw new BadRequestException(-21);
             }
             
-            if (eDate.getMonthValue() == formDate.getMonthValue() && eDate.getYear() == formDate.getYear())
+            if (eDate.getMonthValue() == formDate.getMonthValue() && eDate.getYear() == formDate.getYear()
+                && !exp.getType().getName().equals("Reimbursement"))
                 total += changeCurrency(exp.getAmount() / exp.getBelong().size(), p.getGroup().getCurrency(), newCurr);
         }
         float totalRounded = (float) Math.round(total * 100) / 100;
@@ -209,8 +210,10 @@ public class UserController {
         for (Participates p : participates) {
             Expense e = p.getExpense();
             Type type = e.getType();
-            float amount = changeCurrency(e.getAmount() / e.getBelong().size(), p.getGroup().getCurrency(), newCurr);
-            dictionary.put(type.getId(), dictionary.get(type.getId()) + amount);
+            if (!e.getType().getName().equals("Reimbursement")) {
+                float amount = changeCurrency(e.getAmount() / e.getBelong().size(), p.getGroup().getCurrency(), newCurr);
+                dictionary.put(type.getId(), dictionary.get(type.getId()) + amount);
+            }            
         }
 
         for (Type type : types)

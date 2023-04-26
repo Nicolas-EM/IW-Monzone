@@ -111,11 +111,11 @@ function renderDebt(debt) {
                         <input type="hidden" name="debtorId" value="${debt.idDebtor}">
                         <input type="hidden" name="debtOwnerId" value="${debt.idDebtOwner}">
                         <input type="hidden" name="amount" value="${debt.amount}">
-                        <button type="button" class="btn-settle markPaid"><strong>Mark as paid</Strong></button>
+                        <button type="button" class="btn-settle markPaid mb-2">Mark as paid</button>
                     </form>
                 </div>
-                <div class="col-8 debsText">
-                    <label><strong>${debt.debtorName} owes ${debt.debtOwnerName} ${truncatedAmount} ${currencyString}</strong></label>
+                <div class="col-8">
+                    <label>${debt.debtorName} owes ${debt.debtOwnerName} ${truncatedAmount} ${currencyString}</label>
                 </div>
             </div>`
 }
@@ -123,9 +123,9 @@ function renderDebt(debt) {
 // Render no debts message
 function renderNoDebts() {
     return `<div class="row">
-                <div class="col debsText"><strong>
+                <div class="col">
                     There are no debts to settle :D
-                </strong></div>
+                </div>
             </div>`
 }
 

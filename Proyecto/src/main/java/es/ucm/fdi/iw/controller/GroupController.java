@@ -152,7 +152,7 @@ public class GroupController {
             currencies.add(g.name());
         }
         
-        if(user.hasRole(Role.ADMIN))
+        if (!user.hasRole(Role.ADMIN))
             model.addAttribute("isGroupAdmin", member.getRole() == GroupRole.GROUP_MODERATOR);
         else
             model.addAttribute("isGroupAdmin", false);
