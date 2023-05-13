@@ -112,8 +112,8 @@ function acceptInvite(event, btn, notifId) {
     event.preventDefault();
     go(btn.parentNode.action, 'POST', {})
     .then(d => {
-        console.log("Invite accepted", d);
-        ws.subscribe(`/topic/group/${group.id}`);
+        console.log("Invite accepted", d.status);
+        ws.subscribe(`/topic/group/${d.id}`);
         deleteClientNotif(notifId);
         createToastNotification(notifId, "Invitation Accepted");
         document.getElementById('offcanvasNav').hide();

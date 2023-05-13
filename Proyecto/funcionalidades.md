@@ -1,3 +1,6 @@
+# Equipo Monzone
+[Link al repositorio de GitHub](https://github.com/Nicolas-EM/IW-Monzone.git)
+
 # Funcionalidades:
 - Navegación por todas las vistas
 - Login-Logout
@@ -39,3 +42,4 @@
 - [!] El mark as read debería cambiar el color de la notif
 - [!!] Añadir botón ir atrás en vista expense
 - [!] En group_config y en perfil sale scrollbar vertical, no se ajusta
+- En los miembros en group_config o expense, tu usuario debería aparecer como "You"

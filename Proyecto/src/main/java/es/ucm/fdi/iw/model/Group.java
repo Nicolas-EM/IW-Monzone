@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A group of shared expenses
@@ -82,11 +83,12 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
         private float totBudget;
         private Currency currency;
         private String currencyString;
+        private List<Member.Transfer> members;
     }
 
     @Override
     public Transfer toTransfer() {
-        return new Transfer(id, enabled, name, desc, numMembers, totBudget, currency, getCurrencyText());
+        return new Transfer(id, enabled, name, desc, numMembers, totBudget, currency, getCurrencyText(), members.stream().map(Transferable::toTransfer).collect(Collectors.toList()));
     }
 
     @Override

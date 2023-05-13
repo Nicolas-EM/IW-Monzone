@@ -1,3 +1,6 @@
+const groupsTable = document.getElementById("groupsTable");
+const userId = groupsTable.dataset.userid;
+
 // Profile form
 document.getElementById("profileForm").addEventListener('submit', (e) => {
     e.preventDefault();
@@ -54,8 +57,6 @@ document.getElementById("passwordForm").addEventListener('submit', (e) => {
         })
 });
 
-const groupsTable = document.getElementById("groupsTable");
-
 function getGroups() {
     go(`${config.rootUrl}/user/getGroups`, "GET")
         .then(groups => {
@@ -63,11 +64,10 @@ function getGroups() {
                 const elem = document.getElementById(`group-${group.id}`);
                 if (elem != null)
                     groupsTable.removeChild(elem);
-                go(`${config.rootUrl}/group/${group.id}/getBalance`, "GET")
-                    .then(balance => {
-                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
-                    })
-            })
+                const member = group.members.find(member => member.userId === userId);
+                if (member)
+                    groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
+            });
         })
         .catch(e => {
             console.log("Error retrieving group", e);
@@ -78,24 +78,23 @@ function getGroups() {
 getGroups();
 
 // Render group
-function renderGroup(group, balance) {   
-
-return `<div id="group-${group.id}" class="card text-white h-100 mx-auto">
-<label class="rounded-corners align-items-center w-100">
-  <div class="row">
-    <div class="groupName col-3">
-      ${group.name}
-    </div>
-    <div class="col-4">
-      Your budget: x ${group.currencyString}
-    </div>
-    <div class="col-5">
-      <span class="dot" style="${balance >= 0 ? 'background: green' : 'background: red'}"></span>
-      ${balance} ${group.currencyString}
-    </div>
-  </div>
-</label>
-</div>`
+function renderGroup(group, balance) {
+    return `<div id="group-${group.id}" class="card text-white h-100 mx-auto">
+                <label class="rounded-corners align-items-center w-100">
+                <div class="row">
+                    <div class="groupName col-3">
+                    ${group.name}
+                    </div>
+                    <div class="col-4">
+                    Your budget: x ${group.currencyString}
+                    </div>
+                    <div class="col-5">
+                    <span class="dot" style="${balance >= 0 ? 'background: green' : 'background: red'}"></span>
+                    ${balance} ${group.currencyString}
+                    </div>
+                </div>
+                </label>
+            </div>`;
 }
 
 // Render INCOMING changes
@@ -107,29 +106,17 @@ if (ws.receive) {
         if (obj.type == "GROUP") {
             const group = obj.group;
             const elem = document.getElementById(`group-${group.id}`);
-            switch (obj.action) {
-                case "GROUP_INVITATION_ACCEPTED": {
-                    if (elem === null) {
-                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, 0.0));
-                    }
-                } break;
-                case "GROUP_MEMBER_REMOVED": {
-                    go(`${config.rootUrl}/group/${group.id}/isMember`, "GET")
-                        .then(isMember => {
-                            if (!isMember)
-                                elem.parentElement.removeChild(elem);
-                        })
-                } break;
-                case "GROUP_MODIFIED": {
+            if (obj.action == "GROUP_MODIFIED" || obj.action == "GROUP_DELETED")
+                elem.parentElement.removeChild(elem);
+            if (obj.action == "GROUP_MEMBER_REMOVED") {
+                const member = group.members.find(member => member.userId === userId);
+                if (!member)
                     elem.parentElement.removeChild(elem);
-                    go(`${config.rootUrl}/group/${group.id}/getBalance`, "GET")
-                        .then(balance => {
-                            groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
-                        })
-                } break;
-                case "GROUP_DELETED": {
-                    elem.parentElement.removeChild(elem);
-                } break;
+            }
+            if (obj.action == "GROUP_MODIFIED" || (obj.action == "GROUP_INVITATION_ACCEPTED" && elem === null)) {
+                const member = group.members.find(member => member.userId === userId);
+                if (member)
+                    groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
             }
         }
 
@@ -139,11 +126,11 @@ if (ws.receive) {
             const elem = document.getElementById(`group-${expGroupId}`);
             go(`${config.rootUrl}/group/${expGroupId}/getGroupConfig`, "GET")
                 .then(group => {
-                    go(`${config.rootUrl}/group/${expGroupId}/getBalance`, "GET")
-                        .then(balance => {
-                            elem.parentElement.removeChild(elem);
-                            groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
-                        })
+                    const member = group.members.find(member => member.userId === userId);
+                    if (member) {
+                        elem.parentElement.removeChild(elem);
+                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
+                    }
                 })
         }
     }

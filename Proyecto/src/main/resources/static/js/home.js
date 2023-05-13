@@ -1,4 +1,5 @@
 const groupsTable = document.getElementById("groupsTable");
+const userId = groupsTable.dataset.userid;
 
 function getGroups() {
     go(`${config.rootUrl}/user/getGroups`, "GET")
@@ -7,10 +8,9 @@ function getGroups() {
                 const elem = document.getElementById(`group-${group.id}`);
                 if (elem != null)
                     groupsTable.removeChild(elem);
-                go(`${config.rootUrl}/group/${group.id}/getBalance`, "GET")
-                    .then(balance => {
-                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
-                    })
+                const member = group.members.find(member => member.userId === userId);
+                if (member)
+                    groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
             })
         })
         .catch(e => {
@@ -18,7 +18,7 @@ function getGroups() {
         })
 }
 
-
+// TODO: Arreglar
 function getAllGroups() {
     go(`${config.rootUrl}/admin/getAllGroups`, "GET")
         .then(groups => {
@@ -26,10 +26,7 @@ function getAllGroups() {
                 const elem = document.getElementById(`group-${group.id}`);
                 if (elem != null)
                     groupsTable.removeChild(elem);
-                go(`${config.rootUrl}/group/${group.id}/getBalance`, "GET")
-                    .then(balance => {
-                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
-                    })
+                groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, "-"));
             })
         })
         .catch(e => {
@@ -49,41 +46,12 @@ if (ws.receive) {
         if (obj.type == "GROUP") {
             const group = obj.group;
             const elem = document.getElementById(`group-${group.id}`);
-            switch (obj.action) {
-                case "GROUP_INVITATION_ACCEPTED": {
-                    if (elem === null) {
-                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, 0.0));
-                    }
-                    else {
-                        go(`${config.rootUrl}/group/${group.id}/getBalance`, "GET")
-                            .then(balance => {
-                                elem.parentElement.removeChild(elem);
-                                groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
-                            })
-                    }
-                } break;
-                case "GROUP_MEMBER_REMOVED": {
-                    go(`${config.rootUrl}/group/${group.id}/isMember`, "GET")
-                        .then(isMember => {
-                            elem.parentElement.removeChild(elem);
-                            if (isMember) {
-                                go(`${config.rootUrl}/group/${group.id}/getBalance`, "GET")
-                                    .then(balance => {
-                                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
-                                    })
-                            }
-                        })
-                } break;
-                case "GROUP_MODIFIED": {
-                    elem.parentElement.removeChild(elem);
-                    go(`${config.rootUrl}/group/${group.id}/getBalance`, "GET")
-                        .then(balance => {
-                            groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
-                        })
-                } break;
-                case "GROUP_DELETED": {
-                    elem.parentElement.removeChild(elem);
-                } break;
+            if (elem != null)
+                elem.parentElement.removeChild(elem);
+            if (obj.action != "GROUP_DELETED") {
+                const member = group.members.find(member => member.userId === userId);
+                if (member)
+                    groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
             }
         }
 
@@ -93,11 +61,10 @@ if (ws.receive) {
             const elem = document.getElementById(`group-${expGroupId}`);
             go(`${config.rootUrl}/group/${expGroupId}/getGroupConfig`, "GET")
                 .then(group => {
-                    go(`${config.rootUrl}/group/${expGroupId}/getBalance`, "GET")
-                        .then(balance => {
-                            elem.parentElement.removeChild(elem);
-                            groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, balance));
-                        })
+                    elem.parentElement.removeChild(elem);
+                    const member = group.members.find(member => member.userId === userId);
+                    if (member)
+                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
                 })
         }
     }

@@ -1,18 +1,20 @@
-
 const infoGroup = document.getElementById("info-group");
 const numMembers = document.getElementById("numMembers");
+const budget = document.getElementById("budget");
+const btnLeave = document.getElementById("btn-leave");
+const btnConfirm = document.getElementById("confirmInviteBtn");
+const btnDelete = document.getElementById("btn-delete");
 const groupId = infoGroup.dataset.groupid;
-const budget = infoGroup.dataset.budget;
 const isGroupAdmin = infoGroup.dataset.isgroupadmin;
 const currencies = infoGroup.dataset.currencies;
+const userId = infoGroup.dataset.userid;
 
 // envio de invitaciones con AJAX
-let b = document.getElementById("confirmInviteBtn");
-if (b != null) {  // NO para /group/new
-    b.onclick = (e) => {
+if (btnConfirm != null) {  // NO para /group/new
+    btnConfirm.onclick = (e) => {
         e.preventDefault();
         const username = document.getElementById("inviteUsername").value;
-        go(b.parentNode.action, 'POST', {
+        go(btnConfirm.parentNode.action, 'POST', {
             username
         })
             .then(d => {
@@ -32,78 +34,11 @@ if (modal != null) { // NO para /group/new
         document.getElementById("inviteUsername").value = "";
     })
 }
-  
 
-// Render current info group
-if (groupId) {
-    go(`${config.rootUrl}/group/${groupId}/getGroupConfig`, "GET")
-        .then(group => {
-            renderGroupData(group);
-            renderGroupMembers(group);
-        }
-        );
-}
-
-function renderGroupData(group) {
-    const groupName = document.getElementById('name');
-    groupName.innerHTML = group.name;
-
-    const groupDesc = document.getElementById('desc');
-    groupDesc.innerHTML = group.desc;
-
-    console.log(`Getting curr ${group.currency}`)
-    const groupCurr = document.getElementById(`${group.currency}`);
-    groupCurr.setAttribute('selected', true);
-
-    const groupBudget = document.getElementById('totalBudget');
-    groupBudget.setAttribute('value', group.totBudget);
-
-}
-
-function renderGroupMembers(group) {
-
-    numMembers.innerHTML = group.numMembers;
-
-    const membersTable = document.getElementById('membersTable');
-
-    go(`${config.rootUrl}/group/${groupId}/getMembers`, "GET")
-        .then(members => {
-            membersTable.innerHTML = '';
-            Array.from(members).forEach(member => {
-                if (member.enabled)
-                    membersTable.insertAdjacentHTML("beforeend", renderMember(member, group));
-            })
-
-            // Delete Member button function
-            Array.from(document.getElementsByClassName('delMemberBtn')).forEach(btn => {
-                btn.onclick = (e) => {
-                    e.preventDefault();
-                    go(btn.parentNode.action, 'POST', {
-                        removeId: btn.parentNode.querySelector('input[name="removeId"]').value
-                    })
-                        .then(d => {
-                            console.log("Removed member");
-                            if (d.action == "redirect") {
-                                console.log("Redirecting to ", d.redirect);
-                                window.location.replace(d.redirect);
-                            } else {
-                                renderGroupMembers(group);
-                            }
-                        })
-                        .catch(e => {
-                            console.log("Failed to remove member", e);
-                            alert(JSON.parse(e.text).message);
-                        })
-                }
-            })
-        })
-}
-
-function renderMember(member, group) {
+// Render member in list
+function renderMember(member, currencyString) {
     const truncatedAmount = Number(member.balance).toFixed(2);
     let memberHTML = `<div class="row p-2 member">`;
-    const b = document.getElementById("btn-leave");
-    const userId = b.dataset.userid;
     if (isGroupAdmin === 'true' && member.idUser != userId) {
         memberHTML = `${memberHTML}
                     <div class="col btn-remove">
@@ -133,14 +68,81 @@ function renderMember(member, group) {
                     <span class="dot" style="${truncatedAmount >= 0 ? 'background: green' : 'background: red'}"></span>
                 </div>
                 <div class="balance col">
-                    ${truncatedAmount} ${group.currencyString}
+                    ${truncatedAmount} ${currencyString}
                 </div>
             </div>`;
     return memberHTML;
 }
 
+// Render member list
+function renderGroupMembers(group) {
+
+    numMembers.innerHTML = group.numMembers;
+
+    const membersTable = document.getElementById('membersTable');
+    membersTable.innerHTML = '';
+
+    Array.from(group.members).forEach(member => {
+        if (member.idUser == userId) // Personal budget
+            budget.innerHTML = member.budget;
+        if (member.enabled)
+            membersTable.insertAdjacentHTML("beforeend", renderMember(member, group.currencyString));
+    })
+
+    // Delete Member button function
+    Array.from(document.getElementsByClassName('delMemberBtn')).forEach(btn => {
+        btn.onclick = (e) => {
+            e.preventDefault();
+            go(btn.parentNode.action, 'POST', {
+                removeId: btn.parentNode.querySelector('input[name="removeId"]').value
+            })
+                .then(d => {
+                    console.log("Removed member");
+                    if (d.action == "redirect") {
+                        console.log("Redirecting to ", d.redirect);
+                        window.location.replace(d.redirect);
+                    } else {
+                        renderGroupData(group);
+                    }
+                })
+                .catch(e => {
+                    console.log("Failed to remove member", e);
+                    alert(JSON.parse(e.text).message);
+                })
+        }
+    })
+}
+
+function renderGroupData(group) {
+    const groupName = document.getElementById('name');
+    groupName.innerHTML = group.name;
+
+    const groupDesc = document.getElementById('desc');
+    groupDesc.innerHTML = group.desc;
+
+    console.log(`Getting curr ${group.currency}`)
+    const groupCurr = document.getElementById(`${group.currency}`);
+    groupCurr.setAttribute('selected', true);
+
+    const groupBudget = document.getElementById('totalBudget');
+    groupBudget.setAttribute('value', group.totBudget);
+
+    renderGroupMembers(group);
+}
+
+// Render current info group
+if (groupId) {
+    go(`${config.rootUrl}/group/${groupId}/getGroupConfig`, "GET")
+        .then(group => {
+            renderGroupData(group);
+            renderGroupMembers(group);
+        }
+        );
+}
+
 // Submit Button (SAVE)
-document.getElementById('groupForm').addEventListener('submit', (e) => {
+
+document.getElementById("groupForm").addEventListener('submit', (e) => {
     e.preventDefault();
     console.log('Saving group');
     const b = document.getElementById("btn-save");
@@ -149,6 +151,7 @@ document.getElementById('groupForm').addEventListener('submit', (e) => {
     const currId = document.querySelector('[name="currId"]').value;
     const budget = document.getElementById("budget").value;
 
+    console.log(b.getAttribute('formaction'));
     go(b.getAttribute('formaction'), 'POST', {
         name,
         desc,
@@ -168,19 +171,14 @@ document.getElementById('groupForm').addEventListener('submit', (e) => {
         })
 });
 
-document.getElementById("btn-save").onclick = (e) => {
-    
-};
-
 // Submit Button (DELETE GROUP)
 // NOT for /group/new
-if (document.getElementById("btn-delete") != null) {
-    document.getElementById("btn-delete").onclick = (e) => {
+if (btnDelete != null) {
+    btnDelete.onclick = (e) => {
         e.preventDefault();
         console.log('Deleting group');
-        const b = document.getElementById("btn-delete");
 
-        go(b.getAttribute('formaction'), 'POST')
+        go(btnDelete.getAttribute('formaction'), 'POST')
             .then(d => {
                 console.log("Group: success", d);
                 if (d.action === "redirect") {
@@ -196,14 +194,13 @@ if (document.getElementById("btn-delete") != null) {
 }
 
 // Submit Button (LEAVE GROUP)
-if (document.getElementById("btn-leave") != null) {
-    document.getElementById("btn-leave").onclick = (e) => {
+if (btnLeave != null) {
+    btnLeave.onclick = (e) => {
         e.preventDefault();
         console.log('Leaving group');
-        const b = document.getElementById("btn-leave");
-        const removeId = b.dataset.userid;
+        const removeId = userId;
 
-        go(b.getAttribute('formaction'), 'POST', {
+        go(btnLeave.getAttribute('formaction'), 'POST', {
             removeId
         })
             .then(d => {
@@ -232,24 +229,12 @@ if (ws.receive) {
         // If receiving a group and on that group
         if (obj.type == "GROUP" && obj.group.id == groupId) {
             console.log("Updating group view");
-            switch (obj.action) {
-                case "GROUP_MODIFIED":
-                    renderGroupData(obj.group);
-                    renderGroupMembers(obj.group);
-                    break;
-                case "GROUP_DELETED":
-                    console.log("Redirecting to ", "/user/");
-                    window.location.replace("/user/");
-                    break;
-                case "GROUP_INVITATION_ACCEPTED":
-                    renderGroupMembers(obj.group);
-                    break;
-                case "GROUP_MEMBER_REMOVED":
-                    renderGroupMembers(obj.group);
-                    break;
-                default:
-                    break;
+            if (obj.action === "GROUP_DELETED") {
+                console.log("Redirecting to ", "/user/");
+                window.location.replace("/user/");
             }
+            else
+                renderGroupData(obj.group);
         }
 
         // if receiving an expense
@@ -261,7 +246,7 @@ if (ws.receive) {
                 go(`${config.rootUrl}/group/${expGroupId}/getGroupConfig`, "GET")
                     .then(group => {
                         console.log("Updating group view");
-                        renderGroupMembers(group);
+                        renderGroupData(group);
                     })
             }
         }

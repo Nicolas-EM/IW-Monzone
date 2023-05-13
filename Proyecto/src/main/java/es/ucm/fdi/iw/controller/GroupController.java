@@ -245,55 +245,6 @@ public class GroupController {
     }
 
     /*
-     * Get balance of a user in a group
-     */
-    @ResponseBody
-    @GetMapping("/{groupId}/getBalance")
-    public float getBalance(HttpSession session, @PathVariable long groupId) {
-        User user = (User) session.getAttribute("u");
-        user = entityManager.find(User.class, user.getId());
-
-        // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
-
-        // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new ForbiddenException(-1);
-        }
-
-        if (user.hasRole(Role.ADMIN)) // Si eres admin y no perteneces al grupo devolver 0
-            return 0.0f;
-        
-        return member.getBalance();        
-    }
-
-    /*
-     * Get balance of a user in a group
-     */
-    @ResponseBody
-    @GetMapping("/{groupId}/isMember")
-    public boolean isMember(HttpSession session, @PathVariable long groupId) {
-        User user = (User) session.getAttribute("u");
-        user = entityManager.find(User.class, user.getId());
-
-        // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
-
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled()) 
-            return false;
-        else
-            return true;       
-    }
-
-    /*
      * 
      * POST MAPPINGS
      * 
@@ -701,7 +652,7 @@ public class GroupController {
         notifSender.sendTransfer(group, "/user/" + user.getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_INVITATION_ACCEPTED);
         notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_INVITATION_ACCEPTED);
 
-        return "{\"status\": \"ok\"}";
+        return "{\"status\": \"ok\",\"id\": \"" + groupId + "\"}";
     }
 
 }
