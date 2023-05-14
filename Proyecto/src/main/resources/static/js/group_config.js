@@ -23,7 +23,7 @@ if (btnConfirm != null) {  // NO para /group/new
             })
             .catch(e => {
                 console.log("sad", e);
-                alert(JSON.parse(e.text).message);
+                createToastNotification(`error-invite-creation`, JSON.parse(e.text).message, true);
             })
     }
 }
@@ -179,7 +179,7 @@ document.getElementById("groupForm").addEventListener('submit', (e) => {
         })
         .catch(e => {
             console.log("Error creating/updating group", e);
-            alert(JSON.parse(e.text).message);
+            createToastNotification(`error-group-update`, JSON.parse(e.text).message, true);
         })
 });
 
@@ -198,7 +198,7 @@ function deleteGroup() {
         })
         .catch(e => {
             console.log("Error deleting group", e);
-            alert(JSON.parse(e.text).message);
+            createToastNotification(`error-group-deletion`, JSON.parse(e.text).message, true);
         })
 }
 
@@ -222,7 +222,7 @@ function leaveGroup() {
         })
         .catch(e => {
             console.log("Error leaving group", e);
-            alert(JSON.parse(e.text).message);
+            createToastNotification(`error-group-leaving`, JSON.parse(e.text).message, true);
         })
 }
 
@@ -242,7 +242,7 @@ function deleteMember(removeId) {
         })
         .catch(e => {
             console.log("Failed to remove member", e);
-            alert(JSON.parse(e.text).message);
+            createToastNotification(`error-group-delMember`, JSON.parse(e.text).message, true);
         })
 }
 

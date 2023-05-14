@@ -25,7 +25,7 @@ document.getElementById("profileForm").addEventListener('submit', (e) => {
         })
         .catch(e => {
             console.log("Error saving user", e);
-            alert(JSON.parse(e.text).message);
+            createToastNotification(`error-user-update`, JSON.parse(e.text).message, true);
         })
 });
 
@@ -53,7 +53,7 @@ document.getElementById("passwordForm").addEventListener('submit', (e) => {
         })
         .catch(e => {
             console.log("Error saving user password", e);
-            alert(JSON.parse(e.text).message);
+            createToastNotification(`error-password-update`, JSON.parse(e.text).message, true);
         })
 });
 

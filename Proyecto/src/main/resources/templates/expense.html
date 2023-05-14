@@ -82,12 +82,33 @@
           <!-- Submit button -->
           <div class="row mt-3">
             <button type="submit" id="btn-save" th:formaction="@{/group/{groupId}/{action}(groupId=${groupId}, action=${expense == null} ? 'newExpense' : ${expense?.getId()} + '/updateExpense')}" th:data-notification-url="@{/group/{groupId}/notify(groupId=${groupId})}" class="btn btn-primary rounded-pill fw-bold mt-2">Save</button>
-            <button type="button" th:if="${expense != null}" id="btn-delete" th:formaction="@{/group/{groupId}/{expenseId}/delExpense(groupId=${groupId}, expenseId=${expense.getId()})}" class="btn btn-primary rounded-pill fw-bold mt-2">Delete</button>
+            <button type="button" th:if="${expense != null}" id="btn-delete" class="btn btn-primary rounded-pill fw-bold mt-2" data-bs-toggle="modal" data-bs-target="#confirmModal">Delete</button>
           </div>
         </div>
       </div>
     </form>
   </div>
+
+  <!-- Confirm Modal -->
+  <th:block th:if="${expense} != null">
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="confirmModalLabel">Monzone</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete this expense?
+          </div>
+          <div class="modal-footer">
+            <button id="modalCancelBtn" type="button" class="btn btn-secondary btn-delete" data-bs-dismiss="modal">Cancel</button>
+            <button id="confirmBtn" type="submit" th:formaction="@{/group/{groupId}/{expenseId}/delExpense(groupId=${groupId}, expenseId=${expense.getId()})}" class="btn btn-func btn-primary" data-bs-dismiss="modal">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
 
   <th:block th:replace="fragments/footer.html :: footer" />
   <script th:src="@{/js/expense.js}" src="/js/expense.js"></script>

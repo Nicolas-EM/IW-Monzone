@@ -56,20 +56,19 @@ window.addEventListener("load", (event) => {
         })
         .catch(e => {
           console.log("Error creating expense", e);
-          alert(JSON.parse(e.text).message);
+          createToastNotification(`error-expense-creation`, JSON.parse(e.text).message, true);
         })
   });
 });
 
 
- // Delete Button
-let b = document.getElementById("btn-delete");
+ // Delete expense Button
+let b = document.getElementById("confirmBtn");
 if (b != null) {
   b.onclick = (e) => {
     e.preventDefault();
 
     console.log('Deleting expense');
-    const b = document.getElementById("btn-delete");
 
     go(b.getAttribute('formaction'), 'POST', {})
       .then(d => {
@@ -80,8 +79,8 @@ if (b != null) {
         }
       })
       .catch(e => {
-        console.log("Error creating expense", e);
-        alert(JSON.parse(e.text).message);
+        console.log("Error deleting expense", e);
+        createToastNotification(`error-expense-deletion`, JSON.parse(e.text).message, true);
       })
   };
 } 
