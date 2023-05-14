@@ -72,7 +72,7 @@ function renderExpense(expense) {
                             </div>
                         </div>
                         <!-- Date -->
-                        <div class="col-md-2 d-flex align-items-center justify-content-center">
+                        <div class="col-md-2 d-flex align-items-center justify-content-center text-nowrap">
                             <div class="card-text">${expense.date}</div>
                         </div>
                         <!-- Amount -->
