@@ -38,6 +38,7 @@
 ## Errores [!!!]
 - GROUP_CONFIG: Cuando vuelves a unirse a un grupo un usuario después de salirse/sacarle, se añade dos veces en la lista de miembros
   (al hacer F5 ya sale normal)
+- Seguir testeando manualmente...
 
 ## Mejoras vistas
 - Hovers en home (sobre las cards y sobre el botón de añadir)
