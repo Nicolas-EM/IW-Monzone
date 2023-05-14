@@ -76,7 +76,7 @@
             <label for="picture" class="form-label w-100">Picture (optional)</label>
           </div>
           <div class="row">
-            <input id="imgFileInput" type="file" name="img[]" class="file" accept="image/*">
+            <input id="imgFileInput" type="file" class="file" accept="image/*">
             <img id="imgBtn" th:src="@{/group/{groupId}/{expenseId}/pic(groupId=${groupId}, expenseId=${expense}?${expense.getId()}:0)}" class="border border-secondary ms-2 p-2" role="button">
           </div>
           <!-- Submit button -->
