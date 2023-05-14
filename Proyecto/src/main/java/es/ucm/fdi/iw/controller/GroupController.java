@@ -478,7 +478,7 @@ public class GroupController {
     /**
      * Invites a user to a group
      */
-    @PostMapping("/{id}/inviteMember")
+    @PostMapping("/{groupId}/inviteMember")
     @Transactional
     @ResponseBody
     public String inviteMember(@PathVariable long groupId, @RequestBody JsonNode o, HttpSession session) throws JsonProcessingException  {
