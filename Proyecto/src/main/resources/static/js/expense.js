@@ -55,7 +55,7 @@ window.addEventListener("load", (event) => {
         })
         .catch(e => {
           console.log("Error creating expense", e);
-          alert(JSON.parse(e.text).message);
+          createToastNotification(`error-expense-creation`, JSON.parse(e.text).message, true);
         })
   });
 });
@@ -78,8 +78,8 @@ if (b != null) {
         }
       })
       .catch(e => {
-        console.log("Error creating expense", e);
-        alert(JSON.parse(e.text).message);
+        console.log("Error deleting expense", e);
+        createToastNotification(`error-expense-deletion`, JSON.parse(e.text).message, true);
       })
   };
 } 

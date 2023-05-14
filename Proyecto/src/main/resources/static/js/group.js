@@ -203,6 +203,6 @@ function handleSettleExpenseClick(btn, e) {
         })
         .catch(e => {
             console.log("Error settling debt", e);
-            alert(JSON.parse(e.text).message);
+            createToastNotification(`error-debt-settling`, JSON.parse(e.text).message, true);
         })
 }
