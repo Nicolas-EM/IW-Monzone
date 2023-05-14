@@ -19,12 +19,31 @@
   - group (tanto expenses como balances)
   - expense
 
+___
+
+# Mejoras implementadas
+[P] - indica que se ha pedido por el profesor
+
+## General
+- Refactorizar transfers para reducir nº de peticiones
+- [P] Factor común código comprobaciones existe grupo y pertenece
+
+## Mejoras vistas
+- [!!] Los errores se están mostrando de manera muy cutre (hacerlo con toast notification)
+- [P] Revisar responsiveness en los gastos (group), la fecha se rompe
+
+## Usabilidad
+- [P] Las operaciones destructivas deben pedir confirmación
+
+## Seguridad
+- [P] Puedes llamar a /settle para cancelar todas las deudas de un usuario
+
+___
+
 # Lo que falta:
 ## General
-- [!!!] Refactorizar transfers para reducir nº de peticiones - BEA
 - [!] Validación en cliente en SignUp
 - Un reimbursement no debería poder editarlo el usuario
-- Arreglar el import.sql
 - Hacer el README.md
 - Logs
 - [!!!] TESTS
@@ -32,8 +51,6 @@
 - [!!!] Refactorizar ADMIN (ahora tiene una funcionalidad rara)
 - [P] Revisar DebtCalculator (o comentarlo, o cambiarlo) - BEA
 - [P] Refactor excepciones: Enum
-- [P] DONE - Factor común código comprobaciones existe grupo y pertenece
-- [P] Estaría bien guardar transacciones hechas de deudas
 
 ## Errores [!!!]
 - GROUP_CONFIG: Cuando vuelves a unirse a un grupo un usuario después de salirse/sacarle, se añade dos veces en la lista de miembros
@@ -43,7 +60,6 @@
 ## Mejoras vistas
 - Hovers en home (sobre las cards y sobre el botón de añadir)
 - Añadir orden a los grupos en home
-- [!!] Los errores se están mostrando de manera muy cutre (hacerlo con toast notification)
 - [!] Ajustar decimales en perfil y en home
 - La profile pic no se ajusta a un círculo
 - En las cards de grupos (home) debería mostrarse el circulito rojo/verde del balance
@@ -51,7 +67,6 @@
 - [!] En group_config y en perfil sale scrollbar vertical, no se ajusta
 - En los miembros en group_config o expense, tu usuario debería aparecer como "You"
 - [P] Las notifs deben mostrar fecha
-- [P] Revisar responsiveness en los gastos (group), la fecha se rompe
 
 ## Usabilidad
 - [!!] Al adjuntar una foto en un expense no se muestra, sólo cuando se guarda
@@ -60,9 +75,4 @@
 - [P] Las listas vacías deberían aparecer como "No tienes X todavía"
 - [P] Añadir iconos info en los campos para saber qué son
 - [P] Al cambiar foto usuario, cambiar también la del nav
-- [P] Las operaciones destructivas deben pedir confirmación
 - Debería salir msj éxito al guardar un grupo/gasto
-
-## Seguridad
-- [P] Muchos puntos por comprobar bien los accesos a los recursos ("check if X belongs to Y" y similares)
-- [P] Puedes llamar a /settle para cancelar todas las deudas de un usuario
