@@ -47,7 +47,7 @@
                     <div class="mt-5 w-100">
                         <button id="btn-save" th:formaction="@{/group/{action}(action=${group == null} ? 'newGroup' : ${group?.getId()} + '/updateGroup')}" type="submit" class="btn btn-func btn-primary rounded-pill fw-bold w-25">Save</button>
                         <button type="button" th:if="${group == null}" th:onclick="|location.href='/user/'|" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Cancel</button>
-                        <button id="btn-delete" th:if="${group != null} and ${isGroupAdmin}" th:formaction="@{/group/{id}/delGroup(id=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Delete Group</button>
+                        <button id="btn-delete" type="button" th:if="${group != null} and ${isGroupAdmin}" th:formaction="@{/group/{id}/delGroup(id=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25" data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="delGroup">Delete Group</button>
                     </div>
                 </div>
             </form>
@@ -72,7 +72,7 @@
                     <!-- Invite / Leave buttons -->
                     <div class="row pt-4 pb-4">
                         <button id="inviteBtn" th:if="${isGroupAdmin}" class="btn btn-func btn-primary rounded-pill fw-bold w-25" data-bs-toggle="modal" data-bs-target="#inviteModal" formaction="">Invite a Friend</button>
-                        <button id="btn-leave" type="submit" th:formaction="@{/group/{groupId}/delMember(groupId=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Leave Group</button>
+                        <button id="btn-leave" type="type" th:formaction="@{/group/{groupId}/delMember(groupId=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25" data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="leave">Leave Group</button>
                     </div>
                 </div>
             </div>
@@ -95,6 +95,26 @@
                             <form th:action="@{/group/{groupId}/inviteMember(groupId=${group?.getId()})}" method="POST">
                                 <button id="confirmInviteBtn" type="button" class="btn btn-func btn-primary" data-bs-dismiss="modal">Invite</button>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+
+        <!-- Confirm Modal -->
+        <th:block th:if="${group} != null">
+            <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="confirmModalLabel">Monzone</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div id="confirmModalBdy" class="modal-body">
+                        </div>
+                        <div class="modal-footer">
+                            <button id="modalCancelBtn" type="button" class="btn btn-secondary btn-delete" data-bs-dismiss="modal">Cancel</button>
+                            <button id="confirmBtn" type="button" class="btn btn-func btn-primary" data-bs-dismiss="modal">Confirm</button>
                         </div>
                     </div>
                 </div>
