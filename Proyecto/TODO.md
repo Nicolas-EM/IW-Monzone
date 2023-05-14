@@ -30,10 +30,14 @@
 - [!!!] TESTS
 - Revisar actualizaciones por websockets en user
 - [!!!] Refactorizar ADMIN (ahora tiene una funcionalidad rara)
-- [P] Revisar DebtCalculator (o comentarlo, o cambiarlo)
+- [P] Revisar DebtCalculator (o comentarlo, o cambiarlo) - BEA
 - [P] Refactor excepciones: Enum
 - [P] Factor común código comprobaciones existe grupo y pertenece
 - [P] Estaría bien guardar transacciones hechas de deudas
+
+## Errores [!!!]
+- GROUP_CONFIG: Cuando vuelves a unirse a un grupo un usuario después de salirse/sacarle, se añade dos veces en la lista de miembros
+  (al hacer F5 ya sale normal)
 
 ## Mejoras vistas
 - Hovers en home (sobre las cards y sobre el botón de añadir)
@@ -51,10 +55,12 @@
 ## Usabilidad
 - [!!] Al adjuntar una foto en un expense no se muestra, sólo cuando se guarda
 - [!!] Añadir botón ir atrás en vista expense
+- Añadir botón ir atrás en vista group_config
 - [P] Las listas vacías deberían aparecer como "No tienes X todavía"
 - [P] Añadir iconos info en los campos para saber qué son
 - [P] Al cambiar foto usuario, cambiar también la del nav
 - [P] Las operaciones destructivas deben pedir confirmación
+- Debería salir msj éxito al guardar un grupo/gasto
 
 ## Seguridad
 - [P] Muchos puntos por comprobar bien los accesos a los recursos ("check if X belongs to Y" y similares)

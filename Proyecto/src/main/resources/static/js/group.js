@@ -3,6 +3,7 @@ const debtsTable = document.getElementById("debtsTable");
 const balancesTable = document.getElementById("balancesTable");
 const groupId = expensesTable.dataset.groupid;
 const currencyString = expensesTable.dataset.currency;
+const userId = expensesTable.dataset.userid;
 
 // Render EXISTING Expenses
 go(`${config.rootUrl}/group/${groupId}/getExpenses`, "GET")
@@ -40,6 +41,13 @@ if (ws.receive) {
             }
 
             renderAllDebts();
+        }
+        else if (obj.type == "GROUP" && obj.action == "GROUP_MEMBER_REMOVED") {
+            const member = obj.group.members.find(member => member.idUser == userId);
+            if (member != null && !member.enabled) {
+                console.log("Redirecting to ", "/user/");
+                window.location.replace("/user/");
+            }
         }
     }
 }

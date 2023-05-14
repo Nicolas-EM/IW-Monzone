@@ -135,7 +135,6 @@ if (groupId) {
     go(`${config.rootUrl}/group/${groupId}/getGroupConfig`, "GET")
         .then(group => {
             renderGroupData(group);
-            renderGroupMembers(group);
         }
         );
 }
@@ -229,6 +228,14 @@ if (ws.receive) {
         // If receiving a group and on that group
         if (obj.type == "GROUP" && obj.group.id == groupId) {
             console.log("Updating group view");
+            const redir = obj.action === "GROUP_DELETED";
+            if (obj.action === "GROUP_MEMBER_REMOVED") {
+                const member = obj.group.members.find(member => member.idUser == userId);
+                if (member != null && !member.enabled) {
+                    console.log("Redirecting to ", "/user/");
+                    window.location.replace("/user/");
+                }
+            }
             if (obj.action === "GROUP_DELETED") {
                 console.log("Redirecting to ", "/user/");
                 window.location.replace("/user/");

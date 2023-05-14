@@ -113,6 +113,8 @@ public class GroupController {
 
         model.addAttribute("groupId", groupId);
         model.addAttribute("group", group);
+        model.addAttribute("userId", user.getId());
+
         return "group";
     }
 

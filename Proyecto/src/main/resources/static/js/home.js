@@ -8,8 +8,8 @@ function getGroups() {
                 const elem = document.getElementById(`group-${group.id}`);
                 if (elem != null)
                     groupsTable.removeChild(elem);
-                const member = group.members.find(member => member.userId === userId);
-                if (member)
+                const member = group.members.find(member => member.idUser == userId);
+                if (member != null && member.enabled)
                     groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
             })
         })
@@ -49,8 +49,8 @@ if (ws.receive) {
             if (elem != null)
                 elem.parentElement.removeChild(elem);
             if (obj.action != "GROUP_DELETED") {
-                const member = group.members.find(member => member.userId === userId);
-                if (member)
+                const member = group.members.find(member => member.idUser == userId);
+                if (member != null && member.enabled)
                     groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
             }
         }
@@ -62,7 +62,7 @@ if (ws.receive) {
             go(`${config.rootUrl}/group/${expGroupId}/getGroupConfig`, "GET")
                 .then(group => {
                     elem.parentElement.removeChild(elem);
-                    const member = group.members.find(member => member.userId === userId);
+                    const member = group.members.find(member => member.idUser == userId);
                     if (member)
                         groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
                 })

@@ -121,6 +121,7 @@ public class UserController {
         }
 
         model.addAttribute("memberOf", enabledMemberOf);
+        model.addAttribute("userId", user.getId());
 
         return "home";
     }
@@ -222,12 +223,12 @@ public class UserController {
     }
 
     @GetMapping("/config")
-    public String home(Model model, HttpSession session) {
+    public String config(Model model, HttpSession session) {
         
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
-        model.addAttribute("user", user);
+        model.addAttribute("userId", user.getId());
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
         model.addAttribute("types", types);
