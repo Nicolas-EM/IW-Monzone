@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import es.ucm.fdi.iw.DebtCalculator;
+import es.ucm.fdi.iw.GroupAccessUtilities;
 import es.ucm.fdi.iw.LocalData;
 import es.ucm.fdi.iw.NotificationSender;
 import es.ucm.fdi.iw.model.Debt;
@@ -52,7 +53,6 @@ import es.ucm.fdi.iw.model.Transferable;
 import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
-import es.ucm.fdi.iw.model.User.Role;
 
 import es.ucm.fdi.iw.exception.*;
 
@@ -78,6 +78,9 @@ public class ExpenseController {
 
     @Autowired
     private NotificationSender notifSender;
+
+    @Autowired
+    private GroupAccessUtilities groupAccessUtilities;
 
     private static final Logger log = LogManager.getLogger(AdminController.class);
 
@@ -118,15 +121,10 @@ public class ExpenseController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled())
-            throw new ForbiddenException(-1);
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         setExpenseAttributes(group, 0, model, true);
         model.addAttribute("group", group);
@@ -145,16 +143,10 @@ public class ExpenseController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null)
-            throw new ForbiddenException(-1);
+        groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new ForbiddenException(-1);
-        }
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // get expenses
         List<Expense> expenses = entityManager.createNamedQuery("Participates.getUniqueExpensesByGroup", Expense.class).setParameter("groupId", groupId).getResultList();
@@ -172,15 +164,10 @@ public class ExpenseController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled()))
-            throw new ForbiddenException(-1);
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // check if expense exists
         Expense expense = entityManager.find(Expense.class, expenseId);
@@ -236,15 +223,10 @@ public class ExpenseController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled())
-            throw new ForbiddenException(-1);
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // check if expense exists
         // If expense == null, its a new expense
@@ -288,16 +270,11 @@ public class ExpenseController {
         validated.currUser = user;
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
         validated.group = group;
 
         // check if user belongs to the group
-        MemberID requesterMemberId = new MemberID(group.getId(), user.getId());
-        Member requesterMember = entityManager.find(Member.class, requesterMemberId);
-        if (requesterMember == null || !requesterMember.isEnabled())
-            throw new ForbiddenException(-1); // Requester not in group
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // check if user who paid exists
         User paidBy = entityManager.find(User.class, paidById);
@@ -594,15 +571,10 @@ public class ExpenseController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled())
-            throw new ForbiddenException(-1);
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // check if expense exists
         Expense exp = entityManager.find(Expense.class, expenseId);
@@ -676,10 +648,8 @@ public class ExpenseController {
         long debtOwnerId = objectMapper.convertValue(jsonNode.get("debtOwnerId"), Long.class);
         float amount = objectMapper.convertValue(jsonNode.get("amount"), Float.class);
 
-        // Check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if(group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        // check if group exists
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // Check if debt exists
         Debt debt = entityManager.find(Debt.class, new DebtID(groupId, debtorId, debtOwnerId));

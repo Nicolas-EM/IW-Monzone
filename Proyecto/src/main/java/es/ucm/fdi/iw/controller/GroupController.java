@@ -36,6 +36,7 @@ import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Group.Currency;
 import es.ucm.fdi.iw.model.Member.GroupRole;
+import es.ucm.fdi.iw.GroupAccessUtilities;
 import es.ucm.fdi.iw.NotificationSender;
 import es.ucm.fdi.iw.model.Transferable;
 
@@ -57,6 +58,9 @@ public class GroupController {
 
     @Autowired
 	private NotificationSender notifSender;
+
+    @Autowired
+    private GroupAccessUtilities groupAccessUtilities;
 
     private static final Logger log = LogManager.getLogger(GroupController.class);
 
@@ -100,16 +104,10 @@ public class GroupController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new ForbiddenException(-1);
-        }
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         model.addAttribute("groupId", groupId);
         model.addAttribute("group", group);
@@ -128,16 +126,10 @@ public class GroupController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new ForbiddenException(-1);
-        }
+        Member member = groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // Get budget
         if(user.hasRole(Role.ADMIN))
@@ -178,16 +170,10 @@ public class GroupController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new ForbiddenException(-1);
-        }
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         return group.toTransfer();
     }
@@ -202,16 +188,10 @@ public class GroupController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new ForbiddenException(-1);
-        }
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // get members
         List<Member> members = group.getMembers();
@@ -229,16 +209,10 @@ public class GroupController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (!user.hasRole(Role.ADMIN) && (member == null || !member.isEnabled())) {
-            throw new ForbiddenException(-1);
-        }
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // get debts
         List<Debt> debts = group.getDebts();
@@ -334,16 +308,10 @@ public class GroupController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled()) {
-            throw new ForbiddenException(-1);
-        }
+        Member member = groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         String name = jsonNode.get("name").asText();
         String desc = jsonNode.get("desc").asText();
@@ -394,16 +362,10 @@ public class GroupController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if user belongs to the group
-        MemberID mId = new MemberID(group.getId(), user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled()) {
-            throw new ForbiddenException(-1);
-        }
+        Member member = groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // only moderators can delete group
         if (member.getRole() != GroupRole.GROUP_MODERATOR) {
@@ -453,16 +415,10 @@ public class GroupController {
         user = entityManager.find(User.class, user.getId());
 
         // check if group exists
-        Group group = entityManager.find(Group.class, groupId);
-        if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
 
         // check if requesting user belongs to the group
-        MemberID mId = new MemberID(groupId, user.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled()) {
-            throw new ForbiddenException(-1);
-        }
+        Member member = groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // check if member to remove belongs to group (only if not leaving group)
         Member removeMember = entityManager.find(Member.class, new MemberID(groupId, removeId));
@@ -525,22 +481,19 @@ public class GroupController {
     @PostMapping("/{id}/inviteMember")
     @Transactional
     @ResponseBody
-    public String inviteMember(@PathVariable long id, @RequestBody JsonNode o, HttpSession session) throws JsonProcessingException  {
+    public String inviteMember(@PathVariable long groupId, @RequestBody JsonNode o, HttpSession session) throws JsonProcessingException  {
         
         String username = o.get("username").asText();
         User sender = (User) session.getAttribute("u");
         sender = entityManager.find(User.class, sender.getId());
         
         // check if group exists
-        Group group = entityManager.find(Group.class, id);
+        Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
             throw new ForbiddenException(-1);
 
         // check if sender belongs to the group
-        MemberID mId = new MemberID(group.getId(), sender.getId());
-        Member member = entityManager.find(Member.class, mId);
-        if (member == null || !member.isEnabled()) 
-            throw new ForbiddenException(-1);
+        Member member = groupAccessUtilities.getMemberOrThrow(groupId, sender.getId());
 
         // only moderators can invite new members
         if (member.getRole() != GroupRole.GROUP_MODERATOR) 
@@ -556,7 +509,7 @@ public class GroupController {
             throw new InternalServerException(-1);
         
         User user = userList.get(0);
-        mId = new MemberID(group.getId(), user.getId());
+        MemberID mId = new MemberID(group.getId(), user.getId());
         member = entityManager.find(Member.class, mId);
         // check user not already member
         if (member == null || !member.isEnabled()) {
@@ -656,5 +609,4 @@ public class GroupController {
 
         return "{\"status\": \"ok\",\"id\": \"" + groupId + "\"}";
     }
-
 }

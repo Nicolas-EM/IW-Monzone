@@ -32,7 +32,7 @@
 - [!!!] Refactorizar ADMIN (ahora tiene una funcionalidad rara)
 - [P] Revisar DebtCalculator (o comentarlo, o cambiarlo) - BEA
 - [P] Refactor excepciones: Enum
-- [P] Factor común código comprobaciones existe grupo y pertenece
+- [P] DONE - Factor común código comprobaciones existe grupo y pertenece
 - [P] Estaría bien guardar transacciones hechas de deudas
 
 ## Errores [!!!]
