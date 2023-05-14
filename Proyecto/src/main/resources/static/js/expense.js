@@ -61,14 +61,13 @@ window.addEventListener("load", (event) => {
 });
 
 
- // Delete Button
-let b = document.getElementById("btn-delete");
+ // Delete expense Button
+let b = document.getElementById("confirmBtn");
 if (b != null) {
   b.onclick = (e) => {
     e.preventDefault();
 
     console.log('Deleting expense');
-    const b = document.getElementById("btn-delete");
 
     go(b.getAttribute('formaction'), 'POST', {})
       .then(d => {
