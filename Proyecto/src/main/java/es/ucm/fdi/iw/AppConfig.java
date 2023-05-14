@@ -56,4 +56,9 @@ public class AppConfig {
 	public DebtCalculator getDebtCalculator() {
 		return new DebtCalculator();
 	}
+
+	@Bean(name="groupAccessUtilites")
+	public GroupAccessUtilities getGroupAccessUtilities(){
+		return new GroupAccessUtilities();
+	}
 }
