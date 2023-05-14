@@ -1,9 +1,50 @@
+function getTimeAgo(dateString) {
+    const date = new Date(dateString);
+
+    const millisecondsPerMinute = 60000;
+    const millisecondsPerHour = 3600000;
+    const millisecondsPerDay = 86400000;
+    const millisecondsPerWeek = 604800000;
+    const millisecondsPerMonth = 2592000000;
+    const millisecondsPerYear = 31536000000;
+
+    const currentDate = new Date();
+
+    // Calculate the difference in milliseconds between the current date and the given date
+    const differenceInMilliseconds = currentDate - date;
+
+    if (differenceInMilliseconds < 2 * millisecondsPerMinute) {
+        return 'Just now';  // Less than 2 minutes ago
+    } else if (differenceInMilliseconds < millisecondsPerHour) {
+        const minutes = Math.floor(differenceInMilliseconds / millisecondsPerMinute);
+        return minutes + ' minutes ago';
+    } else if (differenceInMilliseconds < millisecondsPerDay) {
+        const hours = Math.floor(differenceInMilliseconds / millisecondsPerHour);
+        return hours === 1 ? '1 hour ago' : hours + ' hours ago';
+    } else if (differenceInMilliseconds < millisecondsPerWeek) {
+        const days = Math.floor(differenceInMilliseconds / millisecondsPerDay);
+        return days === 1 ? '1 day ago' : days + ' days ago';
+    } else if (differenceInMilliseconds < millisecondsPerMonth) {
+        const weeks = Math.floor(differenceInMilliseconds / millisecondsPerWeek);
+        return weeks === 1 ? '1 week ago' : weeks + ' weeks ago';
+    } else if (differenceInMilliseconds < millisecondsPerYear) {
+        const months = Math.floor(differenceInMilliseconds / millisecondsPerMonth);
+        return months === 1 ? '1 month ago' : months + ' months ago';
+    } else {
+        const years = Math.floor(differenceInMilliseconds / millisecondsPerYear);
+        return years === 1 ? '1 year ago' : years + ' years ago';
+    }
+}
+
 function renderReadNotif(notif) {
     return `<div id="notif-${notif.id}" class="row my-2">
                 <div class="card text-white" role="button">
                     <div class="card-body">
                         <div class="row">
                             <h5>${notif.message}</h5>
+                        </div>
+                        <div class="row">
+                            <p>${notif.dateSent.substring(0, 10)} (${getTimeAgo(notif.dateSent)})</p>
                         </div>
                         <div class="row mt-2">
                             <div class="col invisible">
@@ -24,6 +65,9 @@ function renderUnreadNotif(notif) {
                         <div class="row">
                             <h5>${notif.message}</h5>
                         </div>
+                        <div class="row">
+                            <p>${notif.dateSent.substring(0, 10)} (${getTimeAgo(notif.dateSent)})</p>
+                        </div>
                         <div class="row mt-2">
                             <form id="notifReadBtn-${notif.id}" class="col" method="post" action="/user/${notif.id}/read">
                                 <button class="btn btn-func btn-primary rounded-pill fw-bold" onclick="markNotifRead(event, this, ${notif.id})" type="submit">Mark Read</button>
@@ -43,6 +87,9 @@ function renderInvitation(notif) {
                     <div class="card-body">
                         <div class="row">
                             <h5>${notif.message}</h5>
+                        </div>
+                        <div class="row">
+                            <p>${notif.dateSent.substring(0, 10)} (${getTimeAgo(notif.dateSent)})</p>
                         </div>
                         <div class="row mt-2">
                             <form id="notifReadBtn-${notif.id}" class="col" method="post" action="/group/${notif.idGroup}/acceptInvite">
