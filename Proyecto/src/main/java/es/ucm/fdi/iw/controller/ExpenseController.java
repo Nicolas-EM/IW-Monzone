@@ -648,8 +648,14 @@ public class ExpenseController {
         long debtOwnerId = objectMapper.convertValue(jsonNode.get("debtOwnerId"), Long.class);
         float amount = objectMapper.convertValue(jsonNode.get("amount"), Float.class);
 
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
         // check if group exists
         Group group = groupAccessUtilities.getGroupOrThrow(groupId);
+
+        // check if user belongs to the group
+        groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // Check if debt exists
         Debt debt = entityManager.find(Debt.class, new DebtID(groupId, debtorId, debtOwnerId));
@@ -679,8 +685,6 @@ public class ExpenseController {
         debtOwnerM.setBalance(debtOwnerM.getBalance() - amount);
 
         // send notification ASYNC
-        User user = (User) session.getAttribute("u");
-        user = entityManager.find(User.class, user.getId());
         createAndSendNotifs(NotificationType.DEBT_SETTLED, user, new ArrayList<>(Arrays.asList(debtOwner, debtor)), group, exp);
 
         // send expense to group ASYNC
