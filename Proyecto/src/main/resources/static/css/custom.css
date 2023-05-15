@@ -104,10 +104,10 @@ img.preview {
     border-style: none;
     outline: none;
     min-height: 10%;
-    background-color: #ffc107;
+    background-color: #d19900;
     margin-left: 10%;
 }
 
 .btn-return:hover {
-    background-color: #f89e03;
+    background-color: #b68500;
 }
