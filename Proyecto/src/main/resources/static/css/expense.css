@@ -56,6 +56,14 @@
     margin-left: 15px;
 }
 
+#btn-back {
+    border-style: none;
+    outline: none;
+    width: 30%;
+    background-color: #d19900;
+    float: left;
+}
+
 #btn-delete {
     border-style: none;
     outline: none;
