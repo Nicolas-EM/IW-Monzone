@@ -60,14 +60,14 @@ document.getElementById("passwordForm").addEventListener('submit', (e) => {
 function getGroups() {
     go(`${config.rootUrl}/user/getGroups`, "GET")
         .then(groups => {
-            if(groups.length == 0)
+            if (groups.length == 0)
                 groupsTable.insertAdjacentHTML("afterbegin",`<h2 id="group-none">You don't have groups yet</h2>`);
-            else{
+            else {
                 Array.from(groups).forEach(group => {
                     const elem = document.getElementById(`group-${group.id}`);
                     if (elem != null)
                         groupsTable.removeChild(elem);
-                    const member = group.members.find(member => member.userId === userId);
+                    const member = group.members.find(member => member.idUser == userId);
                     if (member)
                         groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
                 });
@@ -113,12 +113,12 @@ if (ws.receive) {
             if (obj.action == "GROUP_MODIFIED" || obj.action == "GROUP_DELETED")
                 elem.parentElement.removeChild(elem);
             if (obj.action == "GROUP_MEMBER_REMOVED") {
-                const member = group.members.find(member => member.userId === userId);
-                if (!member)
+                const member = group.members.find(member => member.idUser == userId);
+                if (!member && elem != null)
                     elem.parentElement.removeChild(elem);
             }
             if (obj.action == "GROUP_MODIFIED" || (obj.action == "GROUP_INVITATION_ACCEPTED" && elem === null)) {
-                const member = group.members.find(member => member.userId === userId);
+                const member = group.members.find(member => member.idUser == userId);
                 if (member)
                     groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
             }
@@ -130,7 +130,7 @@ if (ws.receive) {
             const elem = document.getElementById(`group-${expGroupId}`);
             go(`${config.rootUrl}/group/${expGroupId}/getGroupConfig`, "GET")
                 .then(group => {
-                    const member = group.members.find(member => member.userId === userId);
+                    const member = group.members.find(member => member.idUser == userId);
                     if (member) {
                         elem.parentElement.removeChild(elem);
                         groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
