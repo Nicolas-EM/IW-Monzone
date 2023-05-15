@@ -56,7 +56,7 @@ if (confirmModal) {
                 break;
             case "delMember":
                 removeId = button.getAttribute('data-bs-removeId');
-                modalBody.innerHTML = "Are you sure you want to remove this person from this group?"
+                modalBody.innerHTML = "Are you sure you want to remove this person from this group? Note that you can't remove a member if their balance is other than 0."
                 break;
         }
 
@@ -258,6 +258,15 @@ if (ws.receive) {
             if (obj.action === "GROUP_DELETED") {
                 console.log("Redirecting to ", "/user/");
                 window.location.replace("/user/");
+            }
+            else if (obj.action == "GROUP_MEMBER_REMOVED") {
+                const member = obj.group.members.find(member => member.idUser == userId);
+                if (member != null && !member.enabled) {
+                    console.log("Redirecting to ", "/user/");
+                    window.location.replace("/user/");
+                }
+                else 
+                    renderGroupData(obj.group);
             }
             else
                 renderGroupData(obj.group);

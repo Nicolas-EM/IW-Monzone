@@ -114,7 +114,7 @@ if (ws.receive) {
                 elem.parentElement.removeChild(elem);
             if (obj.action == "GROUP_MEMBER_REMOVED") {
                 const member = group.members.find(member => member.idUser == userId);
-                if (!member && elem != null)
+                if (member && !member.enabled && elem != null)
                     elem.parentElement.removeChild(elem);
             }
             if (obj.action == "GROUP_MODIFIED" || (obj.action == "GROUP_INVITATION_ACCEPTED" && elem === null)) {

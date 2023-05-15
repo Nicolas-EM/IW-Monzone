@@ -65,7 +65,7 @@ const ws = {
         const subscription = ws.subscriptions[sub];
         if (subscription) {
             subscription.unsubscribe(); // Unsubscribe from the specific endpoint
-            delete subscriptions[sub]; // Remove the subscription from the stored endpoints
+            delete ws.subscriptions[sub]; // Remove the subscription from the stored endpoints
             console.log("Unsubscribed from " + sub);
         } else {
             console.log("No active subscription to " + sub);

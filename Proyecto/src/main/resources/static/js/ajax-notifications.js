@@ -207,8 +207,7 @@ function acceptInvite(event, btn, notifId) {
         .catch(e => console.log("sad", e))
 }
 
-
-
+// Mark notif as read
 function markNotifRead(event, btn, notifId) {
     event.preventDefault();
     go(btn.parentNode.action, 'POST', {})
@@ -221,6 +220,20 @@ function markNotifRead(event, btn, notifId) {
             }
         })
         .catch(e => console.log("Failed to mark notif as read", e))
+}
+
+// Unsuscribe from group
+if (ws.receive) {
+    const oldFn = ws.receive; // guarda referencia a manejador anterior
+    ws.receive = (destination, obj) => {
+        oldFn(destination, obj);
+        if (obj.type == "GROUP") {
+            const member = obj.group.members.find(member => member.idUser == userId);
+            // You're the one removed
+            if (member != null && !member.enabled)
+                ws.unsubscribe(`/topic/group/${obj.group.id}`)
+        }
+    }
 }
 
 // Delete notif client side
