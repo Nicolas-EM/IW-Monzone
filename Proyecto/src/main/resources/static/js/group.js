@@ -5,11 +5,14 @@ const groupId = expensesTable.dataset.groupid;
 const currencyString = expensesTable.dataset.currency;
 const userId = expensesTable.dataset.userid;
 
+
 // Render EXISTING Expenses
 go(`${config.rootUrl}/group/${groupId}/getExpenses`, "GET")
     .then(expenses => {
+        expensesTable.insertAdjacentHTML("afterbegin", `<h2 id="exp-none" style="text-align: center; display: none;">You don't have expenses yet</h2>`);
+        const e = document.getElementById('exp-none');
         if(expenses.length == 0)
-            expensesTable.insertAdjacentHTML("afterbegin", `<h2 id="group-none" style="text-align: center;">You don't have expenses yet</h2>`);
+            e.style.display = 'block';
         else{
             expenses.forEach(expense => {
                 expensesTable.insertAdjacentHTML("afterbegin", renderExpense(expense));
@@ -43,6 +46,12 @@ if (ws.receive) {
                     break;
                 default:
             }
+            // Render mensaje no existen grupos
+            const e = document.getElementById('exp-none');
+            if (e.style.display === 'none' && expensesTable.childElementCount == 1) // El 1 es el mensaje de vacio
+                e.style.display = 'block';  // Mostrar el elemento
+            else if(expensesTable.childElementCount > 1)
+                e.style.display = 'none';  // Ocultar el elemento    
 
             renderAllDebts();
         }

@@ -107,12 +107,21 @@ function renderInvitation(notif) {
 // pinta notifs viejos al cargarse, via AJAX
 go(config.rootUrl + "/user/receivedNotifs", "GET")
     .then(notifs => {
-        let actionNotifsDiv = document.getElementById("actionNotifs-tab-pane");
-        let notifsDiv = document.getElementById("notifs-tab-pane");
-        if(notifs.length == 0){
-            notifsDiv.insertAdjacentHTML("beforeend", `<h3 "id="notif-none">You don't have notifications yet</h3>`);
-            actionNotifsDiv.insertAdjacentHTML("beforeend", `<h3 "id="invit-none">You don't have invitations yet</h3>`);
-        }
+        const actionNotifsDiv = document.getElementById("actionNotifs-tab-pane");
+        const notifsDiv = document.getElementById("notifs-tab-pane");
+
+        notifsDiv.insertAdjacentHTML("beforeend", `<h3 id="notif-none" style="display: none;">You don't have notifications yet</h3>`);
+        actionNotifsDiv.insertAdjacentHTML("beforeend", `<h3 id="invit-none" style="display: none;">You don't have invitations yet</h3>`);
+        
+        const noNotif = document.getElementById('notif-none');
+        const noInvit = document.getElementById('invit-none');
+
+        if(notifsDiv.childElementCount == 1)
+            noNotif.style.display = 'block'
+
+        if(actionNotifsDiv.childElementCount == 1)
+            noInvit.style.display = 'block'
+        
         else{
             notifs.forEach(notif => {
                 if (notif.type == "GROUP_INVITATION") {
@@ -148,24 +157,39 @@ if (ws.receive) {
             let notifsDiv = document.getElementById("notifs-tab-pane");
 
             if (notif.type == 'GROUP_INVITATION') {
-                const e = document.getElementById('invit-none')
-                if (e != null)
-                    actionNotifsDiv.removeChild(e);
-
                 actionNotifsDiv.insertAdjacentHTML("afterbegin", renderInvitation(notif));
+
+                renderNoInvitations();
             }
             else {
-                const e = document.getElementById('notif-none')
-                if (e != null)
-                    actionNotifsDiv.removeChild(e);
-
                 notifsDiv.insertAdjacentHTML("afterbegin", renderUnreadNotif(notif));
+
+                renderNoNotif();  // Ocultar el elemento  
             }
 
             createToastNotification(notif.id, notif.message);
         }
     }
 }
+
+function renderNoNotif() {
+    let notifsDiv = document.getElementById("notifs-tab-pane");
+    const e = document.getElementById('notif-none');
+    if (e.style.display === 'none' && notifsDiv.childElementCount == 1)
+        e.style.display = 'block'; // Mostrar el elemento
+    else if (notifsDiv.childElementCount > 1)
+        e.style.display = 'none'; // Ocultar el elemento  
+}
+
+function renderNoInvitations() {
+    let actionNotifsDiv = document.getElementById("actionNotifs-tab-pane");
+    const e = document.getElementById('invit-none');
+    if (e.style.display === 'none' && actionNotifsDiv.childElementCount == 1)
+        e.style.display = 'block'; // Mostrar el elemento
+    else if (actionNotifsDiv.childElementCount > 1)
+        e.style.display = 'none';
+}
+
 
 // Accept Invite Btn
 function acceptInvite(event, btn, notifId) {
@@ -176,10 +200,14 @@ function acceptInvite(event, btn, notifId) {
             ws.subscribe(`/topic/group/${d.id}`);
             deleteClientNotif(notifId);
             createToastNotification(notifId, "Invitation Accepted");
-            document.getElementById('offcanvasNav').hide();
+            // document.getElementById('offcanvasNav').hide();
+
+            renderNoInvitations();
         })
         .catch(e => console.log("sad", e))
 }
+
+
 
 function markNotifRead(event, btn, notifId) {
     event.preventDefault();
@@ -213,6 +241,9 @@ function deleteNotif(event, btn, notifId) {
         .then(d => {
             deleteClientNotif(notifId);
             createToastNotification(notifId, "Notification Deleted");
+            
+            renderNoInvitations();
+            renderNoNotif();
         })
         .catch(e => console.log("sad", e))
 }
