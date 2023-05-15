@@ -15,8 +15,8 @@
   <div class="container justify-content-center my-4">
     <form id="expenseForm" method="post" th:action="@{/group/{groupId}/{action}(groupId=${groupId}, action=${expense != null} ? ${expense?.getId()} : 'new')}">
       <div class="row">
-        <h1 th:if="${newExpense}">New Expense</h1>
-        <h1 th:unless="${newExpense}">Edit Expense</h1>
+          <h1 th:if="${newExpense}">New Expense</h1>
+          <h1 th:unless="${newExpense}">Edit Expense</h1>
       </div>
       <div class="row row-cols-1 row-cols-lg-3 gx-3 pt-2">
         <!-- Basic Info -->
@@ -30,6 +30,8 @@
             <input id="dateString" type="date" name="dateString" class="rounded-corners w-100" required="required" th:value="${expense?.getDate()}">
             <label for="amount" class="form-label mt-4 w-100">Amount ([[${group.getCurrencyText()}]])</label>
             <input id="amount" name="amount" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getAmount()}">
+
+            <a th:href="@{/group/{groupId}/(groupId=${groupId})}" class="btn btn-primary rounded-pill fw-bold mt-2" id="btn-back">Back</a>
           </div>
         </div>
         <!-- Advanced info -->
