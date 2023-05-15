@@ -63,6 +63,22 @@
     margin-left: 20%;
 }
 
+#indicator {
+    display: flex;
+    align-items: center;
+    max-width: 7%;
+    float: right;
+}
+
+.dot {
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    margin-top: 6px;;
+}
+
 /* ------------ ADD BUTTON ------------*/
 
 .btn-lg {

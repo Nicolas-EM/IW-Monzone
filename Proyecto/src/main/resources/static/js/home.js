@@ -82,7 +82,10 @@ function renderGroup(group, balance) {
                             <div>${group.desc}</div>
                         </div>
                         <div class="row">
-                            <div class="balance col ms-3">${balance} ${group.currencyString} </div>
+                            <div class="balance col ms-3">
+                                <span class="dot" style="${balance >= 0 ? 'background: green' : 'background: red'}"></span>
+                                ${balance}${group.currencyString}                                
+                            </div>
                             <div class="col me-3 col-num-members">
                                 <div class="icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
