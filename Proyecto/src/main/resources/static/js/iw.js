@@ -11,6 +11,11 @@ const ws = {
     retries: 3,
 
     /**
+     * Array of subscribed web sockets
+     */
+    subscriptions: {},
+
+    /**
      * Default action when message is received. 
      */
     receive: (destination, text) => {
@@ -46,11 +51,24 @@ const ws = {
 
     subscribe: (sub) => {
         try {
-            ws.stompClient.subscribe(sub,
+            const subscription = ws.stompClient.subscribe(sub,
                 (m) => ws.receive(m.headers.destination, JSON.parse(m.body))); // fails if non-json received!
+            ws.subscriptions[sub] = subscription; // Store the subscription object with the endpoint as the key
             console.log("Hopefully subscribed to " + sub);
         } catch (e) {
             console.log("Error, could not subscribe to " + sub, e);
+        }
+    },
+
+    // Function to unsubscribe from an endpoint
+    unsubscribe: (sub) => {
+        const subscription = ws.subscriptions[sub];
+        if (subscription) {
+            subscription.unsubscribe(); // Unsubscribe from the specific endpoint
+            delete subscriptions[sub]; // Remove the subscription from the stored endpoints
+            console.log("Unsubscribed from " + sub);
+        } else {
+            console.log("No active subscription to " + sub);
         }
     }
 }
@@ -195,14 +213,14 @@ document.addEventListener("DOMContentLoaded", () => {
         let subs = config.admin ? ["/topic/admin", "/user/queue/notifications"] : ["/user/queue/notifications"]
 
         go(`${config.rootUrl}/user/getGroups`, "GET")
-        .then(groups => {
-            subs = subs.concat(groups.map(group => `/topic/group/${group.id}`));
-            ws.initialize(config.socketUrl, subs);
-        })
-        .catch(error => {
-            console.error(`Failed to get user groups: ${error}`);
-            ws.initialize(config.socketUrl, subs);
-        })
+            .then(groups => {
+                subs = subs.concat(groups.map(group => `/topic/group/${group.id}`));
+                ws.initialize(config.socketUrl, subs);
+            })
+            .catch(error => {
+                console.error(`Failed to get user groups: ${error}`);
+                ws.initialize(config.socketUrl, subs);
+            })
 
         let p = document.querySelector("#nav-unread");
         if (p) {
