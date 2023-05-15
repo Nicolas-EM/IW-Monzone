@@ -66,10 +66,10 @@ public class RootController {
 
         // check params
         if (name.equals("") || username.equals("") || password.equals("") || repeatPassword.equals(""))
-            throw new BadRequestException(-1);
+            throw new BadRequestException(ErrorType.E_EMPTY_FIELDS);
         
         if (!password.equals(repeatPassword))
-            throw new BadRequestException(-3);
+            throw new BadRequestException(ErrorType.E_DIFF_PASS);
         
         // check repeat username
         List<User> u = entityManager.createNamedQuery("User.byUsername", User.class)
@@ -77,7 +77,7 @@ public class RootController {
 		        .getResultList();
         if (u == null || u.size() > 0) {
             log.warn("Error: user repeat " + username);
-            throw new BadRequestException(-2);            
+            throw new BadRequestException(ErrorType.E_USERNAME_TAKEN);            
         }
             
 

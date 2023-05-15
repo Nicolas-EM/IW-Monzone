@@ -264,11 +264,11 @@ public class GroupController {
 
         // parse budget
         if (budget < 0)
-            throw new BadRequestException(-7);
+            throw new BadRequestException(ErrorType.E_INVALID_BUDGET);
 
         // parse curr
         if (currId < 0 || currId >= Currency.values().length)
-            throw new BadRequestException(-20);
+            throw new BadRequestException(ErrorType.E_INVALID_CURRENCY);
         Currency curr = Currency.values()[currId];
 
         // create group
@@ -322,7 +322,7 @@ public class GroupController {
         if (member.getRole() == GroupRole.GROUP_MODERATOR) {
             // parse curr
             if (currId < 0 || currId >= Currency.values().length)
-                throw new BadRequestException(-20);
+                throw new BadRequestException(ErrorType.E_INVALID_CURRENCY);
             Currency curr = Currency.values()[currId];
 
             // update group
@@ -335,7 +335,7 @@ public class GroupController {
         
         // check member budget
         if (budget < 0)
-            throw new BadRequestException(-7);
+            throw new BadRequestException(ErrorType.E_INVALID_BUDGET);
 
         group.setTotBudget(group.getTotBudget() - member.getBudget());
         member.setBudget(budget);
@@ -369,14 +369,14 @@ public class GroupController {
 
         // only moderators can delete group
         if (member.getRole() != GroupRole.GROUP_MODERATOR) {
-            throw new ForbiddenException(-2);
+            throw new ForbiddenException(ErrorType.E_DELETE_FORBIDDEN);
         }
 
         // check all balances = 0 and remove member from the group
         List<Member> members = group.getMembers();
         for (Member m : members) {
             if (m.getBalance() != 0)
-                throw new BadRequestException(-10);
+                throw new BadRequestException(ErrorType.E_BALANCES_NZ);
             m.setEnabled(false);
             ;
         }
@@ -424,13 +424,13 @@ public class GroupController {
         Member removeMember = entityManager.find(Member.class, new MemberID(groupId, removeId));
         if (removeId != user.getId()){
             if (removeMember == null || !removeMember.isEnabled()) {
-                throw new ForbiddenException(-7);
+                throw new ForbiddenException(ErrorType.E_USER_FORBIDDEN);
             }
         }
 
         // only moderators can remove other members
         if (user.getId() != removeId && member.getRole() != GroupRole.GROUP_MODERATOR) {
-            throw new ForbiddenException(-2);
+            throw new ForbiddenException(ErrorType.E_DELMEMBER_FORBIDDEN);
         }
 
         // if only member, delete group
@@ -445,12 +445,12 @@ public class GroupController {
         if (user.getId() == removeId && member.getRole() == GroupRole.GROUP_MODERATOR) {
             List<Member> moderators = entityManager.createNamedQuery("Member.getGroupAdmins",Member.class).setParameter("groupId", groupId).getResultList();
             if(moderators.size() == 1)
-                throw new BadRequestException(-12);
+                throw new BadRequestException(ErrorType.E_ONLY_MODERATOR);
         }
 
         // balance must be 0
         if (removeMember.getBalance() != 0) {
-            throw new BadRequestException(-11);
+            throw new BadRequestException(ErrorType.E_MEMBER_BALANCE_NZ);
         }
 
         // remove member
@@ -490,23 +490,23 @@ public class GroupController {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+            throw new ForbiddenException(ErrorType.E_GROUP_FORBIDDEN);
 
         // check if sender belongs to the group
         Member member = groupAccessUtilities.getMemberOrThrow(groupId, sender.getId());
 
         // only moderators can invite new members
         if (member.getRole() != GroupRole.GROUP_MODERATOR) 
-            throw new ForbiddenException(-2);
+            throw new ForbiddenException(ErrorType.E_INVITE_FORBIDDEN);
 
         // Check invited user
         List<User> userList = entityManager.createNamedQuery("User.byUsername", User.class).setParameter("username", username).getResultList();
 
         if (userList.isEmpty() || !userList.get(0).isEnabled())
-            throw new BadRequestException(-4);
+            throw new BadRequestException(ErrorType.E_USER_NE);
 
         if (userList.size() > 1)
-            throw new InternalServerException(-1);
+            throw new InternalServerException(ErrorType.E_INTERNAL_SERVER);
         
         User user = userList.get(0);
         MemberID mId = new MemberID(group.getId(), user.getId());
@@ -530,12 +530,12 @@ public class GroupController {
 
                 return "{\"status\":\"invited\"}";
             } else {
-                throw new BadRequestException(-23);
+                throw new BadRequestException(ErrorType.E_INVITED_USER);
             }
         } else {
             // user is already in a group
             log.info("User {} cannot join group {}", member.getUser().getUsername(), group.getName());
-            throw new BadRequestException(-14);
+            throw new BadRequestException(ErrorType.E_ALREADY_BELONGS);
         }
     }
 
@@ -557,12 +557,12 @@ public class GroupController {
             .getResultList();
 
         if(invites.size() < 1)
-            throw new ForbiddenException(-8);
+            throw new ForbiddenException(ErrorType.E_INVITATION_FORBIDDEN);
 
         // check if group still exists
         Group group = entityManager.find(Group.class, groupId);
         if(group == null || !group.isEnabled())
-            throw new BadRequestException(-15);
+            throw new BadRequestException(ErrorType.E_GROUP_NE);
 
         for(Notification invite : invites){
             // Check if sender is an admin in group

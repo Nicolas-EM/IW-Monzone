@@ -140,12 +140,12 @@ public class UserController {
         try {
             formDate = LocalDate.parse(dateString + "-01");
         } catch (Exception e) {
-            throw new BadRequestException(-21);
+            throw new BadRequestException(ErrorType.E_INVALID_DATE);
         }
 
         // check currency 
         if (currId < 0 || currId >= Group.Currency.values().length)
-        throw new BadRequestException(-20);
+        throw new BadRequestException(ErrorType.E_INVALID_CURRENCY);
         Group.Currency newCurr = Group.Currency.values()[currId];
 
         float total = 0f;
@@ -156,7 +156,7 @@ public class UserController {
             try {
                 eDate = LocalDate.parse(exp.getDate());
             } catch (Exception e) {
-                throw new BadRequestException(-21);
+                throw new BadRequestException(ErrorType.E_INVALID_DATE);
             }
             
             if (eDate.getMonthValue() == formDate.getMonthValue() && eDate.getYear() == formDate.getYear()
@@ -196,7 +196,7 @@ public class UserController {
                 
         // check currency 
         if (currId < 0 || currId >= Group.Currency.values().length)
-        throw new BadRequestException(-20);
+            throw new BadRequestException(ErrorType.E_INVALID_CURRENCY);
         Group.Currency newCurr = Group.Currency.values()[currId];
 
         List<Type> types = entityManager.createNamedQuery("Type.getAllTypes",Type.class).getResultList();
@@ -346,11 +346,11 @@ public class UserController {
         // Check notification exists
         Notification notif = entityManager.find(Notification.class, notifId);
         if (notif == null)
-            throw new ForbiddenException(-8);
+            throw new ForbiddenException(ErrorType.E_NOTIF_FORBIDDEN);
 
         // Check notification belongs to user
         if (notif.getRecipient().getId() != userId)
-            throw new ForbiddenException(-8);
+            throw new ForbiddenException(ErrorType.E_NOTIF_FORBIDDEN);
 
         notif.setDateRead(LocalDateTime.now());
 
@@ -370,11 +370,11 @@ public class UserController {
         // Check notification exists
         Notification notif = entityManager.find(Notification.class, notifId);
         if (notif == null)
-            throw new ForbiddenException(-8);
+            throw new ForbiddenException(ErrorType.E_NOTIF_FORBIDDEN);
 
         // Check notification belongs to user
         if (notif.getRecipient().getId() != user.getId())
-            throw new ForbiddenException(-8);
+            throw new ForbiddenException(ErrorType.E_NOTIF_FORBIDDEN);
 
         // delete notification
         user.getNotifications().remove(notif);
@@ -395,10 +395,10 @@ public class UserController {
         target = entityManager.find(User.class, target.getId());
 
         if(name == null){ // No name
-            throw new BadRequestException(-6);
+            throw new BadRequestException(ErrorType.E_EMPTY_NAME);
         }
         else if(username == null){ // No username
-            throw new BadRequestException(-13);
+            throw new BadRequestException(ErrorType.E_EMPTY_USERNAME);
         }
 
         target.setUsername(username);
@@ -441,14 +441,14 @@ public class UserController {
 
             if (passwordEncoder.matches(oldPwd, user.getPassword())) { // Comprobar que la contraseña actual del user es igual a oldPwd  
                 if(newPwd.equals(oldPwd)){ // Si la contraseña antigua y la nueva coinciden
-                    throw new BadRequestException(-19);
+                    throw new BadRequestException(ErrorType.E_PASS_UNCHANGED);
                 }
                 else{
             user.setPassword(encodePassword(newPwd)); //save encoded version of password
                 }
             }
             else{ // Old password incorrecta
-                throw new BadRequestException(-5);
+                throw new BadRequestException(ErrorType.E_WRONG_PASS);
             }
 
         }    
@@ -474,7 +474,7 @@ public class UserController {
         // check permissions
         User requester = (User) session.getAttribute("u");
         if (requester.getId() != target.getId() && !requester.hasRole(Role.ADMIN)) {
-            // throw new NotYourProfileException();
+            throw new ForbiddenException(ErrorType.E_PROFILE_FORBIDDEN);
         }
 
         log.info("Updating photo for user {}", id);

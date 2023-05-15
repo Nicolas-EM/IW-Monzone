@@ -13,10 +13,33 @@ import es.ucm.fdi.iw.model.User;
 import lombok.AllArgsConstructor;
 
 /*
+ *  -------------
+ *    ALGORITHM
+ *  -------------
+ *  -> The algorithm uses a greedy technique to solve the problem.
+ *  First, it iterates through the list of members to separate those with positive and negative balances 
+ *  (zeros can be ignored as they don't need to pay anyone).
+ *  
+ *  Two priority queues are constructed, one for positive balances and another for negative balances. An element is 
+ *  considered more prioritized than another if its absolute balance is larger (applicable to both queues).
+ * 
+ *  The problem is solved in a similar way to the knapsack problem when items can be split. Each positive balance 
+ *  represents a knapsack, and the goal is to "fill" it (offset the balance) with the largest negative balance.
+ * 
+ *  If the negative balance (in absolute value) exceeds the positive balance, then the object is "split," and the 
+ *  remaining value is re-inserted into the priority queue for negative balances. Otherwise, the updated positive 
+ *  balance re-enters the positive queue.
+ * 
+ *  NOTE: This algorithm does not solve the problem optimally (in fact, it is an NP-complete problem), 
+ *  but it improves efficiency compared to other algorithms.
+ */
+
+/*
  * Calculates debts given the members of a group
  */
 public class DebtCalculator {
 
+    // Aux class to represent elems in PriorityQueue
     @AllArgsConstructor
     public class Balance implements Comparable<Balance> {
         public User user;
@@ -57,7 +80,7 @@ public class DebtCalculator {
             float balance = pos.balance + neg.balance;
             
             if (Math.abs(balance) >= 0.01 && balance < 0)
-                 negativeB.add(new Balance(debtor, balance));
+                negativeB.add(new Balance(debtor, balance));
             else if (Math.abs(balance) >= 0.01 && balance > 0)
                 positiveB.add(new Balance(debtOwner, balance));
         }

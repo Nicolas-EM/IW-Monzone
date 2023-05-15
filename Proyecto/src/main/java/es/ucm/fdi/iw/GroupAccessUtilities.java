@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.EntityManager;
 
+import es.ucm.fdi.iw.exception.ErrorType;
 import es.ucm.fdi.iw.exception.ForbiddenException;
 import es.ucm.fdi.iw.model.Group;
 import es.ucm.fdi.iw.model.Member;
@@ -21,7 +22,7 @@ public class GroupAccessUtilities {
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
-            throw new ForbiddenException(-1);
+            throw new ForbiddenException(ErrorType.E_GROUP_FORBIDDEN);
 
         return group;
     }
@@ -31,7 +32,7 @@ public class GroupAccessUtilities {
         MemberID mId = new MemberID(groupId, userId);
         Member member = entityManager.find(Member.class, mId);
         if (member == null || !member.isEnabled())
-            throw new ForbiddenException(-1);
+            throw new ForbiddenException(ErrorType.E_GROUP_FORBIDDEN);
 
         return member;
     }

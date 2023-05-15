@@ -54,6 +54,7 @@ import es.ucm.fdi.iw.model.Type;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
 
+
 import es.ucm.fdi.iw.exception.*;
 
 /**
@@ -172,11 +173,11 @@ public class ExpenseController {
         // check if expense exists
         Expense expense = entityManager.find(Expense.class, expenseId);
         if (expense == null || !expense.isEnabled())
-            throw new ForbiddenException(-6);
+            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
 
         // check if expense belongs to the group
         if (!group.hasExpense(expense))
-            throw new ForbiddenException(-6);
+            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
 
         setExpenseAttributes(group, expenseId, model, false);
         model.addAttribute("expense", expense);
@@ -232,11 +233,11 @@ public class ExpenseController {
         // If expense == null, its a new expense
         Expense exp = entityManager.find(Expense.class, expenseId);
         if (exp != null && !exp.isEnabled())
-            throw new ForbiddenException(-6);
+            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
 
         // check if expense belongs to the group
-        if (exp != null && !group.hasExpense(exp))
-            throw new ForbiddenException(-6);
+        if (!group.hasExpense(exp))
+            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
 
         File f = localData.getFile("expense", String.valueOf(expenseId));
         InputStream in = new BufferedInputStream(
@@ -279,20 +280,20 @@ public class ExpenseController {
         // check if user who paid exists
         User paidBy = entityManager.find(User.class, paidById);
         if (paidBy == null || !paidBy.isEnabled())
-            throw new ForbiddenException(-7);
+            throw new ForbiddenException(ErrorType.E_USER_FORBIDDEN);
         validated.paidBy = paidBy;
 
         // check if user who paid belongs to the group
         MemberID paidByMemberId = new MemberID(groupId, paidById);
         Member paidByMember = entityManager.find(Member.class, paidByMemberId);
         if (paidByMember == null || !paidByMember.isEnabled())
-            throw new ForbiddenException(-7);
+            throw new ForbiddenException(ErrorType.E_USER_FORBIDDEN);
         validated.paidByMember = paidByMember;
 
         // check if type exists
         Type type = entityManager.find(Type.class, typeId);
         if (type == null)
-            throw new BadRequestException(-22);
+            throw new BadRequestException(ErrorType.E_INVALID_TYPE);
         validated.type = type;
 
         // check date format
@@ -301,13 +302,13 @@ public class ExpenseController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             date = LocalDate.parse(dateString, formatter);
         } catch (Exception e) {
-            throw new BadRequestException(-21);
+            throw new BadRequestException(ErrorType.E_INVALID_DATE);
         }
         validated.date = date;
 
         // check it has participants
         if (participateIds.isEmpty())
-            throw new BadRequestException(-18);
+            throw new BadRequestException(ErrorType.E_NO_PARTICIPANTS);
 
         // check participants exist
         List<User> participateUsers = new ArrayList<>();
@@ -315,7 +316,7 @@ public class ExpenseController {
             long pId = Long.parseLong(idString);
             User pUser = entityManager.find(User.class, pId);
             if (pUser == null || !pUser.isEnabled())
-                throw new ForbiddenException(-7);
+                throw new ForbiddenException(ErrorType.E_USER_FORBIDDEN);
             participateUsers.add(pUser);
         }
         validated.participateUsers = participateUsers;
@@ -326,14 +327,14 @@ public class ExpenseController {
             MemberID participateMemberId = new MemberID(groupId, u.getId());
             Member participateMember = entityManager.find(Member.class, participateMemberId);
             if (participateMember == null || !participateMember.isEnabled())
-                throw new ForbiddenException(-7);
+                throw new ForbiddenException(ErrorType.E_USER_FORBIDDEN);
             participateMembers.add(participateMember);
         }
         validated.participateMembers = participateMembers;
 
         // check amount is not negative
         if (amount <= 0)
-            throw new BadRequestException(-17);
+            throw new BadRequestException(ErrorType.E_INVALID_AMOUNT);
 
         validated.valid = true;
         return validated;
@@ -472,11 +473,11 @@ public class ExpenseController {
         // check if expense exists
         Expense exp = entityManager.find(Expense.class, expenseId);
         if (exp == null || !exp.isEnabled())
-            throw new ForbiddenException(-6);
+            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
 
         // check if expense belongs to the group
         if (!params.group.hasExpense(exp))
-            throw new ForbiddenException(-6);
+            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
 
         // delete debts of balances
         List<Participates> participants = exp.getBelong();
@@ -579,11 +580,11 @@ public class ExpenseController {
         // check if expense exists
         Expense exp = entityManager.find(Expense.class, expenseId);
         if (exp == null || !exp.isEnabled())
-            throw new ForbiddenException(-6);
+            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
 
         // check if expense belongs to the group
         if (!group.hasExpense(exp))
-            throw new ForbiddenException(-6);
+            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
 
         // List of users to notify
         List<User> notifyUsers = new ArrayList<>();
@@ -660,7 +661,7 @@ public class ExpenseController {
         // Check if debt exists
         Debt debt = entityManager.find(Debt.class, new DebtID(groupId, debtorId, debtOwnerId));
         if (debt == null)
-            throw new ForbiddenException(-9);
+            throw new ForbiddenException(ErrorType.E_SETTLE_FORBIDDEN);
         User debtor = debt.getDebtor();
         User debtOwner = debt.getDebtOwner();
 
