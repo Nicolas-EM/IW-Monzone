@@ -1,17 +1,30 @@
 const groupsTable = document.getElementById("groupsTable");
 const userId = groupsTable.dataset.userid;
 
+let btnAdmin = document.getElementById("btn-admin");
+if (btnAdmin != null){ // Si no existe al estar en una cuenta no ADMIN
+    btnAdmin.onclick = (e) => {
+        e.preventDefault();
+        // Render all groups
+        getAllGroups();
+    }     
+};
+
 function getGroups() {
     go(`${config.rootUrl}/user/getGroups`, "GET")
         .then(groups => {
-            Array.from(groups).forEach(group => {
-                const elem = document.getElementById(`group-${group.id}`);
-                if (elem != null)
-                    groupsTable.removeChild(elem);
-                const member = group.members.find(member => member.idUser == userId);
-                if (member != null && member.enabled)
-                    groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
-            })
+            if(groups.length == 0 )
+                groupsTable.insertAdjacentHTML("afterbegin",`<h2 id="group-none">You don't have groups yet</h2>`);
+            else{
+                Array.from(groups).forEach(group => {
+                    const elem = document.getElementById(`group-${group.id}`);
+                    if (elem != null)
+                        groupsTable.removeChild(elem);
+                    const member = group.members.find(member => member.idUser == userId);
+                    if (member != null && member.enabled)
+                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
+                })
+            }           
         })
         .catch(e => {
             console.log("Error retrieving group", e);
@@ -22,12 +35,21 @@ function getGroups() {
 function getAllGroups() {
     go(`${config.rootUrl}/admin/getAllGroups`, "GET")
         .then(groups => {
+            const e = document.getElementById(`group-none`)
+            if (e != null)
+                groupsTable.removeChild(e);
+
+            if(groups.length == 0){
+                groupsTable.insertAdjacentHTML("afterbegin","<h2>No groups yet</h2>");
+            }
+            else{
             Array.from(groups).forEach(group => {
                 const elem = document.getElementById(`group-${group.id}`);
                 if (elem != null)
                     groupsTable.removeChild(elem);
                 groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, "-"));
             })
+            }
         })
         .catch(e => {
             console.log("Error retrieving group", e);
@@ -82,10 +104,10 @@ function renderGroup(group, balance) {
                             <div>${group.desc}</div>
                         </div>
                         <div class="row">
-                            <div class="balance col ms-3">
-                                <span class="dot" style="${balance >= 0 ? 'background: green' : 'background: red'}"></span>
-                                ${balance}${group.currencyString}                                
-                            </div>
+                        <div class="balance col ms-3">
+                            <span class="dot" style="${balance >= 0 ? 'background: green' : 'background: red'}"></span>
+                            ${balance}${group.currencyString}                                
+                         </div>
                             <div class="col me-3 col-num-members">
                                 <div class="icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
@@ -100,11 +122,3 @@ function renderGroup(group, balance) {
             </div>`
 }
 
-let btnAdmin = document.getElementById("btn-admin");
-if (btnAdmin != null){ // Si no existe al estar en una cuenta no ADMIN
-    btnAdmin.onclick = (e) => {
-        e.preventDefault();
-        // Render all groups
-        getAllGroups();
-}     
-};

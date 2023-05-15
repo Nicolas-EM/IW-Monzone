@@ -109,19 +109,24 @@ go(config.rootUrl + "/user/receivedNotifs", "GET")
     .then(notifs => {
         let actionNotifsDiv = document.getElementById("actionNotifs-tab-pane");
         let notifsDiv = document.getElementById("notifs-tab-pane");
-
-        notifs.forEach(notif => {
-            if (notif.type == "GROUP_INVITATION") {
-                actionNotifsDiv.insertAdjacentHTML("beforeend", renderInvitation(notif));
-            } else {
-                if (notif.dateRead === "") {
-                    notifsDiv.insertAdjacentHTML("beforeend", renderUnreadNotif(notif));
+        if(notifs.length == 0){
+            notifsDiv.insertAdjacentHTML("beforeend", `<h3 "id="notif-none">You don't have notifications yet</h3>`);
+            actionNotifsDiv.insertAdjacentHTML("beforeend", `<h3 "id="invit-none">You don't have invitations yet</h3>`);
+        }
+        else{
+            notifs.forEach(notif => {
+                if (notif.type == "GROUP_INVITATION") {
+                    actionNotifsDiv.insertAdjacentHTML("beforeend", renderInvitation(notif));
+                } else {
+                    if (notif.dateRead === "") {
+                        notifsDiv.insertAdjacentHTML("beforeend", renderUnreadNotif(notif));
+                    }
+                    else {
+                        notifsDiv.insertAdjacentHTML("beforeend", renderReadNotif(notif));
+                    }
                 }
-                else {
-                    notifsDiv.insertAdjacentHTML("beforeend", renderReadNotif(notif));
-                }
-            }
-        })
+            })
+        }        
     }
     );
 
@@ -143,9 +148,17 @@ if (ws.receive) {
             let notifsDiv = document.getElementById("notifs-tab-pane");
 
             if (notif.type == 'GROUP_INVITATION') {
+                const e = document.getElementById('invit-none')
+                if (e != null)
+                    actionNotifsDiv.removeChild(e);
+
                 actionNotifsDiv.insertAdjacentHTML("afterbegin", renderInvitation(notif));
             }
             else {
+                const e = document.getElementById('notif-none')
+                if (e != null)
+                    actionNotifsDiv.removeChild(e);
+
                 notifsDiv.insertAdjacentHTML("afterbegin", renderUnreadNotif(notif));
             }
 

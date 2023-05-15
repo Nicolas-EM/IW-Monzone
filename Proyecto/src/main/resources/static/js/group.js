@@ -8,9 +8,13 @@ const userId = expensesTable.dataset.userid;
 // Render EXISTING Expenses
 go(`${config.rootUrl}/group/${groupId}/getExpenses`, "GET")
     .then(expenses => {
-        expenses.forEach(expense => {
-            expensesTable.insertAdjacentHTML("afterbegin", renderExpense(expense));
-        })
+        if(expenses.length == 0)
+            expensesTable.insertAdjacentHTML("afterbegin", `<h2 id="group-none" style="text-align: center;">You don't have expenses yet</h2>`);
+        else{
+            expenses.forEach(expense => {
+                expensesTable.insertAdjacentHTML("afterbegin", renderExpense(expense));
+            })
+        }       
     }
     );
 

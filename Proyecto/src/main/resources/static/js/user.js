@@ -60,14 +60,18 @@ document.getElementById("passwordForm").addEventListener('submit', (e) => {
 function getGroups() {
     go(`${config.rootUrl}/user/getGroups`, "GET")
         .then(groups => {
-            Array.from(groups).forEach(group => {
-                const elem = document.getElementById(`group-${group.id}`);
-                if (elem != null)
-                    groupsTable.removeChild(elem);
-                const member = group.members.find(member => member.userId === userId);
-                if (member)
-                    groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
-            });
+            if(groups.length == 0)
+                groupsTable.insertAdjacentHTML("afterbegin",`<h2 id="group-none">You don't have groups yet</h2>`);
+            else{
+                Array.from(groups).forEach(group => {
+                    const elem = document.getElementById(`group-${group.id}`);
+                    if (elem != null)
+                        groupsTable.removeChild(elem);
+                    const member = group.members.find(member => member.userId === userId);
+                    if (member)
+                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
+                });
+            }            
         })
         .catch(e => {
             console.log("Error retrieving group", e);
