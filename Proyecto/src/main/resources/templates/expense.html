@@ -31,7 +31,7 @@
             <label for="amount" class="form-label mt-4 w-100">Amount ([[${group.getCurrencyText()}]])</label>
             <input id="amount" name="amount" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getAmount()}">
 
-            <a th:href="@{/group/{groupId}/(groupId=${groupId})}" class="btn btn-primary rounded-pill fw-bold mt-2" id="btn-back">Back</a>
+            <button type="button" th:onclick="|location.href='/group/' + ${group?.getId()}|" class="btn btn-primary btn-return rounded-pill fw-bold mt-2"><i class="fa fa-arrow-left fa-lg"></i></button>                    
           </div>
         </div>
         <!-- Advanced info -->

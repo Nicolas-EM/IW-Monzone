@@ -4,6 +4,7 @@
 <head>
     <th:block th:replace="fragments/head :: header" />
     <link rel="stylesheet" th:href="@{/css/group_config.css}" href="css/group_config.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <title>Monzone</title>
 </head>
 
@@ -48,7 +49,7 @@
                         <button id="btn-save" th:formaction="@{/group/{action}(action=${group == null} ? 'newGroup' : ${group?.getId()} + '/updateGroup')}" type="submit" class="btn btn-func btn-primary rounded-pill fw-bold w-25">Save</button>
                         <button type="button" th:if="${group == null}" th:onclick="|location.href='/user/'|" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Cancel</button>
                         <button id="btn-delete" type="button" th:if="${group != null} and ${isGroupAdmin}" th:formaction="@{/group/{id}/delGroup(id=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25" data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="delGroup">Delete Group</button>
-                        <button type="button" th:if="${group != null}" th:onclick="|location.href='/group/' + ${group?.getId()}|" class="btn btn-return btn-primary rounded-pill fw-bold w-25">Back</button>                    
+                        <button type="button" th:if="${group != null}" th:onclick="|location.href='/group/' + ${group?.getId()}|" class="btn btn-return btn-primary rounded-pill fw-bold mt-2"><strong><i class="fa fa-arrow-left fa-lg"></i></strong></button>                    
                     </div>
                 </div>
             </form>

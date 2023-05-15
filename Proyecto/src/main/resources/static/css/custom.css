@@ -103,10 +103,11 @@ img.preview {
 .btn-return {
     border-style: none;
     outline: none;
-    min-height: 10%;
+    width: 25%;
     background-color: #d19900;
     margin-left: 10%;
 }
+
 
 .btn-return:hover {
     background-color: #b68500;

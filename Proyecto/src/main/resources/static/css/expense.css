@@ -75,3 +75,14 @@
 #imgFileInput {
     display: none;
 }
+
+.btn-return {
+    border-style: none;
+    outline: none;
+    width: 30%;
+    background-color: #d19900;
+}
+
+.btn-return:hover {
+    background-color: #b68500;
+}
