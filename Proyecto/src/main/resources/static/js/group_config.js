@@ -172,6 +172,7 @@ document.getElementById("groupForm").addEventListener('submit', (e) => {
     })
         .then(d => {
             console.log("Group: success", d);
+            createToastNotification(`Group success`, `Group changed successfully`);
             if (d.action === "redirect") {
                 console.log("Redirecting to ", d.redirect);
                 window.location.replace(d.redirect);
