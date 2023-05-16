@@ -115,27 +115,25 @@ go(config.rootUrl + "/user/receivedNotifs", "GET")
         
         const noNotif = document.getElementById('notif-none');
         const noInvit = document.getElementById('invit-none');
+       
+        notifs.forEach(notif => {
+            if (notif.type == "GROUP_INVITATION") {
+                actionNotifsDiv.insertAdjacentHTML("beforeend", renderInvitation(notif));
+            } else {
+                if (notif.dateRead === "") {
+                    notifsDiv.insertAdjacentHTML("beforeend", renderUnreadNotif(notif));
+                }
+                else {
+                    notifsDiv.insertAdjacentHTML("beforeend", renderReadNotif(notif));
+                }
+            }
+        })
 
         if(notifsDiv.childElementCount == 1)
             noNotif.style.display = 'block'
 
         if(actionNotifsDiv.childElementCount == 1)
             noInvit.style.display = 'block'
-        
-        else{
-            notifs.forEach(notif => {
-                if (notif.type == "GROUP_INVITATION") {
-                    actionNotifsDiv.insertAdjacentHTML("beforeend", renderInvitation(notif));
-                } else {
-                    if (notif.dateRead === "") {
-                        notifsDiv.insertAdjacentHTML("beforeend", renderUnreadNotif(notif));
-                    }
-                    else {
-                        notifsDiv.insertAdjacentHTML("beforeend", renderReadNotif(notif));
-                    }
-                }
-            })
-        }        
     }
     );
 
@@ -164,7 +162,7 @@ if (ws.receive) {
             else {
                 notifsDiv.insertAdjacentHTML("afterbegin", renderUnreadNotif(notif));
 
-                renderNoNotif();  // Ocultar el elemento  
+                renderNoNotif(); 
             }
 
             createToastNotification(notif.id, notif.message);

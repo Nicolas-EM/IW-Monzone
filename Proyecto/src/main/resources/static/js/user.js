@@ -60,8 +60,10 @@ document.getElementById("passwordForm").addEventListener('submit', (e) => {
 function getGroups() {
     go(`${config.rootUrl}/user/getGroups`, "GET")
         .then(groups => {
+            groupsTable.insertAdjacentHTML("afterbegin", `<h2 id="group-none" style="display: none;">You don't have groups yet</h2>`);
+            const e = document.getElementById('group-none');
             if (groups.length == 0)
-                groupsTable.insertAdjacentHTML("afterbegin",`<h2 id="group-none">You don't have groups yet</h2>`);
+                e.style.display = 'block';
             else {
                 Array.from(groups).forEach(group => {
                     const elem = document.getElementById(`group-${group.id}`);
@@ -118,13 +120,17 @@ if (ws.receive) {
                     elem.parentElement.removeChild(elem);
             }
             if (obj.action == "GROUP_MODIFIED" || (obj.action == "GROUP_INVITATION_ACCEPTED" && elem === null)) {
-                const empty = document.getElementById("group-none");
-                if (empty != null)
-                    empty.parentElement.removeChild(empty);
-                const member = group.members.find(member => member.idUser == userId);
+                                const member = group.members.find(member => member.idUser == userId);
                 if (member)
                     groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance, member.budget));
             }
+
+            // Render mensaje no existen grupos
+            const e = document.getElementById('group-none');
+            if (e.style.display === 'none' && groupsTable.childElementCount == 1) // El 1 es el mensaje de vacio
+                e.style.display = 'block';  // Mostrar el elemento
+            else if(groupsTable.childElementCount > 1)
+                e.style.display = 'none';  // Ocultar el elemento    
         }
 
         else if (obj.type === "EXPENSE") {
