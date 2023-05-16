@@ -17,7 +17,7 @@ document.getElementById("profileForm").addEventListener('submit', (e) => {
     go(b.getAttribute('formaction'), 'POST', formData, {})
         .then(d => {
             console.log("User: success", d);
-            createToastNotification(`user success-${name}-${username}`, `User changes changed successfully`);
+            createToastNotification(`user success-${name}-${username}`, `User changed successfully`);
             if (d.action === "redirect") {
                 console.log("Redirecting to ", d.redirect);
                 window.location.replace(d.redirect);
@@ -69,7 +69,7 @@ function getGroups() {
                         groupsTable.removeChild(elem);
                     const member = group.members.find(member => member.idUser == userId);
                     if (member)
-                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
+                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance, member.budget));
                 });
             }            
         })
@@ -82,7 +82,7 @@ function getGroups() {
 getGroups();
 
 // Render group
-function renderGroup(group, balance) {
+function renderGroup(group, balance, budget) {
     return `<div id="group-${group.id}" class="card text-white h-100 mx-auto">
                 <label class="rounded-corners align-items-center w-100">
                 <div class="row">
@@ -90,7 +90,7 @@ function renderGroup(group, balance) {
                     ${group.name}
                     </div>
                     <div class="col-4">
-                    Your budget: x ${group.currencyString}
+                    Your budget: ${budget} ${group.currencyString}
                     </div>
                     <div class="col-5">
                     <span class="dot" style="${balance >= 0 ? 'background: green' : 'background: red'}"></span>
@@ -118,9 +118,12 @@ if (ws.receive) {
                     elem.parentElement.removeChild(elem);
             }
             if (obj.action == "GROUP_MODIFIED" || (obj.action == "GROUP_INVITATION_ACCEPTED" && elem === null)) {
+                const empty = document.getElementById("group-none");
+                if (empty != null)
+                    empty.parentElement.removeChild(empty);
                 const member = group.members.find(member => member.idUser == userId);
                 if (member)
-                    groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
+                    groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance, member.budget));
             }
         }
 
@@ -133,7 +136,7 @@ if (ws.receive) {
                     const member = group.members.find(member => member.idUser == userId);
                     if (member) {
                         elem.parentElement.removeChild(elem);
-                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
+                        groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance, member.budget));
                     }
                 })
         }

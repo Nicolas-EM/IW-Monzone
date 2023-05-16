@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import javax.management.BadAttributeValueExpException;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
@@ -262,6 +263,12 @@ public class GroupController {
         Float budget = Float.parseFloat(jsonNode.get("budget").asText());
         Integer currId = jsonNode.get("currId").asInt();       
 
+        // parse name
+        if (name == null || name == "")
+            throw new BadRequestException(ErrorType.E_EMPTY_NAME);
+        else if (name.length() > 100)
+            throw new BadRequestException(ErrorType.E_LONG_NAME);
+
         // parse budget
         if (budget < 0)
             throw new BadRequestException(ErrorType.E_INVALID_BUDGET);
@@ -274,6 +281,8 @@ public class GroupController {
         // create group
         if (desc == null)
             desc = "";
+        else if (desc.length() > 255)
+            throw new BadRequestException(ErrorType.E_LONG_DESC);
         Group g = new Group(name, desc, curr);
         entityManager.persist(g);
         entityManager.flush(); // forces DB to add group & assign valid id

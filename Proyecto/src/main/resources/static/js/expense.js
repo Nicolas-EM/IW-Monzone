@@ -48,7 +48,7 @@ window.addEventListener("load", (event) => {
       go(b.getAttribute('formaction'), 'POST', formData, {})
         .then(d => {
           console.log("Expense: success", d);
-          createToastNotification(`expense success`, `Expense changes changed successfully`);
+          createToastNotification(`expense success`, `Expense changed successfully`);
           if (d.action === "redirect") {
             console.log("Redirecting to ", d.redirect);
             window.location.replace(d.redirect);

@@ -37,7 +37,7 @@ public class Expense implements Transferable<Expense.Transfer>, Comparator<Expen
     @Column(nullable = false)
     private boolean enabled;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
     private String desc;

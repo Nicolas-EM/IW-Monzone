@@ -263,7 +263,7 @@ public class ExpenseController {
         public List<Member> participateMembers;
     }
 
-    private PostParams validatedPostParams(HttpSession session, long groupId, String dateString, float amount, long paidById, List<String> participateIds, long typeId) {
+    private PostParams validatedPostParams(HttpSession session, long groupId, String name, String desc, String dateString, float amount, long paidById, List<String> participateIds, long typeId) {
 
         PostParams validated = new PostParams();
         User user = (User) session.getAttribute("u");
@@ -276,6 +276,16 @@ public class ExpenseController {
 
         // check if user belongs to the group
         groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
+
+        // check name
+        if (name == null || name == "")
+            throw new BadRequestException(ErrorType.E_EMPTY_NAME);
+        else if (name.length() > 100)
+            throw new BadRequestException(ErrorType.E_LONG_NAME);
+
+        // check desc
+        if (desc != null && desc.length() > 255)
+            throw new BadRequestException(ErrorType.E_LONG_DESC);
 
         // check if user who paid exists
         User paidBy = entityManager.find(User.class, paidById);
@@ -304,6 +314,8 @@ public class ExpenseController {
         } catch (Exception e) {
             throw new BadRequestException(ErrorType.E_INVALID_DATE);
         }
+        if (date.isAfter(LocalDate.now()))
+            throw new BadRequestException(ErrorType.E_AFTER_DATE);
         validated.date = date;
 
         // check it has participants
@@ -394,7 +406,7 @@ public class ExpenseController {
     @ResponseBody
     public String newExpense(@PathVariable long groupId, Model model, HttpSession session, @RequestParam("name") String name, @RequestParam("desc") String desc, @RequestParam("dateString") String dateString, @RequestParam("amount") float amount, @RequestParam("paidById") long paidById, @RequestParam("participateIds") List<String> participateIds, @RequestParam("typeId") long typeId, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
 
-        PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
+        PostParams params = validatedPostParams(session, groupId, name, desc, dateString, amount, paidById, participateIds, typeId);
 
         /*
          * 
@@ -468,7 +480,7 @@ public class ExpenseController {
     @ResponseBody
     public String updateExpense(@PathVariable long groupId, @PathVariable long expenseId, Model model, HttpSession session, @RequestParam("name") String name, @RequestParam("desc") String desc, @RequestParam("dateString") String dateString, @RequestParam("amount") float amount, @RequestParam("paidById") long paidById, @RequestParam("participateIds") List<String> participateIds, @RequestParam("typeId") long typeId, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
 
-        PostParams params = validatedPostParams(session, groupId, dateString, amount, paidById, participateIds, typeId);
+        PostParams params = validatedPostParams(session, groupId, name, desc, dateString, amount, paidById, participateIds, typeId);
 
         // check if expense exists
         Expense exp = entityManager.find(Expense.class, expenseId);
