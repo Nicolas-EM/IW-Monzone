@@ -81,7 +81,7 @@ function renderExpense(expense) {
                                 <div class="card-title">${expense.name}</div>
                             </div>
                             <div class="row card-text-row">
-                                <div class="card-subtitle">Paid by ${expense.paidByName}</div>
+                                <div class="card-subtitle">Paid by ${expense.paidByID == userId ? "you" : expense.paidByName}</div>
                             </div>
                         </div>
                         <!-- Date -->
@@ -136,7 +136,7 @@ function renderDebt(debt) {
                     </form>
                 </div>
                 <div class="col-8">
-                    <label>${debt.debtorName} owes ${debt.debtOwnerName} ${truncatedAmount} ${currencyString}</label>
+                    <label>${debt.idDebtor == userId ? "You owe" : debt.debtorName + " owes"} ${debt.idDebtOwner == userId ? "you" : debt.debtOwnerName} - ${truncatedAmount} ${currencyString}</label>
                 </div>
             </div>`
 }
@@ -171,14 +171,14 @@ function renderMemberBalance(member) {
                         <h5 class="back_balance_neg">${truncatedAmount}${currencyString}</h5>
                     </div>   
                     <div class="col text-center">
-                        <h5>${member.username}</h5>
+                        <h5>${member.idUser == userId ? "You" : member.username}</h5>
                     </div>                             
                 </div>`;
     }
     else if (truncatedAmount > 0) {
         return `<div class="row">
                     <div class="col text-center">
-                        <h5>${member.username}</h5>
+                        <h5>${member.idUser == userId ? "You" : member.username}</h5>
                     </div>
                     <div class="col text-center">
                         <h5 class="back_balance_pos">${truncatedAmount}${currencyString}</h5>
@@ -188,7 +188,7 @@ function renderMemberBalance(member) {
     else {
         return `<div class="row">
                     <div class="col text-center">
-                        <h5>${member.username}</h5>
+                        <h5>${member.idUser == userId ? "You" : member.username}</h5>
                     </div>
                     <div class="col text-center">
                         <h5>0.00 ${currencyString}</h5>

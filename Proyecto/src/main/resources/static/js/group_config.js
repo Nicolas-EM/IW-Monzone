@@ -96,7 +96,7 @@ function renderMember(member, currencyString) {
     }
     memberHTML = `${memberHTML}
                 <div id="name-col" class="col d-flex align-items-center border-end border-light-subtle">
-                    ${member.username}
+                    ${member.idUser == userId ? "You" : member.username}
                 </div>
                 <div class="col d-flex align-items-center ps-4">
                     Budget: ${member.budget}

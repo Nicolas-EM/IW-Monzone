@@ -46,6 +46,8 @@ _______
 - En las cards de grupos (home) debería mostrarse el circulito rojo/verde del balance
 - [P] Las notifs deben mostrar fecha
 - Los botones de ir atrás podrían ser flechas en vez de "Back"
+- [!] Ajustar decimales en perfil y en home
+- En los miembros en group_config o expense, tu usuario debería aparecer como "You"
 
 ## Usabilidad
 - [P] Las operaciones destructivas deben pedir confirmación
@@ -53,6 +55,9 @@ _______
 - [!!] Añadir botón ir atrás en vista expense
 - Añadir botón ir atrás en vista group_config
 - [P] Al cambiar foto usuario, cambiar también la del nav
+- [P] Las listas vacías deberían aparecer como "No tienes X todavía"
+- [P] Añadir iconos info en los campos para saber qué son
+- Debería salir msj éxito al guardar un grupo/gasto
 
 ## Seguridad
 - [P] Puedes llamar a /settle para cancelar todas las deudas de un usuario
@@ -63,7 +68,6 @@ _______
 
 ## General
 - [!] Validación en cliente en SignUp
-- Un reimbursement no debería poder editarlo el usuario
 - Hacer el README.md
 - Logs
 - [!!!] TESTS
@@ -77,12 +81,5 @@ _______
 ## Mejoras vistas
 - Hovers en home (sobre las cards y sobre el botón de añadir)
 - Añadir orden a los grupos en home
-- [!] Ajustar decimales en perfil y en home
 - [!] El mark as read debería cambiar el color de la notif
 - [!] En group_config y en perfil sale scrollbar vertical, no se ajusta
-- En los miembros en group_config o expense, tu usuario debería aparecer como "You"
-
-## Usabilidad
-- [P] Las listas vacías deberían aparecer como "No tienes X todavía"
-- [P] Añadir iconos info en los campos para saber qué son
-- Debería salir msj éxito al guardar un grupo/gasto

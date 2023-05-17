@@ -42,7 +42,7 @@
             <option th:unless="${expense != null}" selected disabled hidden value="">Select Payer</option>
             <div th:each="member: ${members}">
               <th:block th:if="${member.isEnabled()}" th:with="user=${member.getUser()}">
-                <option th:value="${user.getId()}" th:selected="${expense?.getPaidBy()?.getId() == user.getId()}? true : false">[[${user.getName()}]]</option>
+                <option th:value="${user.getId()}" th:selected="${expense?.getPaidBy()?.getId() == user.getId()}? true : false">[[${session.u.id == user.getId() ? "You" : user.getName()}]]</option>
               </th:block>
             </div>
           </select>
@@ -63,7 +63,7 @@
                   <li>
                     <div class="form-check">
                       <input class="check-box form-check-input participateCheckbox" type="checkbox" name="participateIds" th:value="${user.getId()}" th:checked="${participateIds != null ? participateIds.contains(user?.getId()) ? true : false : true}">
-                      <label class="form-check-label" for="flexCheckDefault">[[${user.getUsername()}]]</label>
+                      <label class="form-check-label" for="flexCheckDefault">[[${session.u.id == user.getId() ? "You" : user.getName()}]]</label>
                       <label class="split amountPerMember">[[${expense != null ? participateIds.contains(user?.getId()) ? expense?.getAmount() / participateIds?.size() : '' : ''}]]</label>
                     </div>
                   </li>
