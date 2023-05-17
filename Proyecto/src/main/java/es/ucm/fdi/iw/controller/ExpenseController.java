@@ -230,8 +230,15 @@ public class ExpenseController {
         groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // check if expense exists
-        // If expense == null, its a new expense
         Expense exp = entityManager.find(Expense.class, expenseId);
+
+        // If expense == null, its a new expense
+        if(exp == null) {
+            InputStream in = new BufferedInputStream(ExpenseController.defaultExpensePic());
+            return os -> FileCopyUtils.copy(in, os);
+        }
+
+        // Check if expense exists but disabled
         if (exp != null && !exp.isEnabled())
             throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
 

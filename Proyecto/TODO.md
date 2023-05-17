@@ -48,6 +48,7 @@ _______
 - Los botones de ir atrás podrían ser flechas en vez de "Back"
 - [!] Ajustar decimales en perfil y en home
 - En los miembros en group_config o expense, tu usuario debería aparecer como "You"
+- Al crear expense no sale la foto por defecto
 
 ## Usabilidad
 - [P] Las operaciones destructivas deben pedir confirmación
