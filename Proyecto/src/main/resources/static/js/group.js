@@ -115,7 +115,7 @@ function renderAllDebts() {
                 debtsTable.insertAdjacentHTML("afterbegin", renderNoDebts());
             } else {
                 document.querySelectorAll(".btn-settle").forEach((btn) => {
-                    btn.onclick = (e) => handleSettleExpenseClick(btn, e);
+                    btn.onclick = (e) => handleSettleDebtClick(btn, e);
                 });renderDebt
             }
         }
@@ -145,7 +145,7 @@ function renderDebt(debt) {
 function renderNoDebts() {
     return `<div class="row">
                 <div class="col">
-                    There are no debts to settle :D
+                    You don't have debts to settle yet
                 </div>
             </div>`
 }
@@ -198,9 +198,9 @@ function renderMemberBalance(member) {
 }
 
 // Mark debt as settled
-function handleSettleExpenseClick(btn, e) {
+function handleSettleDebtClick(btn, e) {
     e.preventDefault();
-    console.log("Settling expense");
+    console.log("Settling debt");
 
     const debtorId = btn.parentNode.querySelector('input[name="debtorId"]').value;
     const debtOwnerId = btn.parentNode.querySelector('input[name="debtOwnerId"]').value;
@@ -213,6 +213,7 @@ function handleSettleExpenseClick(btn, e) {
     })
         .then((d) => {
             console.log("Settle: success", d);
+            createToastNotification(`debt-settled-${debtorId}-${debtOwnerId}`, "Debt has successfully been settled.");
         })
         .catch(e => {
             console.log("Error settling debt", e);

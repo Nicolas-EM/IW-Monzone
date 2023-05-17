@@ -36,12 +36,12 @@
                         <!-- Set personal budget -->
                         <div class="col">
                             <label for="budget" class="form-label mt-4 w-100">Your budget:</label>
-                            <input id="budget" name="budget" type="text" class="rounded-corners w-100 bg-white budget" required="required" th:value="${budget}" th:placeholder="${group == null}? 'Enter Budget' : ''"></input>
+                            <input id="budget" title="Get notified when you exceed your limit." name="budget" type="text" class="rounded-corners w-100 bg-white budget" required="required" th:value="${budget}" th:placeholder="${group == null}? 'Enter Budget' : ''"></input>
                         </div>
                         <!-- Total Budget -->
                         <div th:if="${group != null}" class="col">
                             <label class="form-label mt-4 w-100">Group budget:</label>
-                            <input id='totalBudget' disabled class="form-control rounded-corners w-100 budget" th:value="${totalBudget}"></input>
+                            <input id='totalBudget' title="Group limit on spending." disabled class="form-control rounded-corners w-100 budget" th:value="${totalBudget}"></input>
                         </div>
                     </div>
                     <!-- Save / Cancel / DelGroup Btns -->
