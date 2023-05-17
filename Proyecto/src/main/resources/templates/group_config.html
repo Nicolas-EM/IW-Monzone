@@ -25,7 +25,7 @@
                     <label for="desc" class="form-label w-100">Description (optional)</label>
                     <textarea id="desc" name="desc" class="rounded-corners form-control" rows="5" th:disabled="${isGroupAdmin == null ? false : isGroupAdmin ? false : true}">[[${group?.getDesc()}]]</textarea>
                     <label for="currency" class="form-label mt-4 w-100">Currency</label>
-                    <select class="form-select rounded-corners" required name="currId" th:disabled="${group == null ? false : true}">
+                    <select class="form-select rounded-corners" id="sel-currency" required name="currId" th:disabled="${group == null ? false : true}">
                         <option th:unless="${group != null}" selected disabled hidden value="">Select Currency</option>
                         <div th:each="curr,i : ${currencies}">
                             <option th:id="${curr}" th:value="${i.index}">[[${curr}]]</option>

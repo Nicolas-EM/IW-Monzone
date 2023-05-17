@@ -5,34 +5,30 @@ Feature: flujo de la app
   @group
   Scenario: Entrar a grupo
     Given call read('login.feature@login_b')
-    And driver baseUrl + '/user/'
     And delay(delayTime)
     When click("#group-2 .card")
     And delay(delayTime)
     Then waitForUrl(baseUrl + '/group/2')
 
-  @group_config
-  Scenario: Configuracion grupo
-    Given call read('principal.feature@group')
-    And driver baseUrl + '/group/2'
-    And delay(delayTime)
-    When click("#groupConfigBtn")
-    And delay(delayTime)
-    Then waitForUrl(baseUrl + '/group/2/config')
+   @group_config
+   Scenario: Configuracion grupo
+     Given call read('principal.feature@group')
+     And delay(delayTime)
+     When click("#groupConfigBtn")
+     And delay(delayTime)
+     Then waitForUrl(baseUrl + '/group/2/config')
 
-  @group_viewExpense
-  Scenario: View expense in group
-    Given call read('principal.feature@group')
-    And driver baseUrl + '/group/2'
-    And delay(delayTime)
-    When click(".body div.card")
-    And delay(delayTime)
-    Then waitForUrl(baseUrl + '/group/2/99')
+   @group_viewExpense
+   Scenario: View expense in group
+     Given call read('principal.feature@group')
+     And delay(delayTime)
+     When click(".body div.card")
+     And delay(delayTime)
+     Then waitForUrl(baseUrl + '/group/2/99')
 
   @group_addExpense
   Scenario: Add expense to group
     Given call read('principal.feature@group')
-    And driver baseUrl + '/group/2'
     And delay(delayTime)
     When click("#addExpense")
     And delay(delayTime)
@@ -47,7 +43,7 @@ Feature: flujo de la app
     And click("#btn-save")
     And delay(delayTime)
     Then waitForUrl(baseUrl + '/group/2')
-
+    And click("#expensesTable .card") # obtiene el primerExpense
     # Comprobar que los campos son correctos
     # Then match input('#name').value == 'Karate Expense'
     # Then match input('#desc').value == 'Auto generated description'
@@ -60,7 +56,6 @@ Feature: flujo de la app
   @profile
   Scenario: View profile
     Given call read('login.feature@login_b')
-    And driver baseUrl + '/user/'
     And delay(delayTime)
     When click("#btn-drop")
     And delay(delayTime)
