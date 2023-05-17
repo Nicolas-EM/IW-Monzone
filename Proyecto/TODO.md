@@ -22,7 +22,7 @@
 
 _______
 
-# MEJORAS IMPLEMENTADAS
+# MEJORAS IMPLEMENTADAS PRE-EXAMEN
 [P] - indica que se ha pedido por el profesor
 
 ## General
