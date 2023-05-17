@@ -1,5 +1,6 @@
 Feature: login en servidor
-
+  Background:
+  * def delayTime = 2000
 #
 #  Este test funciona, pero no es de buena educación martillear una API externa
 #
@@ -15,31 +16,36 @@ Feature: login en servidor
     Given driver baseUrl + '/user/2'
     And input('#username', 'dummy')
     And input('#password', 'world')
-    When submit().click(".form-signin button")
+    When submit().click("#btn-signin")
     Then match html('.error') contains 'Error en nombre de usuario o contraseña'
 
   @login_b
   Scenario: login correcto como b
-    Given driver baseUrl + '/login'
-    And delay(250)
+    Given driver baseUrl
+    And delay(delayTime)
     And input('#username', 'b')
     And input('#password', 'aa')
-    When submit().click(".form-signin button")
+    When click("#btn-signin")
+    And delay(delayTime)
     Then waitForUrl(baseUrl + '/user')
 
   @login_a
   Scenario: login correcto como a
-    Given driver baseUrl + '/login'
+    Given driver baseUrl
+    And delay(delayTime)
     And input('#username', 'a')
     And input('#password', 'aa')
-    When submit().click(".form-signin button")
+    When click("#btn-signin")
+    And delay(delayTime)
     Then waitForUrl(baseUrl + '/admin')
 
   Scenario: logout after login
-    Given driver baseUrl + '/login'
+    Given driver baseUrl
+    And delay(delayTime)
     And input('#username', 'a')
     And input('#password', 'aa')
-    When submit().click(".form-signin button")
+    When click("#btn-signin")
     Then waitForUrl(baseUrl + '/admin')
-    When submit().click("{button}logout")
+    When click("{button}logout")
+    And delay(delayTime)
     Then waitForUrl(baseUrl + '/login')
