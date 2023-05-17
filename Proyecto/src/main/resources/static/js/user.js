@@ -85,6 +85,7 @@ getGroups();
 
 // Render group
 function renderGroup(group, balance, budget) {
+    const truncatedBalance = Number(balance).toFixed(2);
     return `<div id="group-${group.id}" class="card text-white h-100 mx-auto">
                 <label class="rounded-corners align-items-center w-100">
                 <div class="row">
@@ -96,7 +97,7 @@ function renderGroup(group, balance, budget) {
                     </div>
                     <div class="col-5">
                     <span class="dot" style="${balance >= 0 ? 'background: green' : 'background: red'}"></span>
-                    ${balance} ${group.currencyString}
+                    ${truncatedBalance} ${group.currencyString}
                     </div>
                 </div>
                 </label>

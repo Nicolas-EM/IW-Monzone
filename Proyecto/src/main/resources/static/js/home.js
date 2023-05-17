@@ -104,6 +104,7 @@ if (ws.receive) {
 
 // Render group
 function renderGroup(group, balance) {
+    const truncatedBalance = Number(balance).toFixed(2);
     return `<div id="group-${group.id}" class="col">
                 <div class="card text-white" role="button" onclick="location.href='/group/${group.id}'" tabindex="0">
                     <div class="card-header">
@@ -116,7 +117,7 @@ function renderGroup(group, balance) {
                         <div class="row">
                         <div class="balance col ms-3">
                             <span class="dot" style="${balance >= 0 ? 'background: green' : 'background: red'}"></span>
-                            ${balance}${group.currencyString}                                
+                            ${truncatedBalance}${group.currencyString}                                
                          </div>
                             <div class="col me-3 col-num-members">
                                 <div class="icon">
