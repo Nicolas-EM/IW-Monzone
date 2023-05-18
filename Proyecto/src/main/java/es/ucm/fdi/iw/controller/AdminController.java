@@ -52,6 +52,28 @@ public class AdminController {
         return groups.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
 
+    /*
+     * Search groups
+     */
+    @ResponseBody
+    @GetMapping("searchGroup/{groupName}")
+    public List<Long> searchGroupsIds(@PathVariable String groupName){
+        List<Long> ids = entityManager.createNamedQuery("Group.getGroupIdsLike", Long.class).setParameter("groupName", "%" + groupName + "%").getResultList();
+        return ids;
+    }
+
+    
+
+    /*
+     * Search users
+     */
+    @ResponseBody
+    @GetMapping("searchUser/{userName}")
+    public List<Long> searchUsersIds(@PathVariable String userName){
+        List<Long> ids = entityManager.createNamedQuery("User.getUserIdsLike", Long.class).setParameter("userName", "%" + userName + "%").getResultList();
+        return ids;
+    }
+
     @GetMapping("/{groupId}")
     public String index(Model model, HttpSession session, @PathVariable long groupId) {
         return "admin_group";
@@ -64,5 +86,6 @@ public class AdminController {
         List<User> users = entityManager.createNamedQuery("User.getAllUsers", User.class).getResultList();
         return users.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
+
 
 }

@@ -1,5 +1,7 @@
 const groupsTable = document.getElementById("groupsTable");
 const usersList = document.getElementById("usersList");
+const groupsRendered = [];  // IDs of groups rendered
+const usersRendered = [];   // IDs of users rendered
 
 go(`${config.rootUrl}/admin/getAllGroups`, "GET")
     .then(groups => {
@@ -18,7 +20,9 @@ function renderGroup(id, name, enabled) {
     const backgroundColor = enabled ? "white" : "var(--bs-gray-400)";
     const borderLeftColor = enabled ? "var(--bs-yellow)" : "var(--bs-gray-600)";
 
-    return `<div class="card m-2" role="button" onclick="location.href='/admin/${id}'" tabindex="0" style="background-color: ${backgroundColor}; border-left-color: ${borderLeftColor};">
+    groupsRendered.push(id);
+
+    return `<div id="group-${id}" class="card m-2" role="button" onclick="location.href='/admin/${id}'" tabindex="0" style="background-color: ${backgroundColor}; border-left-color: ${borderLeftColor};">
                 <div class="card-header">
                     ID: ${id}
                 </div>
@@ -45,7 +49,9 @@ function renderUser(id, name, username, enabled) {
     const backgroundColor = enabled ? "white" : "var(--bs-gray-400)";
     const borderLeftColor = enabled ? "var(--bs-yellow)" : "var(--bs-gray-600)";
 
-    return `<div class="card m-2" tabindex="0" style="background-color: ${backgroundColor}; border-left-color: ${borderLeftColor};">
+    usersRendered.push(id);
+
+    return `<div id="user-${id}" class="card m-2" tabindex="0" style="background-color: ${backgroundColor}; border-left-color: ${borderLeftColor};">
                 <div class="row row-cols-3 g-0">
                     <!-- Profile pic -->
                     <div class="mx-3 col-4 col-md-2 d-flex align-items-center justify-content-center">
@@ -67,3 +73,73 @@ function renderUser(id, name, username, enabled) {
                 </div>
              </div>`;
 }
+
+document.getElementById('searchGroupInput').addEventListener('input', function () {
+    this.value = this.value.replace(/[^\w\s]/gi, '');
+})
+
+document.getElementById('searchGroupBtn').addEventListener('click', (e) => {
+    const searchQuery = document.getElementById('searchGroupInput').value;
+
+    if(searchQuery === ""){
+        groupsRendered.forEach(groupId => {
+            document.getElementById(`group-${groupId}`).classList.remove('d-none');
+        })
+        document.getElementById('noGroupsFoundMsg').classList.add('d-none');
+        return;
+    }
+
+    go(`${config.rootUrl}/admin/searchGroup/${searchQuery}`, "GET")
+    .then(groupsFound => {
+        console.log(groupsFound);
+
+        groupsRendered.forEach(groupId => {
+            if(!groupsFound.includes(groupId)){
+                document.getElementById(`group-${groupId}`).classList.add('d-none');
+            }
+        })
+
+        if(!groupsFound.length){
+            console.log("No groups found");
+            document.getElementById('noGroupsFoundMsg').classList.remove('d-none');
+        }
+    })
+    .catch(e => {
+        console.log("Error searching for group", e);
+    });
+})
+
+document.getElementById('searchUserInput').addEventListener('input', function () {
+    this.value = this.value.replace(/[^\w\s]/gi, '');
+})
+
+document.getElementById('searchUserBtn').addEventListener('click', (e) => {
+    const searchQuery = document.getElementById('searchUserInput').value;
+
+    if(searchQuery === ""){
+        usersRendered.forEach(userId => {
+            document.getElementById(`user-${userId}`).classList.remove('d-none');
+        })
+        document.getElementById('noUsersFoundMsg').classList.add('d-none');
+        return;
+    }
+
+    go(`${config.rootUrl}/admin/searchUser/${searchQuery}`, "GET")
+    .then(usersFound => {
+        console.log(usersFound);
+
+        usersRendered.forEach(userId => {
+            if(!usersFound.includes(userId)){
+                document.getElementById(`user-${userId}`).classList.add('d-none');
+            }
+        })
+
+        if(!usersFound.length){
+            console.log("No users found");
+            document.getElementById('noUsersFoundMsg').classList.remove('d-none');
+        }
+    })
+    .catch(e => {
+        console.log("Error searching for user", e);
+    });
+})

@@ -25,7 +25,8 @@ import java.util.List;
                 query="SELECT COUNT(u) "
                         + "FROM User u "
                         + "WHERE u.username = :username"),
-        @NamedQuery(name = "User.getAllUsers", query = "SELECT obj FROM User obj")
+        @NamedQuery(name = "User.getAllUsers", query = "SELECT obj FROM User obj"),
+        @NamedQuery(name = "User.getUserIdsLike", query = "SELECT obj.id FROM User obj WHERE LOWER(obj.name) LIKE LOWER(:userName)")
 })
 @Table(name="IWUser")
 public class User implements Transferable<User.Transfer> {

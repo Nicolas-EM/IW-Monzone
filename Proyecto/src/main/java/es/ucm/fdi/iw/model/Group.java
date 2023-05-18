@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @NamedQueries({
-        @NamedQuery(name = "Group.getAllGroups", query = "SELECT obj FROM Group obj")
+        @NamedQuery(name = "Group.getAllGroups", query = "SELECT obj FROM Group obj"),
+        @NamedQuery(name = "Group.getGroupIdsLike", query = "SELECT obj.id FROM Group obj WHERE LOWER(obj.name) LIKE LOWER(:groupName)")
 })
 @Table(name = "IWGroup")
 public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
