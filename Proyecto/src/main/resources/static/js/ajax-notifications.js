@@ -60,7 +60,7 @@ function renderReadNotif(notif) {
 
 function renderUnreadNotif(notif) {
     return `<div id="notif-${notif.id}" class="row my-2">
-                <div class="card text-white" role="button">
+                <div class="card text-white bg-info" role="button">
                     <div class="card-body">
                         <div class="row">
                             <h5>${notif.message}</h5>
@@ -83,7 +83,7 @@ function renderUnreadNotif(notif) {
 
 function renderInvitation(notif) {
     return `<div id="notif-${notif.id}" class="row my-2">
-                <div class="card text-white" role="button">
+                <div class="card text-white bg-info" role="button">
                     <div class="card-body">
                         <div class="row">
                             <h5>${notif.message}</h5>
@@ -212,8 +212,13 @@ function markNotifRead(event, btn, notifId) {
         .then(d => {
             document.getElementById(`notifReadBtn-${notifId}`).classList.add('invisible');
 
+            let cardContainer = document.getElementById(`notif-${notifId}`);
+            let card = cardContainer.querySelector(".card");
+            card.classList.remove("bg-info");
+
             let p = document.querySelector("#nav-unread");
             if (p) {
+                console.log("ENTRA: markNotifRead");
                 p.textContent = +p.textContent - 1;
             }
         })
@@ -236,13 +241,17 @@ if (ws.receive) {
 
 // Delete notif client side
 function deleteClientNotif(notifId) {
+    // Restar según si se pulso el boton de leer o no
+    let notifBtn = document.getElementById(`notifReadBtn-${notifId}`);
+    let p = document.querySelector("#nav-unread");
+
+    if (notifBtn && !notifBtn.classList.contains('invisible'))
+        p.textContent = +p.textContent - 1;
+    else if (!notifBtn)
+        p.textContent = +p.textContent - 1;
+
     const notifDiv = document.getElementById(`notif-${notifId}`);
     notifDiv.parentElement.removeChild(notifDiv);
-
-    let p = document.querySelector("#nav-unread");
-    if (p) {
-        p.textContent = +p.textContent - 1;
-    }
 }
 
 // Delete notif server side
