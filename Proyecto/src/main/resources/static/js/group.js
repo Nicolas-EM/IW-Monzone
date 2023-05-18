@@ -9,7 +9,7 @@ const userId = expensesTable.dataset.userid;
 // Render EXISTING Expenses
 go(`${config.rootUrl}/group/${groupId}/getExpenses`, "GET")
     .then(expenses => {
-        expensesTable.insertAdjacentHTML("afterbegin", `<h2 id="exp-none" style="text-align: center; display: none;">You don't have expenses yet</h2>`);
+        expensesTable.insertAdjacentHTML("afterbegin", `<h2 id="exp-none" style="display: none; text-align: center; font-size: 16px; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px;">You don't have expenses yet</h2>`);
         const e = document.getElementById('exp-none');
         if(expenses.length == 0)
             e.style.display = 'block';

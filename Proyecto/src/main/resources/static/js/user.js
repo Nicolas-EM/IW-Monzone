@@ -60,7 +60,7 @@ document.getElementById("passwordForm").addEventListener('submit', (e) => {
 function getGroups() {
     go(`${config.rootUrl}/user/getGroups`, "GET")
         .then(groups => {
-            groupsTable.insertAdjacentHTML("afterbegin", `<h2 id="group-none" style="display: none;">You don't have groups yet</h2>`);
+            groupsTable.insertAdjacentHTML("afterbegin", `<h2 id="group-none" style="display: none; font-size: 16px; margin-top: 15px; text-transform: uppercase; letter-spacing: 2px;">You don't have groups yet</h2>`);
             const e = document.getElementById('group-none');
             if (groups.length == 0)
                 e.style.display = 'block';
@@ -90,14 +90,14 @@ function renderGroup(group, balance, budget) {
                 <label class="rounded-corners align-items-center w-100">
                 <div class="row">
                     <div class="groupName col-3">
-                    ${group.name}
-                    </div>
-                    <div class="col-4">
-                    Your budget: ${budget} ${group.currencyString}
+                        ${group.name}
                     </div>
                     <div class="col-5">
-                    <span class="dot" style="${balance >= 0 ? 'background: green' : 'background: red'}"></span>
-                    ${truncatedBalance} ${group.currencyString}
+                        Your budget: ${budget} ${group.currencyString}
+                    </div>
+                    <div class="col-4">
+                        <span class="dot" style="${balance >= 0 ? 'background: green' : 'background: red'}"></span>
+                        ${truncatedBalance} ${group.currencyString}
                     </div>
                 </div>
                 </label>

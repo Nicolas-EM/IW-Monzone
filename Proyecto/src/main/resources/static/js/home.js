@@ -13,7 +13,7 @@ if (btnAdmin != null){ // Si no existe al estar en una cuenta no ADMIN
 function getGroups() {
     go(`${config.rootUrl}/user/getGroups`, "GET")
         .then(groups => {
-            groupsTable.insertAdjacentHTML("afterbegin",`<h2 id="group-none" style="display: none;">You don't have groups yet</h2>`);
+            groupsTable.insertAdjacentHTML("afterbegin",`<h2 id="group-none" style="display: none; text-align: center; font-size: 16px; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px;">You don't have groups yet</h2>`);
             const e = document.getElementById('group-none');
 
             if(groups.length == 0)

@@ -21,9 +21,13 @@
 
 .groups {
     max-height: 15vh;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
+
+.groups.scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
 
 #btn-save {
     border-style: none;
@@ -104,5 +108,5 @@
     width: 15px;
     border-radius: 50%;
     display: inline-block;
-    margin-right: 10%;
+    margin-right: 5px;
 }
