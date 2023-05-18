@@ -3,6 +3,7 @@ package es.ucm.fdi.iw.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,6 @@ public class AdminController {
         User u = (User)session.getAttribute("u");
         log.warn("Usuario {} ha accedido a admin", u.getUsername());
 
-        List<Group> groups = entityManager.createNamedQuery("Group.getAllGroups", Group.class).getResultList();
-        model.addAttribute("groups", groups);
         return "admin";
     }
 
@@ -51,6 +50,19 @@ public class AdminController {
     public List<Group.Transfer> getAllGroups(HttpSession session) {
         List<Group> groups = entityManager.createNamedQuery("Group.getAllGroups", Group.class).getResultList();
         return groups.stream().map(Transferable::toTransfer).collect(Collectors.toList());
+    }
+
+    @GetMapping("/{groupId}")
+    public String index(Model model, HttpSession session, @PathVariable long groupId) {
+        return "admin_group";
+    }
+
+    @ResponseBody
+    @Transactional
+    @GetMapping("/getAllUsers")
+    public List<User.Transfer> getAllUsers(HttpSession session) {
+        List<User> users = entityManager.createNamedQuery("User.getAllUsers", User.class).getResultList();
+        return users.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
 
 }
