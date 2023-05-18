@@ -43,7 +43,8 @@ Feature: flujo de la app
     And click("#btn-save")
     And delay(delayTime)
     Then waitForUrl(baseUrl + '/group/2')
-    And click("#expensesTable .card") # obtiene el primerExpense
+    # obtiene el primerExpense
+    And click("#expensesTable .card")
     # Comprobar que los campos son correctos
     # Then match driver('#name').value == 'Karate Expense'
     # Then match driver('#desc').value == 'Auto generated description'

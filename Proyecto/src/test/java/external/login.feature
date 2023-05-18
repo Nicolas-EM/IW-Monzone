@@ -49,6 +49,13 @@ Feature: login en servidor
     And delay(delayTime)
     Then waitForUrl(baseUrl + '/user')
 
+  @logout
+  Scenario: logout
+    When click("#btn-drop")
+    And delay(delayTime)
+    When click("#btn-logout")
+    Then waitForUrl(baseUrl + '/login')
+
   Scenario: logout after login
     Given driver baseUrl
     And delay(delayTime)

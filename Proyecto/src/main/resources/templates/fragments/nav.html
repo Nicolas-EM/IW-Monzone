@@ -54,7 +54,7 @@
                                     <!-- Logout Btn -->
                                     <li>
                                         <form id="logoutForm" class="dropdown-item" th:action="@{/logout}" method="post">
-                                            <a role="button" type="submit" onclick="document.getElementById('logoutForm').submit();">Logout</a>
+                                            <a role="button" id="btn-logout" type="submit" onclick="document.getElementById('logoutForm').submit();">Logout</a>
                                         </form>
                                     </li>
                                 </ul>
@@ -76,7 +76,7 @@
                         <button class="nav-link" id="notifs-tab" data-bs-toggle="tab" data-bs-target="#notifs-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Notifications</button>
                     </li>
                 </ul>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button type="button" id="btn-close" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
                 <div class="tab-content" id="notifsTabContent">

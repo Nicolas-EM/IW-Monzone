@@ -28,13 +28,22 @@ Feature: uso de la app
     Then match driver.value('#budget') == '10.0'
     And delay(delayTime)
 
-
-  #@invitation
-  #Scenario: Invitar a un grupo
-  #  Given call read('principal.feature@group_config')
-  #  And delay(delayTime)
-  #  And click('#inviteBtn')
-  #  And delay(delayTime)
-  #  And input('#inviteUsername', 'user10')
-  #  And click("#confirmInviteBtn")
-  #  And delay(delayTime)
+  @invitationAndJoin
+  Scenario: Invitar a un grupo y unirse
+    Given call read('principal.feature@group_config')
+    And delay(delayTime)
+    And click('#inviteBtn')
+    And delay(delayTime)
+    And input('#inviteUsername', 'Tester')
+    And click("#confirmInviteBtn")
+    And delay(delayTime)
+    Given call read('login.feature@logout')
+    Given call read('login.feature@login_Tester')
+    And delay(delayTime)
+    And click("#notifB")
+    And click("#action-notifs-tab")
+    And click("#btn-accept")
+    And click("#btn-close")
+    When click("#group-2 .card")
+    And delay(delayTime)
+    Then waitForUrl(baseUrl + '/group/2')

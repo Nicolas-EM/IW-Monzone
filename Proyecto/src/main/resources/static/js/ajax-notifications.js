@@ -93,7 +93,7 @@ function renderInvitation(notif) {
                         </div>
                         <div class="row mt-2">
                             <form id="notifReadBtn-${notif.id}" class="col" method="post" action="/group/${notif.idGroup}/acceptInvite">
-                            <button class="btn btn-func btn-primary rounded-pill fw-bold" onclick="acceptInvite(event, this, ${notif.id})">Accept</button>
+                            <button id="btn-accept" class="btn btn-func btn-primary rounded-pill fw-bold" onclick="acceptInvite(event, this, ${notif.id})">Accept</button>
                             </form>
                             <form class="col" method="post" action="/user/${notif.id}/delete">
                                 <button class="btn btn-delete btn-primary rounded-pill fw-bold" onclick="deleteNotif(event, this, ${notif.id})">Delete</button>
