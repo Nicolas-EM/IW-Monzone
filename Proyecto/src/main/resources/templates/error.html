@@ -7,10 +7,10 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="main">
-            <h1>Error</h1>
-            <p th:text="${errorMessage}">Error message here</p>
+    <div class="container-fluid">
+        <div class="main d-flex flex-column mt-4 ms-4">
+            <h1 class="text-left">Error</h1>
+            <p class="text-left" th:text="${errorMessage}">Error message here</p>
         </div>
     </div>
 </body>

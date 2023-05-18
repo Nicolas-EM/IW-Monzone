@@ -1,0 +1,15 @@
+#group-col {
+    border-right: 2px solid gray;
+}
+
+#groupsTable {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.card {
+    border-left: 15px solid var(--bs-yellow);
+    color: black;
+    padding: 0;
+    box-shadow: 0 2px 8px #1a1a1b;
+}

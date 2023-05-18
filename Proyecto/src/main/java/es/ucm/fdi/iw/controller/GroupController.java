@@ -133,10 +133,7 @@ public class GroupController {
         Member member = groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // Get budget
-        if(user.hasRole(Role.ADMIN))
-            model.addAttribute("budget", 0);
-        else
-            model.addAttribute("budget", member.getBudget());
+        model.addAttribute("budget", member.getBudget());
 
         // get members
         List<Member> members = group.getMembers();
@@ -147,11 +144,7 @@ public class GroupController {
             currencies.add(g.name());
         }
         
-        if (!user.hasRole(Role.ADMIN))
-            model.addAttribute("isGroupAdmin", member.getRole() == GroupRole.GROUP_MODERATOR);
-        else
-            model.addAttribute("isGroupAdmin", false);
-        
+        model.addAttribute("isGroupAdmin", member.getRole() == GroupRole.GROUP_MODERATOR);        
         model.addAttribute("currencies", currencies);
         model.addAttribute("group", group);
         model.addAttribute("userId", user.getId());

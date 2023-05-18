@@ -1,15 +1,6 @@
 const groupsTable = document.getElementById("groupsTable");
 const userId = groupsTable.dataset.userid;
 
-let btnAdmin = document.getElementById("btn-admin");
-if (btnAdmin != null){ // Si no existe al estar en una cuenta no ADMIN
-    btnAdmin.onclick = (e) => {
-        e.preventDefault();
-        // Render all groups
-        getAllGroups();
-    }     
-};
-
 function getGroups() {
     go(`${config.rootUrl}/user/getGroups`, "GET")
         .then(groups => {
@@ -28,31 +19,6 @@ function getGroups() {
                         groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance));
                 })
             }           
-        })
-        .catch(e => {
-            console.log("Error retrieving group", e);
-        })
-}
-
-// TODO: Arreglar
-function getAllGroups() {
-    go(`${config.rootUrl}/admin/getAllGroups`, "GET")
-        .then(groups => {
-            const e = document.getElementById(`group-none`)
-            if (e != null)
-                groupsTable.removeChild(e);
-
-            if(groups.length == 0){
-                groupsTable.insertAdjacentHTML("afterbegin","<h2>No groups yet</h2>");
-            }
-            else{
-            Array.from(groups).forEach(group => {
-                const elem = document.getElementById(`group-${group.id}`);
-                if (elem != null)
-                    groupsTable.removeChild(elem);
-                groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, "-"));
-            })
-            }
         })
         .catch(e => {
             console.log("Error retrieving group", e);
@@ -106,7 +72,7 @@ if (ws.receive) {
 function renderGroup(group, balance) {
     const truncatedBalance = Number(balance).toFixed(2);
     return `<div id="group-${group.id}" class="col">
-                <div class="card text-white" role="button" onclick="location.href='/group/${group.id}'" tabindex="0">
+                <div class="card m-2 text-white" role="button" onclick="location.href='/group/${group.id}'" tabindex="0">
                     <div class="card-header">
                         <h5>${group.name}</h5>
                     </div>

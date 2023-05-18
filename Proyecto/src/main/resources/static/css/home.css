@@ -1,13 +1,6 @@
 
 /* ------------ GENERAL ------------*/
 
-#home_groups {
-    margin-top: 3vh;
-    margin-left: 3vh;
-    margin-right: 2vh;
-    row-gap: 4vh;
-}
-
 #groupsTable .card {
     max-width: 20rem;
     max-height: 15rem;
@@ -26,10 +19,6 @@
     overflow: hidden; /* Oculta el texto que no cabe */
     text-overflow: ellipsis; /* Agrega puntos suspensivos al final del texto truncado */
     white-space: nowrap; /* Evita que el texto se desborde */
-}
-
-.colscroll{
-    overflow-y: scroll;
 }
 
 /* ------------ CARD ------------*/

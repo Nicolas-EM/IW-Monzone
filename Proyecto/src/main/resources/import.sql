@@ -11,7 +11,7 @@ VALUES (1, true, 'admin', 'ADMIN,USER', 'a',
 
 -- Generate 10 random users
 INSERT INTO IWUser (id, enabled, name, roles, username, password)
-SELECT t.id + 3, true, CONCAT('User ', t.id + 3), 'USER', CONCAT('user', t.id + 3), '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W'
+SELECT t.id + 4, true, CONCAT('User ', t.id + 3), 'USER', CONCAT('user', t.id + 3), '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W'
 FROM (
   SELECT 1 AS id UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
 ) AS t;

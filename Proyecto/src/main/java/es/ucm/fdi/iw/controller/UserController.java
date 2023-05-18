@@ -473,7 +473,7 @@ public class UserController {
 
         // check permissions
         User requester = (User) session.getAttribute("u");
-        if (requester.getId() != target.getId() && !requester.hasRole(Role.ADMIN)) {
+        if (requester.getId() != target.getId()) {
             throw new ForbiddenException(ErrorType.E_PROFILE_FORBIDDEN);
         }
 

@@ -49,6 +49,7 @@ _______
 - [!] Ajustar decimales en perfil y en home
 - En los miembros en group_config o expense, tu usuario debería aparecer como "You"
 - Al crear expense no sale la foto por defecto
+- [!] En group_config y en perfil sale scrollbar vertical, no se ajusta
 
 ## Usabilidad
 - [P] Las operaciones destructivas deben pedir confirmación
@@ -83,4 +84,3 @@ _______
 - Hovers en home (sobre las cards y sobre el botón de añadir)
 - Añadir orden a los grupos en home
 - [!] El mark as read debería cambiar el color de la notif
-- [!] En group_config y en perfil sale scrollbar vertical, no se ajusta

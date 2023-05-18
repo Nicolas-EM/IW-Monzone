@@ -42,15 +42,15 @@ public class AdminController {
 
         List<Group> groups = entityManager.createNamedQuery("Group.getAllGroups", Group.class).getResultList();
         model.addAttribute("groups", groups);
-        return "home";
+        return "admin";
     }
 
     @ResponseBody
     @Transactional
     @GetMapping("/getAllGroups")
     public List<Group.Transfer> getAllGroups(HttpSession session) {
-
         List<Group> groups = entityManager.createNamedQuery("Group.getAllGroups", Group.class).getResultList();
         return groups.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
+
 }

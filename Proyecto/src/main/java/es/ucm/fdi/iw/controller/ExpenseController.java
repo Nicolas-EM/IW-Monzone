@@ -83,7 +83,7 @@ public class ExpenseController {
     @Autowired
     private GroupAccessUtilities groupAccessUtilities;
 
-    private static final Logger log = LogManager.getLogger(AdminController.class);
+    private static final Logger log = LogManager.getLogger(ExpenseController.class);
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Failed to save image") // 500
     public static class ImageSavingFailed extends RuntimeException {
