@@ -5,6 +5,8 @@ VALUES (1, true, 'admin', 'ADMIN,USER', 'a',
     (2, true, 'bonito', 'USER', 'b',
     '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W'),
     (3, true, 'Nicoooooo', 'ADMIN,USER', 'Nico',
+    '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W'),
+    (4, true, 'Tester', 'USER', 'Tester',
     '{bcrypt}$2a$10$2BpNTbrsarbHjNsUWgzfNubJqBRf.0Vz9924nRSHBqlbPKerkgX.W');
 
 -- Generate 10 random users
@@ -34,7 +36,7 @@ SELECT
     FLOOR(RAND() * 1), -- set role to 0 or 1
     0
 FROM
-    IWUser u WHERE u.id <> 2;
+    IWUser u WHERE u.id <> 2 AND u.id <> 4;
 -- Generate random group memberships for each empty group
 /*
 INSERT INTO IWMember (GROUP_ID, USER_ID, BUDGET, ROLE)

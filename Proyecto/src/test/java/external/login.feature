@@ -39,6 +39,16 @@ Feature: login en servidor
     And delay(delayTime)
     Then waitForUrl(baseUrl + '/admin')
 
+  @login_Tester
+  Scenario: login correcto como Tester
+    Given driver baseUrl
+    And delay(delayTime)
+    And input('#username', 'Tester')
+    And input('#password', 'aa')
+    When click("#btn-signin")
+    And delay(delayTime)
+    Then waitForUrl(baseUrl + '/user')
+
   Scenario: logout after login
     Given driver baseUrl
     And delay(delayTime)

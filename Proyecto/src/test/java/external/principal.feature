@@ -45,10 +45,10 @@ Feature: flujo de la app
     Then waitForUrl(baseUrl + '/group/2')
     And click("#expensesTable .card") # obtiene el primerExpense
     # Comprobar que los campos son correctos
-    # Then match input('#name').value == 'Karate Expense'
-    # Then match input('#desc').value == 'Auto generated description'
-    # Then match input('#dateString').value == '01-01-2023'
-    # Then match input('#amount').value == '42'
+    # Then match driver('#name').value == 'Karate Expense'
+    # Then match driver('#desc').value == 'Auto generated description'
+    # Then match driver('#dateString').value == '01-01-2023'
+    # Then match driver('#amount').value == '42'
     # Then match select('#paidById').value == 'bonito'
     # Then match select('#typeId').value == 'Accommodation'
 
