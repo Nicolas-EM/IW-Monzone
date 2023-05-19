@@ -62,15 +62,11 @@ public class RootController {
         String name = jsonNode.get("name").asText();
         String username = jsonNode.get("username").asText();
         String password = jsonNode.get("password").asText();
-        String repeatPassword = jsonNode.get("repeatPassword").asText();
-
+    
         // check params
-        if (name.equals("") || username.equals("") || password.equals("") || repeatPassword.equals(""))
+        if (name.equals("") || username.equals("") || password.equals(""))
             throw new BadRequestException(ErrorType.E_EMPTY_FIELDS);
-        
-        if (!password.equals(repeatPassword))
-            throw new BadRequestException(ErrorType.E_DIFF_PASS);
-        
+    
         // check repeat username
         List<User> u = entityManager.createNamedQuery("User.byUsername", User.class)
 		        .setParameter("username", username)

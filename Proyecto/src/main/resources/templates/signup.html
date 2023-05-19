@@ -23,10 +23,11 @@
                 <button class="btn btn-light rounded-pill fw-bold mt-3 ms-3 d-lg-none" onclick="location.href='./'">Sign In</button>
                 <form id="signupForm" class="form-content">
                     <h2 class="fw-bold">Create an account</h2>
-                    <input type="text" id="name" placeholder="Name">
-                    <input type="text" id="username" placeholder="Username">
-                    <input type="password" id="password" placeholder="Password">
-                    <input type="password" id="repeatPassword" placeholder="Repeat password">
+                    <input type="text" id="name" placeholder="Name" required="required">
+                    <input type="text" id="username" placeholder="Username" required="required">
+                    <input type="password" id="password" placeholder="Password" required="required">
+                    <input type="password" id="repeatPassword" placeholder="Repeat password" required="required">
+                    <p id="errorParagraph"  class="error"></p>
                     <button type="submit" th:formaction="@{/signup}" id="btn-signup" class="btn btn-primary rounded-pill fw-bold mt-4">Sign Up</button>
                 </form>
             </div>
