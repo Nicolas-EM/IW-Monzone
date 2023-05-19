@@ -13,9 +13,14 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import es.ucm.fdi.iw.model.Expense;
 import es.ucm.fdi.iw.model.Group;
+import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.Transferable;
 
@@ -36,20 +41,70 @@ public class AdminController {
     @Autowired
 	private EntityManager entityManager;
     
+    /*
+     * GET MAPPINGS
+     */
+
+    /*
+     *  Main view
+     */
 	@GetMapping("/")
-    public String index(Model model, HttpSession session) {
+    public String index(HttpSession session) {
         User u = (User)session.getAttribute("u");
         log.warn("Usuario {} ha accedido a admin", u.getUsername());
 
         return "admin";
     }
 
+    /*
+     * Group view
+     */
+    @GetMapping("/{groupId}")
+    public String index(Model model, HttpSession session, @PathVariable long groupId) {
+        // get group
+        Group group = entityManager.find(Group.class, groupId);
+        model.addAttribute("group", group);
+
+        // get currencies
+        List<String> currencies = new ArrayList<>();
+        for (Group.Currency g : Group.Currency.values()) {
+            currencies.add(g.name());
+        }
+        model.addAttribute("currencies", currencies);
+
+        // get expenses
+        List<Participates> ps = group.getOwns();
+        // each expense only once, even if more than 1 user participates in it
+        Set<Expense> uniqueExpenses = new HashSet<>();
+        for (Participates p : ps) {
+            uniqueExpenses.add(p.getExpense());
+        }
+        List<Expense> expenses = new ArrayList<>(uniqueExpenses);
+        model.addAttribute("expenses", expenses);
+
+        return "admin_group";
+    }
+
+    /*
+     *  Get all groups
+     */
     @ResponseBody
     @Transactional
     @GetMapping("/getAllGroups")
     public List<Group.Transfer> getAllGroups(HttpSession session) {
         List<Group> groups = entityManager.createNamedQuery("Group.getAllGroups", Group.class).getResultList();
         return groups.stream().map(Transferable::toTransfer).collect(Collectors.toList());
+    }
+
+    /*
+     * Get all users
+     */
+    @ResponseBody
+    @Transactional
+    @GetMapping("/getAllUsers")
+    public List<User.Transfer> getAllUsers(HttpSession session) {
+        List<User> users = entityManager.createNamedQuery("User.getAllUsers", User.class).getResultList();
+        return users.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
 
     /*
@@ -62,8 +117,6 @@ public class AdminController {
         return ids;
     }
 
-    
-
     /*
      * Search users
      */
@@ -73,19 +126,5 @@ public class AdminController {
         List<Long> ids = entityManager.createNamedQuery("User.getUserIdsLike", Long.class).setParameter("userName", "%" + userName + "%").getResultList();
         return ids;
     }
-
-    @GetMapping("/{groupId}")
-    public String index(Model model, HttpSession session, @PathVariable long groupId) {
-        return "admin_group";
-    }
-
-    @ResponseBody
-    @Transactional
-    @GetMapping("/getAllUsers")
-    public List<User.Transfer> getAllUsers(HttpSession session) {
-        List<User> users = entityManager.createNamedQuery("User.getAllUsers", User.class).getResultList();
-        return users.stream().map(Transferable::toTransfer).collect(Collectors.toList());
-    }
-
 
 }

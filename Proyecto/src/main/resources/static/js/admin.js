@@ -51,7 +51,7 @@ function renderUser(id, name, username, enabled) {
 
     usersRendered.push(id);
 
-    return `<div id="user-${id}" class="card m-2" tabindex="0" style="background-color: ${backgroundColor}; border-left-color: ${borderLeftColor};">
+    return `<div id="user-${id}" class="card m-2" tabindex="0">
                 <div class="row row-cols-3 g-0">
                     <!-- Profile pic -->
                     <div class="mx-3 col-4 col-md-2 d-flex align-items-center justify-content-center">
