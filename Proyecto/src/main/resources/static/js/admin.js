@@ -94,9 +94,12 @@ document.getElementById('searchGroupBtn').addEventListener('click', (e) => {
         console.log(groupsFound);
 
         groupsRendered.forEach(groupId => {
-            if(!groupsFound.includes(groupId)){
-                document.getElementById(`group-${groupId}`).classList.add('d-none');
-            }
+            const groupElement = document.getElementById(`group-${groupId}`);
+            document.getElementById('noGroupsFoundMsg').classList.add('d-none');
+            if (!groupsFound.includes(groupId))
+                groupElement.classList.add('d-none');
+            else 
+                groupElement.classList.remove('d-none');
         })
 
         if(!groupsFound.length){
@@ -129,9 +132,12 @@ document.getElementById('searchUserBtn').addEventListener('click', (e) => {
         console.log(usersFound);
 
         usersRendered.forEach(userId => {
-            if(!usersFound.includes(userId)){
-                document.getElementById(`user-${userId}`).classList.add('d-none');
-            }
+            const userElement = document.getElementById(`user-${userId}`);
+            document.getElementById('noUsersFoundMsg').classList.add('d-none');
+            if (!usersFound.includes(userId))
+                userElement.classList.add('d-none');
+            else
+                userElement.classList.remove('d-none');
         })
 
         if(!usersFound.length){

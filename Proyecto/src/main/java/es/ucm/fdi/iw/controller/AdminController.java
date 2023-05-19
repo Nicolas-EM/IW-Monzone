@@ -111,9 +111,14 @@ public class AdminController {
      * Search groups
      */
     @ResponseBody
-    @GetMapping("searchGroup/{groupName}")
-    public List<Long> searchGroupsIds(@PathVariable String groupName){
-        List<Long> ids = entityManager.createNamedQuery("Group.getGroupIdsLike", Long.class).setParameter("groupName", "%" + groupName + "%").getResultList();
+    @GetMapping("searchGroup/{id}")
+    public List<Long> searchGroupsIds(@PathVariable String id) {
+        List<Long> ids = new ArrayList<>();
+        try {
+            Long groupId = Long.parseLong(id);
+            ids = entityManager.createNamedQuery("Group.getGroupIdsLike", Long.class).setParameter("groupId", groupId).getResultList();
+        }
+        catch(NumberFormatException e) {}
         return ids;
     }
 
@@ -121,9 +126,9 @@ public class AdminController {
      * Search users
      */
     @ResponseBody
-    @GetMapping("searchUser/{userName}")
-    public List<Long> searchUsersIds(@PathVariable String userName){
-        List<Long> ids = entityManager.createNamedQuery("User.getUserIdsLike", Long.class).setParameter("userName", "%" + userName + "%").getResultList();
+    @GetMapping("searchUser/{request}")
+    public List<Long> searchUsersIds(@PathVariable String request){
+        List<Long> ids = entityManager.createNamedQuery("User.getUserIdsLike", Long.class).setParameter("request", request).getResultList();
         return ids;
     }
 

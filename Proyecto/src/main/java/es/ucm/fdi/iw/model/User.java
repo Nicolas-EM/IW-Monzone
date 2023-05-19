@@ -26,7 +26,7 @@ import java.util.List;
                         + "FROM User u "
                         + "WHERE u.username = :username"),
         @NamedQuery(name = "User.getAllUsers", query = "SELECT obj FROM User obj"),
-        @NamedQuery(name = "User.getUserIdsLike", query = "SELECT obj.id FROM User obj WHERE LOWER(obj.name) LIKE LOWER(:userName)")
+        @NamedQuery(name = "User.getUserIdsLike", query = "SELECT obj.id FROM User obj WHERE CAST(obj.id AS string) = :request OR LOWER(obj.username) LIKE CONCAT('%', LOWER(:request), '%')")
 })
 @Table(name="IWUser")
 public class User implements Transferable<User.Transfer> {

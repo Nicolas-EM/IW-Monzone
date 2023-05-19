@@ -2,6 +2,7 @@
 
 .text-field {
     height: 35px;
+    width: 100%;
 }
 
 .rounded-corners {
@@ -40,6 +41,17 @@
     margin-top: 7px;
     margin-left: 10px;
     overflow-y: auto;
+}
+
+#btn-back {
+    border-style: none;
+    outline: none;
+    width: 40%;
+    background-color: var(--bs-brown);
+}
+
+#btn-back:hover {
+    background-color: #865e0c;
 }
 
 /* ------------ Expenses ------------ */
