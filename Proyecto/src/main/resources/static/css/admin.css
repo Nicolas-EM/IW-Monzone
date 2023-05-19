@@ -62,3 +62,12 @@
     font-size:small;
     padding-bottom: 3px;
 }
+
+.img-profile {
+    min-width: 40px;
+    min-height: 40px;
+    max-width: 40px;
+    max-height: 40px;
+    border-radius: 8px;
+    object-fit: cover; 
+}

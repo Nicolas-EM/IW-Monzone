@@ -38,14 +38,14 @@ go(`${config.rootUrl}/admin/getAllUsers`, "GET")
             const elem = document.getElementById(`user-${user.id}`);
             if (elem != null)
                 usersList.removeChild(elem);
-                usersList.insertAdjacentHTML("afterbegin", renderUser(user.id, user.name, user.username, user.enabled));
+                usersList.insertAdjacentHTML("afterbegin", renderUser(user.id, user.name, user.username, user.enabled, `/user/${user.id}/pic`));
         })
     })
     .catch(e => {
         console.log("Error retrieving user", e);
     });
 
-function renderUser(id, name, username, enabled) {
+function renderUser(id, name, username, enabled, imgURL) {
     const backgroundColor = enabled ? "white" : "var(--bs-gray-400)";
     const borderLeftColor = enabled ? "var(--bs-yellow)" : "var(--bs-gray-600)";
 
@@ -55,7 +55,7 @@ function renderUser(id, name, username, enabled) {
                 <div class="row row-cols-3 g-0">
                     <!-- Profile pic -->
                     <div class="mx-3 col-4 col-md-2 d-flex align-items-center justify-content-center">
-                        Aquí va la ProfilePic
+                        <img class="img-profile" src="${imgURL}" alt="Profile pic">
                     </div>
                     <!-- User Info -->
                     <div class="col-8 col-md-7">

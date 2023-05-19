@@ -324,8 +324,13 @@ public class UserController {
      * @throws IOException
      */
     @GetMapping("/{id}/pic")
-    public StreamingResponseBody getPic(HttpSession session) throws IOException {
-        long id = ((User) session.getAttribute("u")).getId();
+    public StreamingResponseBody getPic(HttpSession session, @PathVariable long id) throws IOException {
+        // check if user exists and is you (or admin)
+        long userId = ((User) session.getAttribute("u")).getId();
+        User u = entityManager.find(User.class, userId);
+        if (userId != id && !u.hasRole(Role.ADMIN))
+            throw new ForbiddenException(ErrorType.E_PROFILE_FORBIDDEN);
+
         File f = localData.getFile("user", "" + id);
         InputStream in = new BufferedInputStream(f.exists() ? new FileInputStream(f) : UserController.defaultPic());
         return os -> FileCopyUtils.copy(in, os);
