@@ -10,49 +10,21 @@ Feature: flujo de la app
     And delay(delayTime)
     Then waitForUrl(baseUrl + '/group/2')
 
-   @group_config
-   Scenario: Configuracion grupo
-     Given call read('principal.feature@group')
-     And delay(delayTime)
-     When click("#groupConfigBtn")
-     And delay(delayTime)
-     Then waitForUrl(baseUrl + '/group/2/config')
-
-   @group_viewExpense
-   Scenario: View expense in group
-     Given call read('principal.feature@group')
-     And delay(delayTime)
-     When click(".body div.card")
-     And delay(delayTime)
-     Then waitForUrl(baseUrl + '/group/2/99')
-
-  @group_addExpense
-  Scenario: Add expense to group
+  @group_config
+  Scenario: Configuracion grupo
     Given call read('principal.feature@group')
     And delay(delayTime)
-    When click("#addExpense")
+    When click("#groupConfigBtn")
     And delay(delayTime)
-    Then waitForUrl(baseUrl + '/group/2/new')
-    And delay(delayTime)
-    And input('#name', 'Karate Expense')
-    And input('#desc', 'Auto generated description')
-    And input('#dateString', '01-01-2023')
-    And input('#amount', '42')
-    And select('#paidById', 1)
-    And select('#typeId', 1)
-    And click("#btn-save")
-    And delay(delayTime)
-    Then waitForUrl(baseUrl + '/group/2')
-    # obtiene el primerExpense
-    And click("#expensesTable .card")
-    # Comprobar que los campos son correctos
-    # Then match driver('#name').value == 'Karate Expense'
-    # Then match driver('#desc').value == 'Auto generated description'
-    # Then match driver('#dateString').value == '01-01-2023'
-    # Then match driver('#amount').value == '42'
-    # Then match select('#paidById').value == 'bonito'
-    # Then match select('#typeId').value == 'Accommodation'
+    Then waitForUrl(baseUrl + '/group/2/config')
 
+  @group_viewExpense
+  Scenario: View expense in group
+    Given call read('principal.feature@group')
+    And delay(delayTime)
+    When click(".body div.card")
+    And delay(delayTime)
+    Then waitForUrl(baseUrl + '/group/2/99')
 
   @profile
   Scenario: View profile

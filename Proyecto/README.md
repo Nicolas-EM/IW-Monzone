@@ -130,6 +130,7 @@ En cuanto a la implementación, se han elaborado 3 archivos .features para lleva
         
 - usage.feature, contiene los escenarios básicos de uso de la aplicación:
     - Crear un nuevo grupo y comprobar que se ha creado correctamente
+	  - Eliminar un gasto
     - Crear un gasto y comprobar que se ha creado correctamente
     - Invitar a un usuario a unirse a un grupo, unirse y entrar en el grupo
 

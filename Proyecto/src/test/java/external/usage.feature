@@ -28,6 +28,46 @@ Feature: uso de la app
     Then match driver.value('#budget') == '10.0'
     And delay(delayTime)
 
+  @group_deleteExpense
+  Scenario: Delete group expense
+    Given call read('principal.feature@group')
+    And delay(delayTime)
+    When click("#expensesTable .card")
+    Then waitForUrl(baseUrl + '/group/2/99')
+    And delay(delayTime)
+    And click("#btn-delete")
+    And delay(delayTime)
+    And click("#confirmBtn")
+    Then waitForUrl(baseUrl + '/group/2')
+
+  @group_addExpense
+  Scenario: Add expense to group
+    Given call read('principal.feature@group')
+    And delay(delayTime)
+    When click("#addExpense")
+    And delay(delayTime)
+    Then waitForUrl(baseUrl + '/group/2/new')
+    And delay(delayTime)
+    And input('#name', 'Karate Expense')
+    And input('#desc', 'Auto generated description')
+    And input('#dateString', '01-01-2023')
+    And input('#amount', '42')
+    And select('#paidById', 1)
+    And select('#typeId', 1)
+    And click("#btn-save")
+    And delay(delayTime)
+    Then waitForUrl(baseUrl + '/group/2')
+    # Obtiene el primerExpense
+    And click("#expensesTable .card")
+    And delay(delayTime)
+    # Comprobar que los campos son correctos
+    Then match driver.value('#name') == 'Karate Expense'
+    Then match driver.value('#desc') == 'Auto generated description'
+    Then match driver.value('#dateString') == '2023-01-01'
+    Then match driver.value('#amount') == '42.0'
+    Then match driver.value('#paidById') == '2'
+    Then match driver.value('#typeId') == '2'
+
   @invitationAndJoin
   Scenario: Invitar a un grupo y unirse
     Given call read('principal.feature@group_config')
