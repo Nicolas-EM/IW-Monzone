@@ -51,6 +51,8 @@ public class RootController {
         return "signup";
     }
 
+  
+    
     /*
      * SIGNUP
      */
@@ -72,8 +74,25 @@ public class RootController {
 		        .setParameter("username", username)
 		        .getResultList();
         if (u == null || u.size() > 0) {
-            log.warn("Error: user repeat " + username);
-            throw new BadRequestException(ErrorType.E_USERNAME_TAKEN);            
+            //if that username exist but is not enabled then we can reuse it with the new info
+            if( u!= null && !u.get(0).isEnabled()){
+                // modify data user
+                User target = u.get(0);
+                target = entityManager.find(User.class, target.getId()); 
+                target.setUsername(username);
+                target.setName(name);
+                target.setPassword(encodePassword(password));
+                target.setEnabled(true);
+                log.warn("TODO OK: user updated " + username);
+                return "{\"action\": \"redirect\",\"redirect\": \"/\"}";
+
+            }
+            else{
+
+                log.warn("Error: user repeat " + username);
+                throw new BadRequestException(ErrorType.E_USERNAME_TAKEN);  
+            }
+                      
         }
             
 
