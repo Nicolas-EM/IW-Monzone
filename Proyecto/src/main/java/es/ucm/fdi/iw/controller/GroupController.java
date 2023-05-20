@@ -600,6 +600,7 @@ public class GroupController {
 
             // Delete notification
             entityManager.remove(invite);
+            entityManager.flush();
         }
 
         // Send notification
