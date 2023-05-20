@@ -31,8 +31,8 @@
                     <div class="col-3 pe-4">
                         <label for="enabled" class="form-label w-100">Enabled</label>
                         <input id="enabled" name="enabled" type="text" class="text-field rounded-corners mb-4" th:value="${group.isEnabled() ? 'yes' : 'no'}" th:disabled="true">
-                    </div>                    
-                </div> 
+                    </div>
+                </div>
                 <!-- Row Desc, Currency, TotBudget -->
                 <div class="row">
                     <div class="col-lg-8">
@@ -48,17 +48,17 @@
                             <label for="totBudget" class="form-label w-100 px-0">Total budget</label>
                             <input id="totBudget" name="totBudget" type="text" class="text-field rounded-corners mb-4" th:value="${group.getTotBudget()}" th:disabled="true">
                         </div>
-                    </div>                    
+                    </div>
                 </div>
                 <!-- Row Expenses -->
                 <div class="row">
                     <div class="row">
                         <h2>Expenses</h2>
-                    </div>  
+                    </div>
                     <div class="row">
                         <div class="area-list border border-white">
                             <!-- Dynamic expense list with Thymeleaf -->
-                            <div th:each="exp : ${expenses}" class="w-100">                            
+                            <div th:each="exp : ${expenses}" class="w-100">
                                 <div class="card justify-content-center border-light text-white my-3 mx-2">
                                     <div class="row row-cols-2 row-cols-md-4 g-0">
                                         <!-- Icon -->
@@ -85,8 +85,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>                                                
-                    </div>                    
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- RIGHT PANEL -->
@@ -95,11 +95,11 @@
                 <div class="row">
                     <div class="row">
                         <h2>Members</h2>
-                    </div>  
+                    </div>
                     <div class="row">
                         <div class="area-list border border-white">
                             <!-- Dynamic member list with Thymeleaf -->
-                            <div th:each="mem : ${group.getMembers()}" class="w-100">                            
+                            <div th:each="mem : ${group.getMembers()}" class="w-100">
                                 <div tabindex="0" class="member-card my-3 mx-2" th:classappend="${mem.isEnabled() ? 'enabled' : 'disabled'}">
                                     <div class="row row-cols-3 g-0">
                                         <!-- User ID -->
@@ -113,32 +113,32 @@
                                         <!-- Balance -->
                                         <div id="balance" class="col-4 py-1">
                                             <span class="dot" th:style="${mem.getBalance() >= 0 ? 'background: green' : 'background: red'}"></span>
-                                            Balance: [[${mem.getBalance()}]] [[${group.getCurrency()}]]              
+                                            Balance: [[${#numbers.formatDecimal(mem.getBalance(), 0, 2)}]] [[${group.getCurrency()}]]
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>                                                
+                        </div>
                     </div>
-                </div> 
-                 <!-- Row Debts -->
+                </div>
+                <!-- Row Debts -->
                 <div class="row mt-3 mb-4">
                     <div class="row mt-4">
                         <h2>Debts</h2>
-                    </div>  
+                    </div>
                     <div class="row">
                         <div class="debts-list border border-white">
                             <!-- Dynamic debts list with Thymeleaf -->
-                            <div th:each="deb : ${group.getDebts()}" class="w-100">                            
+                            <div th:each="deb : ${group.getDebts()}" class="w-100">
                                 <div tabindex="0" class="debt-card my-3 mx-2">
                                     <div class="row row-cols-3 px-4 py-2">
-                                        User [[${deb.getDebtor().getId()}]] owes user [[${deb.getDebtOwner().getId()}]]: [[${deb.getAmount()}]] [[${group.getCurrency()}]] 
+                                        User [[${deb.getDebtor().getId()}]] owes user [[${deb.getDebtOwner().getId()}]]: [[${#numbers.formatDecimal(deb.getAmount(), 0, 2)}]] [[${group.getCurrency()}]]
                                     </div>
                                 </div>
                             </div>
-                        </div>                                                
+                        </div>
                     </div>
-                </div>    
+                </div>
             </div>
         </div>
     </main>
