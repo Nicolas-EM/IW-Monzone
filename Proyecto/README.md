@@ -151,6 +151,7 @@ documentación extra utilizada durante el proyecto:
   - Una "especificación de requisitos software", que contiene el diseño de cada interfaz, con los requisitos importantes a tener en cuenta
   para cada funcionalidad (NOTA: No está actualizada, puede contener requisitos obsoletos)
   - TODO.md -> Fichero donde se incluyen las funcionalidades implementadas, las mejoras que se han realizado para la entrega antes del 
-  examen de la asignatura, y los aspectos que han quedado sin implementar, junto con la prioridad de cada tarea.
+  examen de la asignatura, y los aspectos que han quedado sin implementar, junto con la prioridad de cada tarea
+  - TODO - Excel Completo -> Excel realizado antes de la entrega pre-examen para organizar la asignación de tareas
   - 4 ficheros con el diseño de marca de la aplicación: el logo original, el logo en sus dos versiones (light mode VS dark mode) y el icono
 - Se incluye aquí el [link al repositorio de GitHub](https://github.com/Nicolas-EM/IW-Monzone.git)
