@@ -35,6 +35,8 @@ _______
 - [!!!] Funcionalidad ADMIN
 - Arreglar import.sql para cuadrar TotBudget y NumMembers
 - [!!!] TESTS - Crear gasto, invitar usuario
+- Hacer el README.md
+- Factor común código comprobaciones expense
 
 ## Errores [!!!]
 - USER: Cuando se añaden grupos no se elimina el mensaje de lista vacía
@@ -78,13 +80,6 @@ _______
 _______
 
 # LO QUE FALTA
-
-## General
-- Hacer el README.md
-- Factor común código comprobaciones expense
-
-## Errores [!!!]
-- Seguir testeando manualmente...
 
 ## Mejoras vistas
 - Añadir orden a los grupos en home
