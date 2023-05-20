@@ -90,6 +90,15 @@
     margin-left: 10%;
 }
 
+#btn-delete {
+    border-style: none;
+    outline: none;
+    background-color: #610000;
+    margin-left: 10%;
+}
+
+
+
 .card {
     background-color: var(--bs-orange);
     margin-top: 2%; 

@@ -62,12 +62,21 @@
             <button th:formaction="@{/user/ChangePassword}" type="submit" id="btn-savePassword" class="btn btn-primary rounded-pill fw-bold">Save Password</button>
           </div>
         </form>
-        <!-- Logout Btn -->
-        <div class="col-12 d-flex align-items-center justify-content-center separator2">
-          <form id="logoutFormUser" th:action="@{/logout}" method="post">
-            <button type="button" id="btn-logout" class="btn btn-primary rounded-pill fw-bold" onclick="document.getElementById('logoutFormUser').submit();">Logout</button>
-          </form>
-        </div>
+       
+            <!-- Logout Btn -->
+            <div class="col-12 d-flex align-items-center justify-content-center separator2">
+              <form id="logoutFormUser" th:action="@{/logout}" method="post">
+                <button type="button" id="btn-logout" class="btn btn-primary rounded-pill fw-bold" onclick="document.getElementById('logoutFormUser').submit();">Logout</button>
+              </form>
+            
+            <!-- Delete account Btn -->
+              
+            <form id="deleteUser" th:action="@{/user/DeleteUser}" method="post">
+              <button  data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="delUser" type="button" id="btn-delete" class="btn btn-primary rounded-pill fw-bold" onclick="">Unsubscribe</button>
+            </form>
+            
+
+            </div>
 
       </div>
 
@@ -129,6 +138,26 @@
         </div>
       </div>
     </div>
+     <!-- Confirm Modal -->
+     <th:block th:if="true">
+      <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content bg-dark">
+                  <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="confirmModalLabel">Monzone</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div id="confirmModalBdy" class="modal-body">
+                  </div>
+                  <div class="modal-footer">
+                      <button id="modalCancelBtn" type="button" class="btn btn-secondary btn-delete" data-bs-dismiss="modal">Cancel</button>
+                      <button id="confirmBtn" type="button" class="btn btn-func btn-primary" data-bs-dismiss="modal">Confirm</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </th:block>
+
   </main>
 
   <th:block th:replace="fragments/footer.html :: footer" />

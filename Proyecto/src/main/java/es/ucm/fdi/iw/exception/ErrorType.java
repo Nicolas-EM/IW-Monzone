@@ -8,6 +8,7 @@ public enum ErrorType {
     E_USERNAME_TAKEN("Invalid username: Username is already taken."),
     E_DIFF_PASS("Passwords don't match."),
     E_USER_NE("Invalid user: User doesn't exist."),
+    E_USER_NOTENABLE("Invalid user: User is not enable"),
     E_WRONG_PASS("Wrong password."),
     E_EMPTY_NAME("Invalid data: Name must not be empty."),
     E_INVALID_BUDGET("Invalid data: Budget must be a float greater or equal to 0."),
