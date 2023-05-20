@@ -106,6 +106,19 @@ public class ExpenseController {
         model.addAttribute("newExpense", newExpense);
     }
 
+    private Expense getExpenseOrThrow(long expenseId){
+        Expense expense = entityManager.find(Expense.class, expenseId);
+        if (expense == null || !expense.isEnabled())
+            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
+
+        return expense;
+    }
+
+    private void expenseBelongsToGroupOrThrow(Group group, Expense expense) {
+        if (!group.hasExpense(expense))
+            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
+    }
+
     /*
      * 
      * GET MAPPINGS
@@ -171,13 +184,10 @@ public class ExpenseController {
         groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // check if expense exists
-        Expense expense = entityManager.find(Expense.class, expenseId);
-        if (expense == null || !expense.isEnabled())
-            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
+        Expense expense = getExpenseOrThrow(expenseId);
 
         // check if expense belongs to the group
-        if (!group.hasExpense(expense))
-            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
+        expenseBelongsToGroupOrThrow(group, expense);
 
         setExpenseAttributes(group, expenseId, model, false);
         model.addAttribute("expense", expense);
@@ -243,8 +253,7 @@ public class ExpenseController {
             throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
 
         // check if expense belongs to the group
-        if (!group.hasExpense(exp))
-            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
+        expenseBelongsToGroupOrThrow(group, exp);
 
         File f = localData.getFile("expense", String.valueOf(expenseId));
         InputStream in = new BufferedInputStream(
@@ -490,13 +499,10 @@ public class ExpenseController {
         PostParams params = validatedPostParams(session, groupId, name, desc, dateString, amount, paidById, participateIds, typeId);
 
         // check if expense exists
-        Expense exp = entityManager.find(Expense.class, expenseId);
-        if (exp == null || !exp.isEnabled())
-            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
+        Expense exp = getExpenseOrThrow(expenseId);
 
         // check if expense belongs to the group
-        if (!params.group.hasExpense(exp))
-            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
+        expenseBelongsToGroupOrThrow(params.group, exp);
 
         // delete debts of balances
         List<Participates> participants = exp.getBelong();
@@ -597,13 +603,10 @@ public class ExpenseController {
         groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // check if expense exists
-        Expense exp = entityManager.find(Expense.class, expenseId);
-        if (exp == null || !exp.isEnabled())
-            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
+        Expense exp = getExpenseOrThrow(expenseId);
 
         // check if expense belongs to the group
-        if (!group.hasExpense(exp))
-            throw new ForbiddenException(ErrorType.E_EXPENSE_FORBIDDEN);
+        expenseBelongsToGroupOrThrow(group, exp);
 
         // List of users to notify
         List<User> notifyUsers = new ArrayList<>();
