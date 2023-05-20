@@ -1,5 +1,6 @@
 const groupsTable = document.getElementById("groupsTable");
 const userId = groupsTable.dataset.userid;
+let canDelete = true;
 
 // Profile form
 document.getElementById("profileForm").addEventListener('submit', (e) => {
@@ -70,8 +71,13 @@ function getGroups() {
                     if (elem != null)
                         groupsTable.removeChild(elem);
                     const member = group.members.find(member => member.idUser == userId);
-                    if (member)
+                    if (member){
                         groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group, member.balance, member.budget));
+                        if (member.balance !== 0.0 ){
+                            canDelete = false;
+                        }
+                    }
+
                 });
             }            
         })
@@ -102,6 +108,36 @@ function renderGroup(group, balance, budget) {
                 </div>
                 </label>
             </div>`;
+}
+
+// DELETE USER
+function deleteUser() {
+    console.log('Deleting user account');
+    if (canDelete === true)
+    {
+        document.getElementById("deleteUser").submit();
+    }
+    else{
+        createToastNotification(`error-group-leaving`, "Error. you cannot unsubscribe while your balance is not 0 in any group", true);
+    }
+}
+
+// Confirm modal logic (delete)
+let confirmModal = document.getElementById('confirmModal')
+if (confirmModal) {
+    confirmModal.addEventListener('show.bs.modal', event => {
+        // Button that triggered the modal
+        const button = event.relatedTarget;
+
+        // Extract info from data-bs-* attributes
+        const btnType = button.getAttribute('data-bs-type');
+        const modalBody = document.getElementById('confirmModalBdy');
+        modalBody.innerHTML = "Are you sure you want to delete your account? Please note that you cannot do this if your balance is different than 0 in any of the groups you are a member of."
+     
+        document.getElementById('confirmBtn').onclick = () => {
+            deleteUser();
+        }
+    })
 }
 
 // Render INCOMING changes

@@ -427,7 +427,20 @@ public class UserController {
         return "{\"action\": \"none\"}";
     }
 
+    /*
+     * Delete user
+     */
+     @Transactional
+     @PostMapping("/DeleteUser")
+     public String postDeleteUser(HttpSession session, Model model) {
 
+         User target = (User) session.getAttribute("u");
+         target = entityManager.find(User.class, target.getId());
+         target.setEnabled(false);
+        // session.setAttribute("u", target);
+        return "login";
+     }
+ 
      /*
      * Change Password
      */

@@ -33,6 +33,9 @@ public class IwUserDetailsService implements UserDetailsService {
 	        User u = entityManager.createNamedQuery("User.byUsername", User.class)
                     .setParameter("username", username)
                     .getSingleResult();
+			// check if enabled
+			if (!u.isEnabled())
+				throw new Exception();
 	        // build UserDetails object
 	        ArrayList<SimpleGrantedAuthority> roles = new ArrayList<>();
 	        for (String r : u.getRoles().split("[,]")) {

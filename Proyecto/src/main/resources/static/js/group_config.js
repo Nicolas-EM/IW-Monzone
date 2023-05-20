@@ -52,7 +52,7 @@ if (confirmModal) {
                 modalBody.innerHTML = "Are you sure you want to leave this group?"
                 break;
             case "delGroup":
-                modalBody.innerHTML = "Are you sure you want to delete this group?"
+                modalBody.innerHTML = "Are you sure you want to delete this group? Note that you can't delete a group if someone's balance is other than 0."
                 break;
             case "delMember":
                 removeId = button.getAttribute('data-bs-removeId');
@@ -148,7 +148,6 @@ if (groupId) {
     go(`${config.rootUrl}/group/${groupId}/getGroupConfig`, "GET")
         .then(group => {
             renderGroupData(group);
-            renderGroupMembers(group);
         }
         );
 }
@@ -238,7 +237,7 @@ function deleteMember(removeId) {
                 console.log("Redirecting to ", d.redirect);
                 window.location.replace(d.redirect);
             } else {
-                //renderGroupData(group);
+                renderGroupData(group);
             }
         })
         .catch(e => {

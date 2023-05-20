@@ -1,47 +1,110 @@
-# Aplicación de Plantilla de IW
+# Equipo Monzone - Proyecto (Pre-Examen)
 
-Debes buscar todos los lugares donde aparece la palabra "plantilla" (incluido este párrafo) y reemplazar las ocurrencias, y el contexto circundante, por valores que tengan sentido en tu aplicación. Por ejemplo, este párrafo deberías eliminarlo de tu proyecto.
+## Propuesta
 
-## Contenido de la plantilla
 
-- en [src/main/java/es/ucm/fdi/iw](https://github.com/manuel-freire/iw/tree/main/plantilla/src/main/java/es/ucm/fdi/iw) están los ficheros de configuración-mediante-código de la aplicación (ojo porque en otro sitio está el fichero principal de configuración-mediante-propiedades, [application.properties](https://github.com/manuel-freire/iw/blob/main/plantilla/src/main/resources/application.properties)):
+## Diagrama BD
+A continuación se listan las tablas que forman la Base de Datos de Monzone, con los atributos que contienen.
+- User:
+  - id - PK
+  - enabled - Para bajas lógicas
+  - name - Nombre
+  - username - Nombre de usuario, único
+  - password - Contraseña cifrada
+  - roles - Lista de roles, puede ser {User,Admin}
+- Group:
+  - id - PK
+  - enabled - Para bajas lógicas
+  - name - Nombre
+  - desc - Descripción
+  - num_members - Número de miembros, atributo derivado (count(members))
+  - tot_budget - Presupuesto grupal, atributo derivado (suma de los budget de cada miembro)
+  - currency - Tipo de moneda, uno de {EUR,USD,GBP}
+- Member:
+  - user_id - Usuario que es miembro, PK
+  - group_id - Grupo al que pertenece, PK
+  - enabled - Para bajas lógicas
+  - role - Rol del usuario en el grupo, puede ser uno de estos {User,Moderator}
+  - budget - Presupuesto del miembro en ese grupo
+  - balance - Dinero total que debe/le deben en un momento al miembro
+- Debt:
+  - group_id - Grupo en el que se da la deuda, PK
+  - debtor_id - Usuario que debe dinero, PK
+  - debt_owner_id - Usuario al que le deben dinero, PK
+  - amount - Cuánto debe debtor a debt_owner
+- Type:
+  - id - PK
+  - name - Nombre identificador de la categoría
+- Expense:
+  - id - PK
+  - enabled - Para bajas lógicas
+  - name - Nombre
+  - desc - Descripción
+  - amount - Cuánto ha costado el gasto
+  - type_id - Categoría del gasto
+  - date - Fecha en la que se produjo el gasto
+  - paid_by_id - Usuario que pagó el gasto
+- Participates:
+  - expense_id - Gasto, PK
+  - group_id - Grupo al que pertenece el gasto
+  - user_id - Usuario que participa en el gasto, PK
+- Notification:
+  - id - PK
+  - date_read - Fecha en la que se leyó la notificación
+  - date_sent - Fecha en la que se envió la notificación
+  - group_id - Grupo implicado en la notificación
+  - type - Tipo de notificación (ver clase Notification.java)
+  - message - Mensaje que contiene la notificación
+  - recipient_id - Usuario destinatario
+  - sender_id - Usuario emisor
 
-    * **AppConfig.java** - configura LocalData (usado para gestionar subida y bajada de ficheros de usuario) y fichero de internacionalización (que debería llamarse `Messages_XX.properties`, donde `XX` es un código como `es` para español ó `en` para inglés; y vivir en el directorio [resources](https://github.com/manuel-freire/iw/tree/main/plantilla/src/main/resources).
-    * **IwApplication.java** - punto de entrada de Spring Boot
-    * **IwUserDetailsService.java** - autenticación mediante base de datos. Referenciado desde SecurityConfig.java. La base de datos se inicializa tras cada arranque desde el [import.sql](https://github.com/manuel-freire/iw/blob/main/plantilla/src/main/resources/import.sql), aunque tocando [application.properties](https://github.com/manuel-freire/iw/blob/main/plantilla/src/main/resources/application.properties) puedes hacer que se guarde y cargue de disco, ignorando el _import_.
-    * **LocalData.java** - facilita guardar y devolver ficheros de usuario (es decir, que no forman parte de los fuentes de tu aplicación). Para ello colabora con AppConfig y usa el directorio especificado en [application.properties](https://github.com/manuel-freire/iw/blob/main/plantilla/src/main/resources/application.properties)
-    * **LoginSuccessHandler.java** - añade una variable de sesión llamada `u` nada más entrar un usuario, con la información de ese usuario. Esta variable es accesible desde Thymeleaf con `${session.user}`, y desde cualquier _Mapping_ de controllador usando el argumento `HttpSession session`, y leyendo su valor vía `(User)session.getAttribute("u")`. También añade a la sesión algo de configuración para websockets (variables `ws` y `url`), que se escriben como JS en las cabeceras de las páginas en el fragmento [head.html](https://github.com/manuel-freire/iw/blob/main/plantilla/src/main/resources/templates/fragments/head.html).
-    * **SecurityConfig.java** - establece la configuración de seguridad. Modifica su método `configure` para decir quién puede hacer qué, mediante `hasRole` y `permitAll`. 
-    * **StartupConfig.java** - se ejecuta nada más lanzarse la aplicación. En la plantilla sólo se usa para inicializar la `debug` a partir del [application.properties](https://github.com/manuel-freire/iw/blob/main/plantilla/src/main/resources/application.properties), accesible desde Thymeleaf mediante `${application.debug}`
-    * **WebSocketConfig.java** - configura uso de websockets
-    * **WebSocketSecurityConfig.java** - seguridad para websockets
+## Usuarios y Roles
+### Usuarios
+En primer lugar, con el fichero import.sql se crean en la BD los siguientes usuarios, con sus correspondientes contraseñas:
+- Username: a | Name: admin | Password: aa
+- Username: b | Name: bonito | Password: aa
+- Username: Nico | Name: Nicoooooo | Password: aa
+- Username: Tester | Name: Tester | Password: aa
+- Username: user4 | Name: User 4 | Password: aa
+- Username: user5 | Name: User 5 | Password: aa
+- Username: user6 | Name: User 6 | Password: aa
+- Username: user7 | Name: User 7 | Password: aa
+- Username: user8 | Name: User 8 | Password: aa
+- Username: user9 | Name: User 9 | Password: aa
+- Username: user10 | Name: User 10 | Password: aa
+- Username: user11 | Name: User 11 | Password: aa
+- Username: user12 | Name: User 12 | Password: aa
+- Username: user13 | Name: User 13 | Password: aa
 
-- en [src/main/java/es/ucm/fdi/iw/controller](https://github.com/manuel-freire/iw/tree/main/plantilla/src/main/java/es/ucm/fdi/iw/controller) hay 3 controladores:
+### Roles
+En cuanto a tipos de usuario general, existen dos: USER y ADMIN. El usuario normal (USER) es aquel que puede utilizar la funcionalidad normal de la aplicación, formando parte de
+grupos, gestionando gastos y deudas.. El administrador (ADMIN) tiene una funcionalidad extra, que permite visualizar todas las entidades que forman parte de la BD. Puede ver
+una lista de todos los usuarios (activos o no) con su información (excepto contraseña, evidentemente), y una lista de grupos (activos o no) con su información, incluyendo los miembros
+que forman/formaban parte de él, los gastos y las deudas que contiene.
+-> En este caso, los usuarios administradores son a (admin) y Nico (Nicoooooo)
 
-  * **RootController.java** - para usuarios que acaban de llegar al sitio, gestiona `/` y `/login`
-  * **AdminController.java** - para administradores, gestionando todo lo que hay bajo `/admin`. No hace casi nada, pero sólo pueden llegar allí los que tengan rol administrador (porque así lo dice en SecurityConfig.config)
-  * **UserControlller.java** - para usuarios registrados, gestionando todo lo que hay bajo `/user`. Tiene funcionalidad útil para construir páginas:
-  
-    + Un ejemplo de método para gestionar un formulario de cambiar información del usuario (bajo `@PostMapping("/{id}")`)
-    + Puede devolver imágenes de avatar, y permite también subirlas. Ver métodos `getPic` (bajo `@GetMapping("{id}/pic")`) y `postPic` (bajo `@PostMapping("{id}/pic")`)
-    + Puede gestionar también peticiones AJAX (= que no devuelven vistas) para consultar mensajes recibidos, consultar cuántos mensajes no-leídos tiene ese usuario, y enviar un mensaje a ese usuario (`retrieveMessages`, `checkUnread` y `postMsg`, respectivamente). Esta última función también envía el mensaje via websocket al usuario, si es que está conectado en ese momento.
-    
-- en [src/main/resources](https://github.com/manuel-freire/iw/tree/main/plantilla/src/main/resources) están los recursos no-de-código-de-servidor, y en particular, las vistas, los recursos web estáticos, el contenido inicial de la BBDD, y las propiedades generales de la aplicación.
+Por otro lado, en el contexto de la aplicación, existen a su vez dos maneras de "pertenecer" a un grupo: siendo usuario normal (USER) o siendo moderador (MODERATOR) del grupo.
+El primero puede visualizar todo el contenido del grupo, así como crear/editar/borrar gastos, saldar deudas o editar su presupuesto personal dentro del grupo (también puede salirse
+del grupo). El moderador, además de estas funcionalidades, tiene unos privilegios extra sobre el grupo: puede editar la configuración del grupo, invitar a miembros y eliminarlos,
+y eliminar el grupo.
 
-  * **static/**  - contiene recursos estáticos web, como ficheros .js, .css, ó imágenes que no cambian
-  
-    - **js/stomp.js** - necesario para usar STOMP sobre websockets (que es lo que usaremos para enviar y recibir mensajes)
-    - **js/iw.js** - configura websockets, y contiene funciones de utilidad para gestionar AJAX y previsualización de imágenes
-    - **js/ajax-demo.js** - ejemplos (usados desde [user.html](https://github.com/manuel-freire/iw/blob/main/plantilla/src/main/resources/templates/user.html)) de AJAX, envío y recepción de mensajes por websockets, y previsualización de imágenes
+## Pruebas
+Para la realización de pruebas se ha creado un usuario "Tester" que no pertenece a ningún grupo y en el usuario "b" se han añadido un grupo y un expense de forma permanente.
+En cuanto a la implementación, se han elaborado 3 archivos .features para llevar a cabo las pruebas:
 
-  * **templates/** - contiene vistas, y fragmentos de vista (en `templates/fragments`)
-  
-    - **fragments/head.html** - para incluir en el `<head>` de tus páginas. Incluída desde  
-    - **fragments/nav.html** - para incluir al comienzo del `<body>`, contiene una navbar. *Cambia los contenidos* para que tengan sentido para tu aplicación.    
-    - **fragments/footer.html** - para incluir al final del `<body>`, con un footer. *Cambia su contenido visual*, pero ten en cuenta que es donde se cargan los .js de bootstrap, además de `stomp.js` e `iw.js`.
-    - **error.html** - usada cuando se producen errores. Tiene un comportamiento muy distinto cuando la aplicación está en modo `debug` y cuando no lo está. 
-    - **user.html** - vista de usuario. Debería mostrar información sobre un usuario, y posiblemente formularios para modificarle, pero en la plantilla se usa para demostrar funcionamiento de AJAX y websockets, en conjunción con `static/js/ajax-demo.js`. Deberías, lógicamente, *cambiar su contenido*.
-  
-  * **application.properties** - contiene la configuración general de la aplicación. Ojo porque ciertas configuraciones se hacen en los ficheros `XyzConfig.java` vistos anteriormente. Por ejemplo, qué roles pueden acceder a qué rutas se configura desde `SecurityConfig.java`.
-  * **import.sql** - contiene código SQL para inicializar la BBDD. La configuración inicial hace que la BBDD se borre y reinicialice a cada arranque, lo cual es útil para pruebas. Es posible cambiarla para que la BBDD persista entre arraques de la aplicación, y se ignore el `import.sql`.
-    
+- login.feature, contiene escenarios relacionados con el inicio y fin de sesión:
+    - Hacer login con distintos usuarios (entre ellos el admin)
+    - Hacer logout
+
+- principal.feature, contiene los escenarios básicos de navegación:
+    - Entrar a un grupo
+    - Entrar a la configuración de un grupo
+    - Entrar en un gasto
+    - Entrar en el perfil
+        
+- usage.feature, contiene los escenarios básicos de uso de la aplicación:
+    - Crear un nuevo grupo y comprobar que se ha creado correctamente
+    - Crear un gasto y comprobar que se ha creado correctamente
+    - Invitar a un usuario a unirse a un grupo, unirse y entrar en el grupo
+
+## Comentarios

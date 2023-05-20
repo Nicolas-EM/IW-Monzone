@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import javax.management.BadAttributeValueExpException;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
@@ -34,7 +33,6 @@ import es.ucm.fdi.iw.model.Notification;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.User;
-import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Group.Currency;
 import es.ucm.fdi.iw.model.Member.GroupRole;
 import es.ucm.fdi.iw.GroupAccessUtilities;
