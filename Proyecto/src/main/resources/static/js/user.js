@@ -115,8 +115,7 @@ function deleteUser() {
     console.log('Deleting user account');
     if (canDelete === true)
     {
-        go(btnLeave.getAttribute('formaction'), 'POST', {
-        });
+        document.getElementById("deleteUser").submit();
     }
     else{
         createToastNotification(`error-group-leaving`, "Error. you cannot unsubscribe while your balance is not 0 in any group", true);
