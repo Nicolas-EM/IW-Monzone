@@ -35,7 +35,6 @@ public class Notification implements Transferable<Notification.Transfer>  {
 
     public enum NotificationType {
         BUDGET_WARNING,
-        // DEBT_WARNING,
         EXPENSE_CREATED,
         EXPENSE_MODIFIED,
         EXPENSE_DELETED,

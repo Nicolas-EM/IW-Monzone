@@ -29,8 +29,12 @@ _______
 - Refactorizar transfers para reducir nº de peticiones
 - [P] Factor común código comprobaciones existe grupo y pertenece
 - Revisar actualizaciones por websockets en user
-- [P] Revisar DebtCalculator (o comentarlo, o cambiarlo)
+- [P] Comentar DebtCalculator
 - [P] Refactor excepciones: Enum
+- [!] Validación en cliente en SignUp
+- [!!!] Funcionalidad ADMIN
+- Arreglar import.sql para cuadrar TotBudget y NumMembers
+- [!!!] TESTS - Crear gasto, invitar usuario
 
 ## Errores [!!!]
 - USER: Cuando se añaden grupos no se elimina el mensaje de lista vacía
@@ -38,6 +42,8 @@ _______
 - No se comprueba que la fecha sea anterior a la actual en expense (servidor)
 - No se comprueba que name y desc sea < x caracteres (servidor)
 - USER: Cuando te eliminan de un grupo desaparece de tu lista, pero hay error en AJAX
+- El nº notifs no se calcula bien
+- Te deja hacer login aunque el usuario esté desactivado
 
 ## Mejoras vistas
 - [!!] Los errores se están mostrando de manera muy cutre (hacerlo con toast notification)
@@ -50,6 +56,9 @@ _______
 - En los miembros en group_config o expense, tu usuario debería aparecer como "You"
 - Al crear expense no sale la foto por defecto
 - [!] En group_config y en perfil sale scrollbar vertical, no se ajusta
+- Hovers en home (sobre las cards y sobre el botón de añadir)
+- [!] El mark as read debería cambiar el color de la notif
+- Los mensajes de listas vacías podrían ir en letra más pequeña, se ve feo
 
 ## Usabilidad
 - [P] Las operaciones destructivas deben pedir confirmación
@@ -69,11 +78,8 @@ _______
 # LO QUE FALTA
 
 ## General
-- [!] Validación en cliente en SignUp
 - Hacer el README.md
-- Logs
-- [!!!] TESTS
-- [!!!] Refactorizar ADMIN (ahora tiene una funcionalidad rara)
+- Factor común código comprobaciones expense
 
 ## Errores [!!!]
 - GROUP_CONFIG: Cuando vuelves a unirse a un grupo un usuario después de salirse/sacarle, se añade dos veces en la lista de miembros
@@ -81,6 +87,4 @@ _______
 - Seguir testeando manualmente...
 
 ## Mejoras vistas
-- Hovers en home (sobre las cards y sobre el botón de añadir)
 - Añadir orden a los grupos en home
-- [!] El mark as read debería cambiar el color de la notif
