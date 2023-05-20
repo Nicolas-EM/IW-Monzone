@@ -26,6 +26,8 @@ así como el dinero que ha gastado en cada una de las categorías disponibles. T
 cambio en los ajustes del grupo, nuevos miembros que llegan...). Además, también se notificará al usuario cuando llegue al 50%, 75% y 100% de su presupuesto 
 en alguno de sus grupos. Estas notificaciones podrán marcarse como leídas o directamente eliminarse si el usuario no desea conservarlas
 - Invitaciones -> Un usuario podrá aceptar o denegar una invitación a un grupo
+- Admin -> Los administradores de la aplicación podrán tener acceso (de lectura) a toda la información almacenada en la aplicación, para poder detectar
+anomalías o acciones sospechosas
 
 ## Diagrama BD
 A continuación se listan las tablas que forman la Base de Datos de Monzone, con los atributos que contienen.
