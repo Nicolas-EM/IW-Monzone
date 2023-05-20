@@ -35,6 +35,8 @@ _______
 - [!!!] Funcionalidad ADMIN
 - Arreglar import.sql para cuadrar TotBudget y NumMembers
 - [!!!] TESTS - Crear gasto, invitar usuario
+- Hacer el README.md
+- Factor común código comprobaciones expense
 
 ## Errores [!!!]
 - USER: Cuando se añaden grupos no se elimina el mensaje de lista vacía
@@ -44,6 +46,8 @@ _______
 - USER: Cuando te eliminan de un grupo desaparece de tu lista, pero hay error en AJAX
 - El nº notifs no se calcula bien
 - Te deja hacer login aunque el usuario esté desactivado
+- GROUP_CONFIG: Cuando vuelves a unirse a un grupo un usuario después de salirse/sacarle, se añade dos veces en la lista de miembros
+  (al hacer F5 ya sale normal)
 
 ## Mejoras vistas
 - [!!] Los errores se están mostrando de manera muy cutre (hacerlo con toast notification)
@@ -76,15 +80,6 @@ _______
 _______
 
 # LO QUE FALTA
-
-## General
-- Hacer el README.md
-- Factor común código comprobaciones expense
-
-## Errores [!!!]
-- GROUP_CONFIG: Cuando vuelves a unirse a un grupo un usuario después de salirse/sacarle, se añade dos veces en la lista de miembros
-  (al hacer F5 ya sale normal)
-- Seguir testeando manualmente...
 
 ## Mejoras vistas
 - Añadir orden a los grupos en home
