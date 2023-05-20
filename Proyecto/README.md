@@ -1,7 +1,31 @@
 # Equipo Monzone - Proyecto (Pre-Examen)
 
 ## Propuesta
+Monzone es la solución perfecta para dividir gastos entre amigos, familiares o compañeros de piso. Con esta aplicación web se pueden crear
+grupos de gastos, agregar compras y dejar que la aplicación calcule de forma automática y eficiente las deudas entre cada miembro del grupo
+para reducir el número de pagos. Además, con esta plataforma el usuario podrá configurar un presupuesto en cada grupo y recibir avisos cuando
+se acerque a su límite establecido, así como visualizar estadísticas de diversos tipos sobre los gastos en los que va participando.
 
+### Funcionalidades
+Seguidamente se proporciona una lista de las funcionalidades principales que ofrece Monzone al usuario:
+- Crear un grupo -> Cualquier usuario puede crear un grupo con la configuración deseada, convirtiéndose automáticamente en el moderador de dicho grupo
+- Editar/Eliminar un grupo -> Si eres el moderador, podrás editar los ajustes de tu grupo o eliminarlo
+- Invitar/Quitar miembros -> Si eres el moderador, podrás invitar a cualquier usuario, siempre que conozcas su nombre de usuario, y eliminar a miembros
+que no tengan deudas (a favor o en contra)
+- Añadir/Editar/Eliminar gastos en un grupo -> Cualquier miembro del grupo podrá gestionar los gastos, incluyendo el usuario que lo pagó, quiénes participaron
+en el gasto y la categoría en la que lo incluyen, entre otros muchos aspectos
+- Visualizar los gastos y las deudas -> Cualquier miembro del grupo podrá ver todos los gastos que se han ido añadiendo, así como una representación visual
+del equilibrio que tiene cada miembro y las deudas calculadas por la app
+- Marcar una deuda como pagada -> Cualquier miembro del grupo podrá marcar una deuda como pagada, que se registrará a modo de "gasto positivo", para restaurar
+el equilibro de los usuarios
+- Editar perfil -> Por supuesto, el usuario podrá modificar su información personal, incluyendo el cambio de contraseña
+- Visualizar estadísticas personales -> Cada usuario tendrá acceso a unas estadísticas que le permitirán conocer su total de gastos en un mes particular,
+así como el dinero que ha gastado en cada una de las categorías disponibles. Todo esto en el tipo de moneda que seleccione
+- Ver resumen de grupos -> Además, en el perfil podrá ver rápidamente una lista de los grupos a los que pertenece, con la información más relevante
+- Notificaciones -> Por un lado, se informará a los usuarios cuando otro haga cualquier tipo de modificación en un grupo (incluyendo cambios en gastos,
+cambio en los ajustes del grupo, nuevos miembros que llegan...). Además, también se notificará al usuario cuando llegue al 50%, 75% y 100% de su presupuesto 
+en alguno de sus grupos. Estas notificaciones podrán marcarse como leídas o directamente eliminarse si el usuario no desea conservarlas
+- Invitaciones -> Un usuario podrá aceptar o denegar una invitación a un grupo
 
 ## Diagrama BD
 A continuación se listan las tablas que forman la Base de Datos de Monzone, con los atributos que contienen.
@@ -108,3 +132,22 @@ En cuanto a la implementación, se han elaborado 3 archivos .features para lleva
     - Invitar a un usuario a unirse a un grupo, unirse y entrar en el grupo
 
 ## Comentarios
+### Cosas que han quedado sin implementar
+Hay algunas mejoras que no ha sido posible implementar para esta entrega, aunque en el fichero TODO.md se incluyen todas las 
+correcciones que sí se han hecho con respecto a la entrega anterior:
+- Añadir orden a los grupos en home (por nombre) y en admin (por ID).
+- No se han añadido transacciones de deudas en la BD porque ya se guarda registro de los pagos que se hacen a través de los 
+Reimbursement (creados en el servidor cuando un usuario paga una deuda).
+- Un Reimbursement no debería poder editarlo el usuario.
+
+### Otros comentarios
+- Además de la carpeta src, donde se incluye el código fuente, el pom.xml y el README.md, existe un directorio doc/ donde se incluye
+documentación extra utilizada durante el proyecto:
+  - El modelo de datos, elaborado con la herramienta de modelado de software IBM RSAD
+  - El modelo del dominio (Diagrama Entidad-Relación), elaborado con Lucid
+  - Una "especificación de requisitos software", que contiene el diseño de cada interfaz, con los requisitos importantes a tener en cuenta
+  para cada funcionalidad (NOTA: No está actualizada, puede contener requisitos obsoletos)
+  - TODO.md -> Fichero donde se incluyen las funcionalidades implementadas, las mejoras que se han realizado para la entrega antes del 
+  examen de la asignatura, y los aspectos que han quedado sin implementar, junto con la prioridad de cada tarea.
+  - 4 ficheros con el diseño de marca de la aplicación: el logo original, el logo en sus dos versiones (light mode VS dark mode) y el icono
+- Se incluye aquí el [link al repositorio de GitHub](https://github.com/Nicolas-EM/IW-Monzone.git)
