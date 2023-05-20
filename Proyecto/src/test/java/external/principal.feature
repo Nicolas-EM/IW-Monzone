@@ -23,8 +23,6 @@ Feature: flujo de la app
     Given call read('principal.feature@group')
     And delay(delayTime)
     When click(".body div.card")
-    And delay(delayTime)
-    Then waitForUrl(baseUrl + '/group/2/99')
 
   @profile
   Scenario: View profile

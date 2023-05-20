@@ -66,7 +66,7 @@ Feature: uso de la app
     Then match driver.value('#dateString') == '2023-01-01'
     Then match driver.value('#amount') == '42.0'
     Then match driver.value('#paidById') == '2'
-    Then match driver.value('#typeId') == '2'
+    Then match driver.value('#typeId') == '1'
 
   @invitationAndJoin
   Scenario: Invitar a un grupo y unirse

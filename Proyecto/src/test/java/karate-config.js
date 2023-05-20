@@ -24,7 +24,7 @@ function fn() {
         // executable: '/usr/bin/chromium-browser',
 
         // "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-        executable:"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" , // Poner la ruta donde este el .exe de Chrome en tu ordenador
+        executable:"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" , // Poner la ruta donde este el .exe de Chrome en tu ordenador
         addOptions: ["--remote-allow-origins=*", "--incognito"],
         showDriverLog: true
     })

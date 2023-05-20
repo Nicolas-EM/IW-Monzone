@@ -12,7 +12,7 @@ class ExternalRunner {
     @Karate.Test
     Karate testUsage() {
         return Karate.run("usage").relativeTo(getClass());
-    }    
+    }
 
     
     // @Karate.Test
