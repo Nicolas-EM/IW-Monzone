@@ -15,6 +15,7 @@ import es.ucm.fdi.iw.model.Transferable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -69,7 +70,6 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
- 
 
     /**
      * Encodes a password, so that it can be saved for future checking. Notice
@@ -135,7 +135,6 @@ public class UserController {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
-        
         LocalDate formDate;
         try {
             formDate = LocalDate.parse(dateString + "-01");
@@ -143,9 +142,9 @@ public class UserController {
             throw new BadRequestException(ErrorType.E_INVALID_DATE);
         }
 
-        // check currency 
+        // check currency
         if (currId < 0 || currId >= Group.Currency.values().length)
-        throw new BadRequestException(ErrorType.E_INVALID_CURRENCY);
+            throw new BadRequestException(ErrorType.E_INVALID_CURRENCY);
         Group.Currency newCurr = Group.Currency.values()[currId];
 
         float total = 0f;
@@ -158,9 +157,9 @@ public class UserController {
             } catch (Exception e) {
                 throw new BadRequestException(ErrorType.E_INVALID_DATE);
             }
-            
+
             if (eDate.getMonthValue() == formDate.getMonthValue() && eDate.getYear() == formDate.getYear()
-                && !exp.getType().getName().equals("Reimbursement"))
+                    && !exp.getType().getName().equals("Reimbursement"))
                 total += changeCurrency(exp.getAmount() / exp.getBelong().size(), p.getGroup().getCurrency(), newCurr);
         }
         float totalRounded = (float) Math.round(total * 100) / 100;
@@ -190,30 +189,31 @@ public class UserController {
      */
     @ResponseBody
     @GetMapping("/getByType/{currId}")
-        public Map<Long, Float> getByType(Model model, HttpSession session, @PathVariable int currId) {
+    public Map<Long, Float> getByType(Model model, HttpSession session, @PathVariable int currId) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
-                
-        // check currency 
+
+        // check currency
         if (currId < 0 || currId >= Group.Currency.values().length)
             throw new BadRequestException(ErrorType.E_INVALID_CURRENCY);
         Group.Currency newCurr = Group.Currency.values()[currId];
 
-        List<Type> types = entityManager.createNamedQuery("Type.getAllTypes",Type.class).getResultList();
+        List<Type> types = entityManager.createNamedQuery("Type.getAllTypes", Type.class).getResultList();
 
         Map<Long, Float> dictionary = new HashMap<>();
         for (Type type : types) {
             dictionary.put(type.getId(), 0.0f);
         }
-    
+
         List<Participates> participates = user.getExpenses();
         for (Participates p : participates) {
             Expense e = p.getExpense();
             Type type = e.getType();
             if (!e.getType().getName().equals("Reimbursement")) {
-                float amount = changeCurrency(e.getAmount() / e.getBelong().size(), p.getGroup().getCurrency(), newCurr);
+                float amount = changeCurrency(e.getAmount() / e.getBelong().size(), p.getGroup().getCurrency(),
+                        newCurr);
                 dictionary.put(type.getId(), dictionary.get(type.getId()) + amount);
-            }            
+            }
         }
 
         for (Type type : types)
@@ -224,7 +224,7 @@ public class UserController {
 
     @GetMapping("/config")
     public String config(Model model, HttpSession session) {
-        
+
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
@@ -394,15 +394,16 @@ public class UserController {
     @ResponseBody
     @Transactional
     @PostMapping("/ChangeDataUser")
-    public String postUserData(HttpSession session, Model model, @RequestParam("name") String name,  @RequestParam("username") String username, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+    public String postUserData(HttpSession session, Model model, @RequestParam("name") String name,
+            @RequestParam("username") String username,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
 
         User target = (User) session.getAttribute("u");
         target = entityManager.find(User.class, target.getId());
 
-        if(name == null){ // No name
+        if (name == null) { // No name
             throw new BadRequestException(ErrorType.E_EMPTY_NAME);
-        }
-        else if(username == null){ // No username
+        } else if (username == null) { // No username
             throw new BadRequestException(ErrorType.E_EMPTY_USERNAME);
         }
 
@@ -410,7 +411,7 @@ public class UserController {
         target.setName(name);
 
         // save the new user image
-        if(imageFile != null){
+        if (imageFile != null) {
             File f = localData.getFile("user", "" + target.getId());
             try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f))) {
                 byte[] imageBytes = imageFile.getBytes();
@@ -430,25 +431,27 @@ public class UserController {
     /*
      * Delete user
      */
-     @Transactional
-     @PostMapping("/DeleteUser")
-     public String postDeleteUser(HttpSession session, Model model) {
+    @Transactional
+    @PostMapping("/deleteUser")
+    public String postDeleteUser(HttpSession session, Model model) {
+        User target = (User) session.getAttribute("u");
+        target = entityManager.find(User.class, target.getId());
+        target.setEnabled(false);
+        
+        session.invalidate(); // Invalidate the user's session
+        SecurityContextHolder.clearContext(); // Clear the security context
 
-         User target = (User) session.getAttribute("u");
-         target = entityManager.find(User.class, target.getId());
-         target.setEnabled(false);
-        // session.setAttribute("u", target);
-        return "login";
-     }
- 
-     /*
+        return "redirect:/login";
+    }
+
+    /*
      * Change Password
      */
     @ResponseBody
     @Transactional
     @PostMapping("/ChangePassword")
     public String postChangePassword(HttpSession session, @RequestBody JsonNode jsonNode, Model model) {
-        
+
         String oldPwd = jsonNode.get("oldPwd").asText();
         String newPwd = jsonNode.get("newPwd").asText();
 
@@ -457,20 +460,19 @@ public class UserController {
 
         if (newPwd != null && oldPwd != null) {
 
-            if (passwordEncoder.matches(oldPwd, user.getPassword())) { // Comprobar que la contraseña actual del user es igual a oldPwd  
-                if(newPwd.equals(oldPwd)){ // Si la contraseña antigua y la nueva coinciden
+            if (passwordEncoder.matches(oldPwd, user.getPassword())) { // Comprobar que la contraseña actual del user es
+                                                                       // igual a oldPwd
+                if (newPwd.equals(oldPwd)) { // Si la contraseña antigua y la nueva coinciden
                     throw new BadRequestException(ErrorType.E_PASS_UNCHANGED);
+                } else {
+                    user.setPassword(encodePassword(newPwd)); // save encoded version of password
                 }
-                else{
-            user.setPassword(encodePassword(newPwd)); //save encoded version of password
-                }
-            }
-            else{ // Old password incorrecta
+            } else { // Old password incorrecta
                 throw new BadRequestException(ErrorType.E_WRONG_PASS);
             }
 
-        }    
-       
+        }
+
         return "{\"action\": \"none\"}";
     }
 
