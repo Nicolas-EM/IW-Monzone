@@ -5,7 +5,7 @@ const btnLeave = document.getElementById("btn-leave");
 const btnConfirm = document.getElementById("confirmInviteBtn");
 const btnDelete = document.getElementById("btn-delete");
 const groupId = infoGroup.dataset.groupid;
-const isGroupAdmin = infoGroup.dataset.isgroupadmin;
+let isGroupAdmin = infoGroup.dataset.isgroupadmin;
 const currencies = infoGroup.dataset.currencies;
 const userId = infoGroup.dataset.userid;
 
@@ -36,7 +36,7 @@ if (modal != null) { // NO para /group/new
     })
 }
 
-// Confirm modal logic (delete / leave)
+// Confirm modal logic (delete / leave / addModerator)
 let confirmModal = document.getElementById('confirmModal')
 if (confirmModal) {
     confirmModal.addEventListener('show.bs.modal', event => {
@@ -46,7 +46,7 @@ if (confirmModal) {
         // Extract info from data-bs-* attributes
         const btnType = button.getAttribute('data-bs-type');
         const modalBody = document.getElementById('confirmModalBdy');
-        let removeId;
+        let userId;
         switch (btnType) {
             case "leave":
                 modalBody.innerHTML = "Are you sure you want to leave this group?"
@@ -55,8 +55,12 @@ if (confirmModal) {
                 modalBody.innerHTML = "Are you sure you want to delete this group? Note that you can't delete a group if someone's balance is other than 0."
                 break;
             case "delMember":
-                removeId = button.getAttribute('data-bs-removeId');
+                userId = button.getAttribute('data-bs-removeId');
                 modalBody.innerHTML = "Are you sure you want to remove this person from this group? Note that you can't remove a member if their balance is other than 0."
+                break;
+            case "makeModerator":
+                userId = button.getAttribute('data-bs-userId');
+                modalBody.innerHTML = "Are you sure you want to make this user a moderator of this group?"
                 break;
         }
 
@@ -69,7 +73,10 @@ if (confirmModal) {
                     deleteGroup();
                     break;
                 case "delMember":
-                    deleteMember(removeId);
+                    deleteMember(userId);
+                    break;
+                case "makeModerator":
+                    makeModerator(userId);
                     break;
             }
         }
@@ -80,34 +87,53 @@ if (confirmModal) {
 function renderMember(member, currencyString) {
     const truncatedAmount = Number(member.balance).toFixed(2);
     let memberHTML = `<div class="row p-2 member">`;
-    if (isGroupAdmin === 'true' && member.idUser != userId) {
+    if (isGroupAdmin === 'true' && member.idUser != userId && member.role != "GROUP_CREATOR") {
         memberHTML = `${memberHTML}
-                    <div class="col btn-remove">
-                    <button type="submit" title="Remove group member." class="btn" data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="delMember" data-bs-removeId="${member.idUser}">
-                        <svg id="trash" xmlns="http://www.w3.org/2000/svg" width="25" fill="white" class="bi bi-trash3" viewbox="0 0 16 16">
-                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
-                        </svg>
-                    </button>
-                </div>`;
-    }
-    else if (isGroupAdmin === 'true' && member.idUser == userId) {
+                    <div class="col adminBtns">
+                        <button type="submit" title="Remove group member." class="btn" data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="delMember" data-bs-removeId="${member.idUser}">
+                            <svg id="trash" xmlns="http://www.w3.org/2000/svg" width="25" fill="white" class="bi bi-trash3" viewbox="0 0 16 16">
+                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z" />
+                            </svg>
+                        </button>`;
+        if (member.role != "GROUP_MODERATOR") {
+            memberHTML = `${memberHTML} 
+                            <button type="submit" title="Make member a group moderator." class="btn" data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="makeModerator" data-bs-userId="${member.idUser}">
+                                <img src="/img/admin.png" alt="Make group moderator" width="auto" height="35" class="d-inline-block align-text-top ps-2">
+                            </button>
+                        </div>`;
+        } else {
+            memberHTML = `${memberHTML} </div>`;
+        }
+    } else if (isGroupAdmin === 'true' && (member.idUser == userId || member.role == "GROUP_CREATOR")) {
         memberHTML = `${memberHTML}
-                <div class="col btn-remove"></div>`;
+                            <div class="col adminBtns"></div>`;
     }
+
     memberHTML = `${memberHTML}
                 <div id="name-col" class="col d-flex align-items-center border-end border-light-subtle">
-                    ${member.idUser == userId ? "You" : member.username}
-                </div>
-                <div class="col d-flex align-items-center ps-4">
-                    Budget: ${member.budget}
-                </div>
-                <div id="indicator">
-                    <span class="dot" style="${truncatedAmount >= 0 ? 'background: green' : 'background: red'}"></span>
-                </div>
-                <div class="balance col">
-                    ${truncatedAmount} ${currencyString}
-                </div>
-            </div>`;
+                    ${member.idUser == userId ? "You" : member.username}`;
+
+    if (member.role == "GROUP_MODERATOR") {
+        memberHTML = `${memberHTML}
+                <img src="/img/crown.png" alt="adminIcon" title="Group moderator" width="auto" height="35" class="d-inline-block align-text-top ps-2">`;
+    } else if (member.role == "GROUP_CREATOR") {
+        memberHTML = `${memberHTML}
+                <img src="/img/superadmin.svg" alt="creatorIcon" title="Group creator" width="auto" height="35" class="d-inline-block align-text-top ps-2">`;
+    }
+
+    memberHTML = `${memberHTML}
+                        </div>
+                            <div class="col d-flex align-items-center ps-4">
+                                Budget: ${member.budget}
+                            </div>
+                            <div id="indicator">
+                                <span class="dot" style="${truncatedAmount >= 0 ? 'background: green' : 'background: red'}"></span>
+                            </div>
+                            <div class="balance col">
+                                ${truncatedAmount} ${currencyString}
+                            </div>
+                        </div>`;
+
     return memberHTML;
 }
 
@@ -226,6 +252,26 @@ function leaveGroup() {
         })
 }
 
+// MAKE MODERATOR
+function makeModerator(userId) {
+    go(`/group/${groupId}/makeMod`, 'POST', {
+        userId
+    })
+        .then(d => {
+            console.log("Added moderator");
+            go(`${config.rootUrl}/group/${groupId}/getGroupConfig`, "GET")
+                .then(group => {
+                    renderGroupData(group);
+                }).catch(e => {
+                    console.log("Failed to re-render group: ", e);
+                });
+        })
+        .catch(e => {
+            console.log("Failed to create moderator", e);
+            createToastNotification(`error-group-addModerator`, JSON.parse(e.text).message, true);
+        })
+}
+
 // DELETE MEMBER
 function deleteMember(removeId) {
     go(`/group/${groupId}/delMember`, 'POST', {
@@ -252,6 +298,8 @@ if (ws.receive) {
     ws.receive = (destination, obj) => {
         oldFn(destination, obj); // llama al manejador anterior
 
+        console.log("Received obj:", obj)
+
         // If receiving a group and on that group
         if (obj.type == "GROUP" && obj.group.id == groupId) {
             console.log("Updating group view");
@@ -265,8 +313,18 @@ if (ws.receive) {
                     console.log("Redirecting to ", "/user/");
                     window.location.replace("/user/");
                 }
-                else 
+                else
                     renderGroupData(obj.group);
+            }
+            else if (obj.action == "GROUP_MODERATOR_ADDED") {
+                const member = obj.group.members.find(member => member.idUser == userId);
+                console.log("Moderator added, you are: ", member);
+                if (member != null && member.role === "GROUP_MODERATOR") {
+                    console.log("You are now an admin");
+                    // If you are now an admin
+                    isGroupAdmin = "true";
+                }
+                renderGroupData(obj.group);
             }
             else
                 renderGroupData(obj.group);

@@ -24,7 +24,7 @@ FROM (
 ) AS t;
 
 -- insert B into group 2 for Test
-INSERT INTO IWMember (GROUP_ID, USER_ID, enabled, BUDGET, ROLE, balance) VALUES (2, 2, true,100, 1, 0);
+INSERT INTO IWMember (GROUP_ID, USER_ID, enabled, BUDGET, ROLE, balance) VALUES (2, 2, true,100, 2, 0);
 
 -- Generate random group memberships for each user
 INSERT INTO IWMember (GROUP_ID, USER_ID, enabled, BUDGET, ROLE, balance)

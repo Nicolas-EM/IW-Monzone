@@ -286,7 +286,7 @@ function renderToastNofif(notifId, body) {
                     <strong class="me-auto text-light">Monzone</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-                <div class="toast-body text-light">
+                <div class="toast-body text-light" role="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav" aria-controls="offcanvasNav">
                     ${body}
                 </div>
             </div>`

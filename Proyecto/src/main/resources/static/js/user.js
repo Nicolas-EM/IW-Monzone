@@ -92,8 +92,8 @@ getGroups();
 // Render group
 function renderGroup(group, balance, budget) {
     const truncatedBalance = Number(balance).toFixed(2);
-    return `<div id="group-${group.id}" class="card text-white h-100 mx-auto">
-                <label class="rounded-corners align-items-center w-100">
+    return `<div id="group-${group.id}" class="card text-white h-100 mx-auto" onclick="location.href='/group/${group.id}'" tabindex="0">
+                <label class="rounded-corners align-items-center w-100" role="button">
                 <div class="row">
                     <div class="groupName col-3">
                         ${group.name}

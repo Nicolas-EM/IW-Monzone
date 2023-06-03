@@ -15,23 +15,21 @@ import java.time.format.DateTimeFormatter;
  * Notifications of the system.
  */
 @Entity
-@Inheritance (strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @NamedQueries({
-	@NamedQuery(name="Notification.countUnread",
-	query="SELECT COUNT(*) FROM Notification n WHERE n.recipient.id = :userId AND n.dateRead = null"),
-    @NamedQuery(name="Invite.byUserAndGroup",
-    query="SELECT n FROM Notification n WHERE recipient.id = :userId AND group.id = :groupId AND n.type = :type")
+        @NamedQuery(name = "Notification.countUnread", query = "SELECT COUNT(*) FROM Notification n WHERE n.recipient.id = :userId AND n.dateRead = null"),
+        @NamedQuery(name = "Invite.byUserAndGroup", query = "SELECT n FROM Notification n WHERE recipient.id = :userId AND group.id = :groupId AND n.type = :type")
 })
-@Table(name="IWNotification")
-public class Notification implements Transferable<Notification.Transfer>  {
-    
+@Table(name = "IWNotification")
+public class Notification implements Transferable<Notification.Transfer> {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gen")
     @SequenceGenerator(name = "gen", sequenceName = "gen")
-	protected long id;
+    protected long id;
 
     public enum NotificationType {
         BUDGET_WARNING,
@@ -41,10 +39,11 @@ public class Notification implements Transferable<Notification.Transfer>  {
         DEBT_SETTLED, // With "negative" expense
 
         GROUP_INVITATION,
-        GROUP_INVITATION_ACCEPTED,  // When a user accepts an invite
+        GROUP_INVITATION_ACCEPTED, // When a user accepts an invite
         GROUP_MEMBER_REMOVED,
         GROUP_MODIFIED,
-        GROUP_DELETED
+        GROUP_DELETED,
+        GROUP_MODERATOR_ADDED // When new moderator is added
     }
 
     @ManyToOne
@@ -69,7 +68,7 @@ public class Notification implements Transferable<Notification.Transfer>  {
     @Column(nullable = true)
     protected LocalDateTime dateRead = null;
 
-    public Notification(NotificationType type, User sender, User recipient, Group group){
+    public Notification(NotificationType type, User sender, User recipient, Group group) {
         this.type = type;
         this.dateSent = LocalDateTime.now();
         this.sender = sender;
@@ -90,7 +89,7 @@ public class Notification implements Transferable<Notification.Transfer>  {
     }
 
     // Expense notifications
-    public Notification(NotificationType type, User sender, User recipient, Group group, Expense e){
+    public Notification(NotificationType type, User sender, User recipient, Group group, Expense e) {
         this.type = type;
         this.dateSent = LocalDateTime.now();
         this.sender = sender;
@@ -100,11 +99,11 @@ public class Notification implements Transferable<Notification.Transfer>  {
         messageBuilder(e);
     }
 
-    private void messageBuilder(){
+    private void messageBuilder() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.sender.getName());
 
-        switch(type) {
+        switch (type) {
             case GROUP_INVITATION:
                 sb.append(" has invited you to join \"");
                 break;
@@ -120,7 +119,11 @@ public class Notification implements Transferable<Notification.Transfer>  {
             case GROUP_MEMBER_REMOVED:
                 sb.append(" no longer belongs to \"");
                 break;
-            default: {}                
+            case GROUP_MODERATOR_ADDED:
+                sb.append(" has added a new moderator to \"");
+                break;
+            default: {
+            }
         }
 
         sb.append(this.group.getName());
@@ -143,11 +146,11 @@ public class Notification implements Transferable<Notification.Transfer>  {
     }
 
     // Expense message builder
-    private void messageBuilder(Expense e){
+    private void messageBuilder(Expense e) {
         StringBuilder sb = new StringBuilder();
         sb.append(this.sender.getName());
 
-        switch(type) {
+        switch (type) {
             case EXPENSE_CREATED:
                 sb.append(" created the expense \"");
                 break;
@@ -162,7 +165,8 @@ public class Notification implements Transferable<Notification.Transfer>  {
                 sb.append(this.group.getName());
                 this.message = sb.toString();
                 return;
-            default: {}                
+            default: {
+            }
         }
 
         sb.append(e.getName());
@@ -172,9 +176,9 @@ public class Notification implements Transferable<Notification.Transfer>  {
         this.message = sb.toString();
     }
 
-    public String getDateSent(){
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");  
-        return dateSent.format(format);  
+    public String getDateSent() {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return dateSent.format(format);
     }
 
     @AllArgsConstructor
@@ -189,7 +193,8 @@ public class Notification implements Transferable<Notification.Transfer>  {
         private long idSender;
         private long idRecipient;
 
-        public Transfer(long id, String message, NotificationType type, String dateRead, String dateSent, long idGroup, long idRecipient){
+        public Transfer(long id, String message, NotificationType type, String dateRead, String dateSent, long idGroup,
+                long idRecipient) {
             this.id = id;
             this.message = message;
             this.type = type;
@@ -203,14 +208,16 @@ public class Notification implements Transferable<Notification.Transfer>  {
     @Override
     public Transfer toTransfer() {
         String dateReadString = "";
-        if(dateRead != null)
+        if (dateRead != null)
             dateReadString = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateRead);
 
-        if (sender == null){
+        if (sender == null) {
             // System generated notification
-            return new Transfer(id, message, type, dateReadString, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent), group.getId(), recipient.getId());
+            return new Transfer(id, message, type, dateReadString,
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent), group.getId(), recipient.getId());
         }
 
-        return new Transfer(id, message, type, dateReadString, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent), group.getId(), sender.getId(), recipient.getId());
+        return new Transfer(id, message, type, dateReadString, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateSent),
+                group.getId(), sender.getId(), recipient.getId());
     }
 }

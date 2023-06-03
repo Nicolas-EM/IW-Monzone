@@ -9,14 +9,14 @@ go(`${config.rootUrl}/admin/getAllGroups`, "GET")
             const elem = document.getElementById(`group-${group.id}`);
             if (elem != null)
                 groupsTable.removeChild(elem);
-            groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group.id, group.name, group.enabled));
+            groupsTable.insertAdjacentHTML("afterbegin", renderGroup(group.id, group.name, group.numExpenses, group.enabled));
         })
     })
     .catch(e => {
         console.log("Error retrieving group", e);
     });
 
-function renderGroup(id, name, enabled) {
+function renderGroup(id, name, numExpenses ,enabled) {
     const backgroundColor = enabled ? "white" : "var(--bs-gray-400)";
     const borderLeftColor = enabled ? "var(--bs-yellow)" : "var(--bs-gray-600)";
 
@@ -27,7 +27,8 @@ function renderGroup(id, name, enabled) {
                     ID: ${id}
                 </div>
                 <div class="card-body py-2 px-3">
-                     Name: ${name}
+                    <p>Name: ${name}</p>
+                    <p>Expenses:  ${numExpenses}</p>
                 </div>
              </div>`;
 }

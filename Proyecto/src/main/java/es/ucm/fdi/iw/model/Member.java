@@ -17,17 +17,19 @@ import javax.persistence.*;
 @Data
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "Member.getGroupAdmins", query = "SELECT obj FROM Member obj WHERE group.id = :groupId AND role = 1"),
+        @NamedQuery(name = "Member.getGroupAdmins", query = "SELECT obj FROM Member obj WHERE group.id = :groupId AND role = 1"),
 })
-@Table(name="IWMember")
+@Table(name = "IWMember")
 public class Member implements Transferable<Member.Transfer>, Comparator<Member> {
 
     public enum GroupRole {
-        GROUP_USER,			    // normal users 
-        GROUP_MODERATOR,        // admin users
+        GROUP_USER, // normal users
+        GROUP_MODERATOR, // admin users
+        GROUP_CREATOR, // "superadmin"
     }
 
-    @EmbeddedId private MemberID mId;
+    @EmbeddedId
+    private MemberID mId;
 
     @Column(nullable = false)
     private boolean enabled;
@@ -41,7 +43,7 @@ public class Member implements Transferable<Member.Transfer>, Comparator<Member>
     @Column(nullable = false)
     private float balance;
 
-	@ManyToOne
+    @ManyToOne
     @MapsId("groupID")
     private Group group;
 

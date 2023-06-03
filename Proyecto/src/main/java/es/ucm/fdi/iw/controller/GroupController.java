@@ -56,7 +56,7 @@ public class GroupController {
     private EntityManager entityManager;
 
     @Autowired
-	private NotificationSender notifSender;
+    private NotificationSender notifSender;
 
     @Autowired
     private GroupAccessUtilities groupAccessUtilities;
@@ -141,8 +141,9 @@ public class GroupController {
         for (Group.Currency g : Group.Currency.values()) {
             currencies.add(g.name());
         }
-        
-        model.addAttribute("isGroupAdmin", member.getRole() == GroupRole.GROUP_MODERATOR);        
+
+        model.addAttribute("isGroupAdmin",
+                member.getRole() == GroupRole.GROUP_MODERATOR || member.getRole() == GroupRole.GROUP_CREATOR);
         model.addAttribute("currencies", currencies);
         model.addAttribute("group", group);
         model.addAttribute("userId", user.getId());
@@ -175,7 +176,7 @@ public class GroupController {
      */
     @ResponseBody
     @GetMapping("{groupId}/getMembers")
-    public List<Member.Transfer> getMembers(@PathVariable long groupId, HttpSession session){
+    public List<Member.Transfer> getMembers(@PathVariable long groupId, HttpSession session) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
@@ -187,7 +188,7 @@ public class GroupController {
 
         // get members
         List<Member> members = group.getMembers();
-        
+
         return members.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
 
@@ -196,7 +197,7 @@ public class GroupController {
      */
     @ResponseBody
     @GetMapping("{groupId}/getDebts")
-    public List<Debt.Transfer> getDebts(@PathVariable long groupId, HttpSession session){
+    public List<Debt.Transfer> getDebts(@PathVariable long groupId, HttpSession session) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
@@ -208,7 +209,7 @@ public class GroupController {
 
         // get debts
         List<Debt> debts = group.getDebts();
-        
+
         return debts.stream().map(Transferable::toTransfer).collect(Collectors.toList());
     }
 
@@ -220,7 +221,7 @@ public class GroupController {
 
     @Async
     private CompletableFuture<Void> createAndSendNotifs(NotificationType type, User sender, Group group) {
-        
+
         for (Member m : group.getMembers()) {
             // Do not send notification to sender
             if (m.getUser().getId() == sender.getId() || !m.isEnabled())
@@ -252,7 +253,7 @@ public class GroupController {
         String name = jsonNode.get("name").asText();
         String desc = jsonNode.get("desc").asText();
         Float budget = Float.parseFloat(jsonNode.get("budget").asText());
-        Integer currId = jsonNode.get("currId").asInt();       
+        Integer currId = jsonNode.get("currId").asInt();
 
         // parse name
         if (name == null || name == "")
@@ -281,7 +282,7 @@ public class GroupController {
         log.warn("ID de grupo creado es {}", g.getId());
 
         // create member
-        Member m = new Member(new MemberID(g.getId(), u.getId()), true, GroupRole.GROUP_MODERATOR, budget, 0, g,
+        Member m = new Member(new MemberID(g.getId(), u.getId()), true, GroupRole.GROUP_CREATOR, budget, 0, g,
                 u);
         entityManager.persist(m);
         entityManager.flush(); // forces DB to add group & assign valid id
@@ -303,7 +304,7 @@ public class GroupController {
     @Transactional
     @PostMapping("{groupId}/updateGroup")
     public String updateGroup(HttpSession session, @PathVariable long groupId, @RequestBody JsonNode jsonNode) {
-        
+
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
@@ -316,10 +317,10 @@ public class GroupController {
         String name = jsonNode.get("name").asText();
         String desc = jsonNode.get("desc").asText();
         Float budget = Float.parseFloat(jsonNode.get("budget").asText());
-        Integer currId = jsonNode.get("currId").asInt();        
+        Integer currId = jsonNode.get("currId").asInt();
 
         // only moderators can edit group settings
-        if (member.getRole() == GroupRole.GROUP_MODERATOR) {
+        if (member.getRole() == GroupRole.GROUP_MODERATOR || member.getRole() == GroupRole.GROUP_CREATOR) {
             // parse curr
             if (currId < 0 || currId >= Currency.values().length)
                 throw new BadRequestException(ErrorType.E_INVALID_CURRENCY);
@@ -332,7 +333,7 @@ public class GroupController {
             group.setName(name);
             group.setCurrency(curr);
         }
-        
+
         // check member budget
         if (budget < 0)
             throw new BadRequestException(ErrorType.E_INVALID_BUDGET);
@@ -368,7 +369,7 @@ public class GroupController {
         Member member = groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
 
         // only moderators can delete group
-        if (member.getRole() != GroupRole.GROUP_MODERATOR) {
+        if (member.getRole() != GroupRole.GROUP_MODERATOR && member.getRole() != GroupRole.GROUP_CREATOR) {
             throw new ForbiddenException(ErrorType.E_DELETE_FORBIDDEN);
         }
 
@@ -393,7 +394,7 @@ public class GroupController {
 
         // send notif
         createAndSendNotifs(NotificationType.GROUP_DELETED, user, group);
-        
+
         // send group to other members
         notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_DELETED);
 
@@ -407,8 +408,9 @@ public class GroupController {
     @Transactional
     @ResponseBody
     @PostMapping("{groupId}/delMember")
-    public String removeMember(@PathVariable long groupId, Model model, HttpSession session, @RequestBody JsonNode node) {
-                
+    public String removeMember(@PathVariable long groupId, Model model, HttpSession session,
+            @RequestBody JsonNode node) {
+
         long removeId = node.get("removeId").asLong();
 
         User user = (User) session.getAttribute("u");
@@ -422,29 +424,37 @@ public class GroupController {
 
         // check if member to remove belongs to group (only if not leaving group)
         Member removeMember = entityManager.find(Member.class, new MemberID(groupId, removeId));
-        if (removeId != user.getId()){
+        if (removeId != user.getId()) {
             if (removeMember == null || !removeMember.isEnabled()) {
                 throw new ForbiddenException(ErrorType.E_USER_FORBIDDEN);
             }
         }
 
         // only moderators can remove other members
-        if (user.getId() != removeId && member.getRole() != GroupRole.GROUP_MODERATOR) {
+        if (user.getId() != removeId && member.getRole() != GroupRole.GROUP_MODERATOR
+                && member.getRole() != GroupRole.GROUP_CREATOR) {
             throw new ForbiddenException(ErrorType.E_DELMEMBER_FORBIDDEN);
         }
 
         // if only member, delete group
-        if(group.getMembers().size() == 1){
+        if (group.getMembers().size() == 1) {
             log.warn("Deleting EMPTY group {}", group);
             return delGroup(session, groupId);
         }
 
+        // can't remove group creator
+        if (removeMember.getRole() == GroupRole.GROUP_CREATOR) {
+            throw new ForbiddenException(ErrorType.E_DELETECREATOR_FORBIDDEN);
+        }
+
         /*
-         *  moderator can't leave the group if there are no other admins
+         * moderator can't leave the group if there are no other admins
          */
-        if (user.getId() == removeId && member.getRole() == GroupRole.GROUP_MODERATOR) {
-            List<Member> moderators = entityManager.createNamedQuery("Member.getGroupAdmins",Member.class).setParameter("groupId", groupId).getResultList();
-            if(moderators.size() == 1)
+        if (user.getId() == removeId
+                && (member.getRole() == GroupRole.GROUP_MODERATOR || member.getRole() == GroupRole.GROUP_CREATOR)) {
+            List<Member> moderators = entityManager.createNamedQuery("Member.getGroupAdmins", Member.class)
+                    .setParameter("groupId", groupId).getResultList();
+            if (moderators.size() == 1)
                 throw new BadRequestException(ErrorType.E_ONLY_MODERATOR);
         }
 
@@ -465,7 +475,8 @@ public class GroupController {
         createAndSendNotifs(NotificationType.GROUP_MEMBER_REMOVED, removeMember.getUser(), group);
 
         // Send group to members and particularly to the member removed
-        notifSender.sendTransfer(group, "/user/" + removeMember.getUser().getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_MEMBER_REMOVED);
+        notifSender.sendTransfer(group, "/user/" + removeMember.getUser().getUsername() + "/queue/notifications",
+                "GROUP", NotificationType.GROUP_MEMBER_REMOVED);
         notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_MEMBER_REMOVED);
 
         if (user.getId() == removeId) {
@@ -481,12 +492,13 @@ public class GroupController {
     @PostMapping("/{groupId}/inviteMember")
     @Transactional
     @ResponseBody
-    public String inviteMember(@PathVariable long groupId, @RequestBody JsonNode o, HttpSession session) throws JsonProcessingException  {
-        
+    public String inviteMember(@PathVariable long groupId, @RequestBody JsonNode o, HttpSession session)
+            throws JsonProcessingException {
+
         String username = o.get("username").asText();
         User sender = (User) session.getAttribute("u");
         sender = entityManager.find(User.class, sender.getId());
-        
+
         // check if group exists
         Group group = entityManager.find(Group.class, groupId);
         if (group == null || !group.isEnabled())
@@ -496,18 +508,19 @@ public class GroupController {
         Member member = groupAccessUtilities.getMemberOrThrow(groupId, sender.getId());
 
         // only moderators can invite new members
-        if (member.getRole() != GroupRole.GROUP_MODERATOR) 
+        if (member.getRole() != GroupRole.GROUP_MODERATOR && member.getRole() != GroupRole.GROUP_CREATOR)
             throw new ForbiddenException(ErrorType.E_INVITE_FORBIDDEN);
 
         // Check invited user
-        List<User> userList = entityManager.createNamedQuery("User.byUsername", User.class).setParameter("username", username).getResultList();
+        List<User> userList = entityManager.createNamedQuery("User.byUsername", User.class)
+                .setParameter("username", username).getResultList();
 
         if (userList.isEmpty() || !userList.get(0).isEnabled())
             throw new BadRequestException(ErrorType.E_USER_NE);
 
         if (userList.size() > 1)
             throw new InternalServerException(ErrorType.E_INTERNAL_SERVER);
-        
+
         User user = userList.get(0);
         MemberID mId = new MemberID(group.getId(), user.getId());
         member = entityManager.find(Member.class, mId);
@@ -515,18 +528,18 @@ public class GroupController {
         if (member == null || !member.isEnabled()) {
             // check user not already invited
             List<Notification> invites = entityManager.createNamedQuery("Invite.byUserAndGroup", Notification.class)
-                .setParameter("userId", user.getId())
-                .setParameter("groupId", group.getId())
-                .setParameter("type", NotificationType.GROUP_INVITATION)
-                .getResultList();
+                    .setParameter("userId", user.getId())
+                    .setParameter("groupId", group.getId())
+                    .setParameter("type", NotificationType.GROUP_INVITATION)
+                    .getResultList();
 
-            if(invites.isEmpty()){
+            if (invites.isEmpty()) {
                 Notification invite = new Notification(NotificationType.GROUP_INVITATION, sender, user, group);
                 entityManager.persist(invite);
                 entityManager.flush();
 
                 // Send notification
-                notifSender.sendNotification(invite, "/user/"+ user.getUsername() +"/queue/notifications");
+                notifSender.sendNotification(invite, "/user/" + user.getUsername() + "/queue/notifications");
 
                 return "{\"status\":\"invited\"}";
             } else {
@@ -545,30 +558,30 @@ public class GroupController {
     @PostMapping("/{groupId}/acceptInvite")
     @Transactional
     @ResponseBody
-    public String acceptInvite(@PathVariable long groupId, HttpSession session){
+    public String acceptInvite(@PathVariable long groupId, HttpSession session) {
         User user = (User) session.getAttribute("u");
         user = entityManager.find(User.class, user.getId());
 
         // check if an invite for user exists
         List<Notification> invites = entityManager.createNamedQuery("Invite.byUserAndGroup", Notification.class)
-            .setParameter("userId", user.getId())
-            .setParameter("groupId", groupId)
-            .setParameter("type", NotificationType.GROUP_INVITATION)
-            .getResultList();
+                .setParameter("userId", user.getId())
+                .setParameter("groupId", groupId)
+                .setParameter("type", NotificationType.GROUP_INVITATION)
+                .getResultList();
 
-        if(invites.size() < 1)
+        if (invites.size() < 1)
             throw new ForbiddenException(ErrorType.E_INVITATION_FORBIDDEN);
 
         // check if group still exists
         Group group = entityManager.find(Group.class, groupId);
-        if(group == null || !group.isEnabled())
+        if (group == null || !group.isEnabled())
             throw new BadRequestException(ErrorType.E_GROUP_NE);
 
-        for(Notification invite : invites){
+        for (Notification invite : invites) {
             // Check if sender is an admin in group
             User sender = invite.getSender();
             Member m = entityManager.find(Member.class, new MemberID(group.getId(), sender.getId()));
-            if(m == null || m.getRole() != GroupRole.GROUP_MODERATOR){
+            if (m == null || (m.getRole() != GroupRole.GROUP_MODERATOR && m.getRole() != GroupRole.GROUP_CREATOR)) {
                 // notification should be deleted as it is no longer valid
                 user.getNotifications().remove(invite);
                 entityManager.remove(invite);
@@ -578,19 +591,19 @@ public class GroupController {
 
             // notification valid, check if user is not already member
             Member newMember = entityManager.find(Member.class, new MemberID(group.getId(), user.getId()));
-            if(newMember != null && newMember.isEnabled()){
+            if (newMember != null && newMember.isEnabled()) {
                 // notification should be deleted as it is no longer valid
                 user.getNotifications().remove(invite);
                 entityManager.remove(invite);
 
                 return "{\"status\": \"already_in_group\"}";
-            }
-            else if(newMember == null){
-                newMember = new Member(new MemberID(group.getId(), user.getId()), true, GroupRole.GROUP_USER, 0, 0, group, user);
+            } else if (newMember == null) {
+                newMember = new Member(new MemberID(group.getId(), user.getId()), true, GroupRole.GROUP_USER, 0, 0,
+                        group, user);
                 entityManager.persist(newMember);
             } else {
                 newMember.setEnabled(true);
-            }            
+            }
             // Update user and group
             user.getMemberOf().add(newMember);
             group.getMembers().add(newMember);
@@ -605,9 +618,61 @@ public class GroupController {
         createAndSendNotifs(NotificationType.GROUP_INVITATION_ACCEPTED, user, group);
 
         // Send group transfer to user (to render if on /user/)
-        notifSender.sendTransfer(group, "/user/" + user.getUsername() + "/queue/notifications", "GROUP", NotificationType.GROUP_INVITATION_ACCEPTED);
+        notifSender.sendTransfer(group, "/user/" + user.getUsername() + "/queue/notifications", "GROUP",
+                NotificationType.GROUP_INVITATION_ACCEPTED);
         notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP", NotificationType.GROUP_INVITATION_ACCEPTED);
 
         return "{\"status\": \"ok\",\"id\": \"" + groupId + "\"}";
+    }
+
+    /**
+     * Make user a GROUP_MODERATOR
+     */
+    @PostMapping("/{groupId}/makeMod")
+    @Transactional
+    @ResponseBody
+    public String makeModerator(@PathVariable long groupId, @RequestBody JsonNode node, HttpSession session)
+            throws JsonProcessingException {
+
+        log.warn("Attempting to add moderator to group ", groupId);
+
+        long newModId = node.get("userId").asLong();
+
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
+
+        // check if requesting user belongs to the group
+        Member member = groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
+
+        // Check if requesting member is admin
+        if (member.getRole() != GroupRole.GROUP_MODERATOR && member.getRole() != GroupRole.GROUP_CREATOR) {
+            throw new ForbiddenException(ErrorType.E_ADDMODERATOR_FORBIDDEN);
+        }
+
+        // Check if new mod belongs to group
+        Member newModMember = groupAccessUtilities.getMemberOrThrow(groupId, newModId);
+
+        // Check if user is already a moderator
+        if (newModMember.getRole() == GroupRole.GROUP_MODERATOR)
+            throw new BadRequestException(ErrorType.E_ADDMODERATOR);
+
+        // Make user moderator
+        newModMember.setRole(GroupRole.GROUP_MODERATOR);
+
+        entityManager.flush();
+
+        // Send transfers for updates
+        notifSender.sendTransfer(group, "/user/" + newModMember.getUser().getUsername() + "/queue/notifications",
+                "GROUP", NotificationType.GROUP_MODERATOR_ADDED);
+        notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP",
+                NotificationType.GROUP_MODERATOR_ADDED);
+
+        // Send notification to members
+        createAndSendNotifs(NotificationType.GROUP_MODERATOR_ADDED, user, group);
+
+        return "{\"action\": \"none\"}";
     }
 }

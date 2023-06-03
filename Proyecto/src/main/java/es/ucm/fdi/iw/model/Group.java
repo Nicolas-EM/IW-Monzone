@@ -41,16 +41,16 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
     private boolean enabled;
 
     private String desc;
-    
+
     @Column(nullable = false, length = 100)
     private String name;
-    
+
     @Column(nullable = false)
     private int numMembers;
-    
+
     @Column(nullable = false)
     private float totBudget;
-    
+
     @Column(nullable = false)
     private Currency currency;
 
@@ -63,7 +63,7 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
     @OneToMany(mappedBy = "group")
     private List<Debt> debts = new ArrayList<>();
 
-    public Group(String name, String desc, Currency currency){
+    public Group(String name, String desc, Currency currency) {
         this.enabled = true;
         this.name = name;
         this.desc = desc;
@@ -85,11 +85,13 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
         private Currency currency;
         private String currencyString;
         private List<Member.Transfer> members;
+        private int numExpenses;
     }
 
     @Override
     public Transfer toTransfer() {
-        return new Transfer(id, enabled, name, desc, numMembers, totBudget, currency, getCurrencyText(), members.stream().map(Transferable::toTransfer).collect(Collectors.toList()));
+        return new Transfer(id, enabled, name, desc, numMembers, totBudget, currency, getCurrencyText(),
+                members.stream().map(Transferable::toTransfer).collect(Collectors.toList()), this.owns.size());
     }
 
     @Override
@@ -105,8 +107,8 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
     }
 
     public String getCurrencyText() {
-        switch(currency){
-            case EUR: 
+        switch (currency) {
+            case EUR:
                 return "€";
             case USD:
                 return "$";
@@ -122,5 +124,4 @@ public class Group implements Transferable<Group.Transfer>, Comparator<Group> {
         return g1.getName().compareTo(g2.getName());
     }
 
-  
 }
