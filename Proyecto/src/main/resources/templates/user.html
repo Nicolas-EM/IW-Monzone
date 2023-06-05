@@ -66,12 +66,12 @@
         <!-- Logout Btn -->
         <div class="col-12 d-flex align-items-center justify-content-center separator2">
           <form id="logoutFormUser" th:action="@{/logout}" method="post">
-            <button type="button" id="btn-logout" class="btn btn-primary rounded-pill fw-bold" onclick="document.getElementById('logoutFormUser').submit();">Logout</button>
+            <button type="button" class="btn btn-primary rounded-pill fw-bold btn-delete" onclick="document.getElementById('logoutFormUser').submit();">Logout</button>
           </form>
 
           <!-- Delete account Btn -->
           <form id="deleteUser" th:action="@{/user/deleteUser}" method="post">
-            <button data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="delUser" type="button" id="btn-delete" class="btn btn-primary rounded-pill fw-bold text-nowrap">Delete Account</button>
+            <button data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="delUser" type="button" class="btn btn-primary btn-delete rounded-pill fw-bold text-nowrap">Delete Account</button>
           </form>
         </div>
 
