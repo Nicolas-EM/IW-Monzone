@@ -695,8 +695,6 @@ public class GroupController {
         // Make user moderator
         newModMember.setRole(GroupRole.GROUP_MODERATOR);
 
-        entityManager.flush();
-
         // Send transfers for updates
         notifSender.sendTransfer(group, "/user/" + newModMember.getUser().getUsername() + "/queue/notifications",
                 "GROUP", NotificationType.GROUP_MODERATOR_ADDED);
@@ -745,8 +743,6 @@ public class GroupController {
 
         // Remove moderator role
         remModMember.setRole(GroupRole.GROUP_USER);
-
-        entityManager.flush();
 
         // Send transfers for updates
         notifSender.sendTransfer(group, "/user/" + remModMember.getUser().getUsername() + "/queue/notifications",
