@@ -54,3 +54,4 @@ Propuesta nuestra: Permitir a un moderador quitar a otro moderador sus privilegi
 - Arreglo botón logout en nav cuando estás en user (salía rojo)
 - En la lista de miembros de un grupo (group_config) tu usuario "You" sale en negrita
 - Lista de miembros en group_config con mejor espaciado
+- Mejoras de responsiveness en group config

@@ -636,6 +636,7 @@ public class GroupController {
                 entityManager.persist(newMember);
             } else {
                 newMember.setEnabled(true);
+                newMember.setRole(GroupRole.GROUP_USER);
             }
             // Update user and group
             user.getMemberOf().add(newMember);
