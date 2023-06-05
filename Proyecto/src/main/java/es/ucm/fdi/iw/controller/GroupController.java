@@ -1,7 +1,9 @@
 package es.ucm.fdi.iw.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,7 @@ import es.ucm.fdi.iw.model.Member;
 import es.ucm.fdi.iw.model.MemberID;
 import es.ucm.fdi.iw.model.Notification;
 import es.ucm.fdi.iw.model.Notification.NotificationType;
+import es.ucm.fdi.iw.model.User.Role;
 import es.ucm.fdi.iw.model.Participates;
 import es.ucm.fdi.iw.model.User;
 import es.ucm.fdi.iw.model.Group.Currency;
@@ -211,6 +214,37 @@ public class GroupController {
         List<Debt> debts = group.getDebts();
 
         return debts.stream().map(Transferable::toTransfer).collect(Collectors.toList());
+    }
+
+    /*
+     * Get number of expenses
+     */
+    @ResponseBody
+    @GetMapping("{groupId}/getTotExpenses")
+    public Integer getTotExpenses(@PathVariable long groupId, HttpSession session) {
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
+
+        // check if user belongs to the group or admin
+        try {
+            groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
+        } catch (Exception e) {
+            if (!user.hasRole(Role.ADMIN))
+                throw new ForbiddenException(ErrorType.E_GROUP_FORBIDDEN);
+        }
+
+        // get expenses
+        List<Participates> ps = group.getOwns();
+        // each expense only once, even if more than 1 user participates in it
+        Set<Expense> uniqueExpenses = new HashSet<>();
+        for (Participates p : ps) {
+            uniqueExpenses.add(p.getExpense());
+        }
+
+        return uniqueExpenses.size();
     }
 
     /*

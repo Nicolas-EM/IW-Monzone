@@ -5,8 +5,8 @@ import com.intuit.karate.junit5.Karate;
 class ExternalRunner {
 
     @Karate.Test
-    Karate testPreguntaB() {
-        return Karate.run("preguntaB").relativeTo(getClass());
+    Karate testGroupButton() {
+        return Karate.run("groupButton").relativeTo(getClass());
     }
 
     @Karate.Test

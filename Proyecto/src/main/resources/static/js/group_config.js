@@ -60,7 +60,7 @@ if (confirmModal) {
                 break;
             case "makeModerator":
                 userId = button.getAttribute('data-bs-userId');
-                modalBody.innerHTML = "Are you sure you want to make this user a moderator of this group?"
+                modalBody.innerHTML = "Are you sure you want to make this user a moderator? They will be able to edit/delete the group, and invite/remove other members."
                 break;
         }
 
