@@ -78,10 +78,8 @@ img.preview {
 .btn-func {
     border-style: none;
     outline: none;
-    min-height: 10%;
     background-color: #d19900;
     float: left;
-    margin-left: 15px;
 }
 
 .btn-func:hover {
@@ -93,7 +91,7 @@ img.preview {
     outline: none;
     min-height: 10%;
     background-color: #610000;
-    margin-left: 10%;
+    padding-inline: 20px;
 }
 
 .btn-delete:hover {
@@ -101,14 +99,15 @@ img.preview {
 }
 
 .btn-return {
-    border-style: none;
-    outline: none;
-    width: 25%;
-    background-color: #d19900;
-    margin-left: 10%;
+    width: 5vh;
+    height: 4vh;
+    color: var(--bs-gray-200);
+    border: 1px solid var(--bs-gray-200);
 }
 
 
 .btn-return:hover {
-    background-color: #b68500;
+    background-color: var(--bs-gray-500);
+    color: var(--bs-gray-900);
+    border: 1px solid var(--bs-gray-900);
 }

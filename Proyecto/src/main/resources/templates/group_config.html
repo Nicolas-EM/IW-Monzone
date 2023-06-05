@@ -12,8 +12,9 @@
     <header th:replace="fragments/nav.html :: nav"></header>
 
     <main class="container my-4">
-        <div class="row">
-            <h1>Group Settings</h1>
+        <div class="row mt-3 d-flex align-items-center">
+            <button type="button" th:if="${group != null}" th:onclick="|location.href='/group/' + ${group?.getId()}|" class="btn btn-return me-2"><i class="fa fa-arrow-left fa-lg"></i></button>
+            <h1 class="w-auto">Group Settings</h1>
         </div>
         <div class="row row-cols-1 row-cols-md-2 mt-3 gx-4">
             <form id="groupForm" method="post" class="col-md-5">
@@ -45,12 +46,14 @@
                         </div>
                     </div>
                     <!-- Save / Cancel / DelGroup Btns -->
-                    <div class="mt-5 w-100">
+                    <div class="mt-5 w-100 d-flex justify-content-between">
                         <button id="btn-save" th:formaction="@{/group/{action}(action=${group == null} ? 'newGroup' : ${group?.getId()} + '/updateGroup')}" type="submit" class="btn btn-func btn-primary rounded-pill fw-bold w-25">Save</button>
-                        <button type="button" th:if="${group == null}" th:onclick="|location.href='/user/'|" class="btn btn-delete btn-primary rounded-pill fw-bold w-25">Cancel</button>
-                        <button id="btn-delete" type="button" th:if="${group != null} and ${isGroupAdmin}" th:formaction="@{/group/{id}/delGroup(id=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25" data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="delGroup">Delete Group</button>
-                        <button type="button" th:if="${group != null}" th:onclick="|location.href='/group/' + ${group?.getId()}|" class="btn btn-return btn-primary rounded-pill fw-bold mt-2"><strong><i class="fa fa-arrow-left fa-lg"></i></strong></button>                    
+                        <div class="d-flex">
+                            <button type="button" th:if="${group == null}" th:onclick="|location.href='/user/'|" class="btn btn-delete btn-primary rounded-pill fw-bold">Cancel</button>
+                            <button id="btn-delete" type="button" th:if="${group != null} and ${isGroupAdmin}" th:formaction="@{/group/{id}/delGroup(id=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="delGroup">Delete Group</button>
+                        </div>
                     </div>
+                    
                 </div>
             </form>
             <!-- Col members -->
@@ -72,10 +75,10 @@
                     <div id="membersTable" class="row">
                     </div>
                     <!-- Invite / Leave buttons -->
-                    <div class="row pt-4 pb-4">
-                        <button id="inviteBtn" th:if="${isGroupAdmin}" class="btn btn-func btn-primary rounded-pill fw-bold w-25" data-bs-toggle="modal" data-bs-target="#inviteModal" formaction="">Invite a Friend</button>
-                        <button id="btn-leave" type="type" th:formaction="@{/group/{groupId}/delMember(groupId=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25" data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="leave">Leave Group</button>
-                    </div>
+                    <div class="row pt-4 pb-4 justify-content-between">
+                        <button id="inviteBtn" th:if="${isGroupAdmin}" class="btn btn-func btn-primary rounded-pill fw-bold w-25 ms-4" data-bs-toggle="modal" data-bs-target="#inviteModal" formaction="">Invite a Friend</button>
+                        <button id="btn-leave" type="type" th:formaction="@{/group/{groupId}/delMember(groupId=${group?.getId()})}" class="btn btn-delete btn-primary rounded-pill fw-bold w-25 mx-5" data-bs-toggle="modal" data-bs-target="#confirmModal" data-bs-type="leave">Leave Group</button>
+                    </div>                                       
                 </div>
             </div>
         </div>

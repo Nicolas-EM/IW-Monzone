@@ -56,14 +56,6 @@
     margin-left: 15px;
 }
 
-#btn-back {
-    border-style: none;
-    outline: none;
-    width: 30%;
-    background-color: #d19900;
-    float: left;
-}
-
 #btn-delete {
     border-style: none;
     outline: none;
@@ -74,15 +66,4 @@
 
 #imgFileInput {
     display: none;
-}
-
-.btn-return {
-    border-style: none;
-    outline: none;
-    width: 30%;
-    background-color: #d19900;
-}
-
-.btn-return:hover {
-    background-color: #b68500;
 }

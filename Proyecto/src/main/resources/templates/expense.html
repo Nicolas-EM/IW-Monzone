@@ -14,24 +14,23 @@
 
   <div class="container justify-content-center my-4">
     <form id="expenseForm" method="post" th:action="@{/group/{groupId}/{action}(groupId=${groupId}, action=${expense != null} ? ${expense?.getId()} : 'new')}">
-      <div class="row">
-        <h1 th:if="${newExpense}">New Expense</h1>
-        <h1 th:unless="${newExpense}">Edit Expense</h1>
+      <div class="row mt-3 d-flex align-items-center">
+        <button type="button" th:onclick="|location.href='/group/' + ${group?.getId()}|" class="btn btn-return me-2"><i class="fa fa-arrow-left fa-lg"></i></button>
+        <h1 class="w-auto" th:if="${newExpense}">New Expense</h1>
+        <h1 class="w-auto" th:unless="${newExpense}">Edit Expense</h1>
       </div>
-      <div class="row row-cols-1 row-cols-lg-3 gx-3 pt-2">
+      <div class="row row-cols-1 row-cols-lg-3 gx-3 pt-2 mt-3">
         <!-- Basic Info -->
         <div class="col">
           <div>
             <label for="name" class="form-label w-100">Name</label>
-            <input id="name" name="name" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getName()}">
+            <input id="name" name="name" type="text" class="form-control rounded-corners mb-4 w-100" required="required" th:value="${expense?.getName()}">
             <label for="desc" class="form-label w-100">Description (optional)</label>
             <textarea id="desc" name="desc" class="rounded-corners form-control" rows="5">[[${expense?.getDesc()}]]</textarea>
             <label for="date" class="form-label mt-4 w-100">Date</label>
-            <input id="dateString" type="date" name="dateString" class="rounded-corners w-100" required="required" th:value="${expense?.getDate()}">
+            <input id="dateString" type="date" name="dateString" class="form-control rounded-corners w-100" required="required" th:value="${expense?.getDate()}">
             <label for="amount" class="form-label mt-4 w-100">Amount ([[${group.getCurrencyText()}]])</label>
-            <input id="amount" name="amount" type="text" class="rounded-corners mb-4 w-100" required="required" th:value="${expense?.getAmount()}">
-
-            <button type="button" id="btn-back" th:onclick="|location.href='/group/' + ${group?.getId()}|" class="btn btn-primary btn-return rounded-pill fw-bold mt-2"><i class="fa fa-arrow-left fa-lg"></i></button>                    
+            <input id="amount" name="amount" type="text" class="form-control rounded-corners mb-4 w-100" required="required" th:value="${expense?.getAmount()}">
           </div>
         </div>
         <!-- Advanced info -->

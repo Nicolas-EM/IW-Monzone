@@ -115,12 +115,13 @@ function renderMember(member, currencyString) {
 
     if (member.role == "GROUP_MODERATOR") {
         memberHTML = `${memberHTML}
-                <img src="/img/crown.png" alt="adminIcon" title="Group moderator" width="auto" height="35" class="d-inline-block align-text-top ps-2">`;
+                <img src="/img/crown.png" alt="adminIcon" title="Group moderator" width="auto" height="25" class="d-inline-block align-text-top ps-2">`;
     } else if (member.role == "GROUP_CREATOR") {
         memberHTML = `${memberHTML}
                 <img src="/img/superadmin.svg" alt="creatorIcon" title="Group creator" width="auto" height="35" class="d-inline-block align-text-top ps-2">`;
     }
 
+    // Budget and balance - Always shown
     memberHTML = `${memberHTML}
                         </div>
                             <div class="col d-flex align-items-center ps-4">

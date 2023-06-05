@@ -24,3 +24,8 @@ Propuesta del examen: Añadir un test que comprueba que la mejora anterior funci
 Propuesta del examen: En la vista de administrador, en la tarjeta de cada grupo muestra además del nombre el número de gastos de ese grupo.
 - En admin.js, añadimos una petición (GET) para pedir el número de gastos de un grupo y en el renderGoup() añadimos el div donde se mostrará el nº de gastos
 - En GroupController.java, añadimos un GetMapping que calcule los gastos que tiene un grupo. Para ello, obtenemos las filas de la relación Participates y utilizamos un Set para no repetir los gastos aunque más de un miembro participe en ellos (igual que se hace en AdminController en el GetMapping index)
+
+### Mejoras visuales
+- Botones ir atrás en expense y group_config
+- Disposición botones en user y group_config (tanto new como edit)
+- Arreglo botón logout en nav cuando estás en user (salía rojo)
