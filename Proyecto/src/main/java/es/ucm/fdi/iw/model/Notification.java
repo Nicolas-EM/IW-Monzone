@@ -43,7 +43,8 @@ public class Notification implements Transferable<Notification.Transfer> {
         GROUP_MEMBER_REMOVED,
         GROUP_MODIFIED,
         GROUP_DELETED,
-        GROUP_MODERATOR_ADDED // When new moderator is added
+        GROUP_MODERATOR_ADDED, // When new moderator is added
+        GROUP_MODERATOR_REMOVED // When a user stops being a moderator
     }
 
     @ManyToOne
@@ -121,6 +122,9 @@ public class Notification implements Transferable<Notification.Transfer> {
                 break;
             case GROUP_MODERATOR_ADDED:
                 sb.append(" has added a new moderator to \"");
+                break;
+            case GROUP_MODERATOR_REMOVED:
+                sb.append(" has removed a moderator from \"");
                 break;
             default: {
             }

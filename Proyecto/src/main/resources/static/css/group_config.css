@@ -10,6 +10,10 @@ body {
     padding-left: 10px;
 }
 
+.member {
+  min-height: 7vh;
+}
+
 /* ------------ COL-1 ------------ */
 
 .empty {
@@ -58,6 +62,10 @@ input[type=number] {
 #people {
     max-width: 10%;
     padding-top: 7px;
+}
+
+.creator {
+  min-height: 5vh;
 }
 
 #trash:hover {

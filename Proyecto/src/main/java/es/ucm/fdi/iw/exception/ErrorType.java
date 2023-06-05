@@ -29,6 +29,7 @@ public enum ErrorType {
     E_INVALID_TYPE("Invalid data. Type must be one of the available."),
     E_INVITED_USER("Invalid user. User already invited."),
     E_ADDMODERATOR("Invalid user. User is already a moderator."),
+    E_REMOVEMODERATOR("Invalid user. User is already a normal user (non-moderator) or is the creator of the group."),
     // ForbiddenException
     E_GROUP_FORBIDDEN("FORBIDDEN: The group doesn't exist or you are not allowed to access it."),
     E_DELETE_FORBIDDEN("FORBIDDEN: You can't delete a group unless you are the moderator."),
@@ -36,6 +37,7 @@ public enum ErrorType {
     E_DELMEMBER_FORBIDDEN("FORBIDDEN: You can't remove other members unless you are the moderator."),
     E_INVITE_FORBIDDEN("FORBIDDEN: You can't invite a member unless you are the moderator."),
     E_ADDMODERATOR_FORBIDDEN("FORBIDDEN: You can't invite add moderators unless you are a moderator."),
+    E_REMOVEDMODERATOR_FORBIDDEN("FORBIDDEN: You can't remove a member as group moderator unless you are a moderator."),
     E_EXPENSE_FORBIDDEN("FORBIDDEN: The expense doesn't exist or you are not allowed to access it."),
     E_USER_FORBIDDEN("FORBIDDEN: User doesn't exist or doesn't belong to the group."),
     E_INVITATION_FORBIDDEN("FORBIDDEN: Group doesn't exist or you are not invited to it."),

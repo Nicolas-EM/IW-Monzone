@@ -263,7 +263,6 @@ public class GroupController {
 
             Notification notif = new Notification(type, sender, m.getUser(), group);
             entityManager.persist(notif);
-            entityManager.flush();
 
             // Send notification
             notifSender.sendNotification(notif, "/user/" + m.getUser().getUsername() + "/queue/notifications");
@@ -659,7 +658,7 @@ public class GroupController {
         return "{\"status\": \"ok\",\"id\": \"" + groupId + "\"}";
     }
 
-    /**
+    /*
      * Make user a GROUP_MODERATOR
      */
     @PostMapping("/{groupId}/makeMod")
@@ -706,6 +705,57 @@ public class GroupController {
 
         // Send notification to members
         createAndSendNotifs(NotificationType.GROUP_MODERATOR_ADDED, user, group);
+
+        return "{\"action\": \"none\"}";
+    }
+
+    /*
+     * Remove member as a GROUP_MODERATOR
+     */
+    @PostMapping("/{groupId}/removeMod")
+    @Transactional
+    @ResponseBody
+    public String removeModerator(@PathVariable long groupId, @RequestBody JsonNode node, HttpSession session)
+            throws JsonProcessingException {
+
+        log.warn("Attempting to remove member as moderator from group ", groupId);
+
+        long remModId = node.get("userId").asLong();
+
+        User user = (User) session.getAttribute("u");
+        user = entityManager.find(User.class, user.getId());
+
+        // check if group exists
+        Group group = groupAccessUtilities.getGroupOrThrow(groupId);
+
+        // check if requesting user belongs to the group
+        Member member = groupAccessUtilities.getMemberOrThrow(groupId, user.getId());
+
+        // Check if requesting member is admin
+        if (member.getRole() != GroupRole.GROUP_MODERATOR && member.getRole() != GroupRole.GROUP_CREATOR) {
+            throw new ForbiddenException(ErrorType.E_REMOVEDMODERATOR_FORBIDDEN);
+        }
+
+        // Check if member to remove moderator belongs to group
+        Member remModMember = groupAccessUtilities.getMemberOrThrow(groupId, remModId);
+
+        // Check if user is already a non-moderator
+        if (remModMember.getRole() != GroupRole.GROUP_MODERATOR)
+            throw new BadRequestException(ErrorType.E_REMOVEMODERATOR);
+
+        // Remove moderator role
+        remModMember.setRole(GroupRole.GROUP_USER);
+
+        entityManager.flush();
+
+        // Send transfers for updates
+        notifSender.sendTransfer(group, "/user/" + remModMember.getUser().getUsername() + "/queue/notifications",
+                "GROUP", NotificationType.GROUP_MODERATOR_REMOVED);
+        notifSender.sendTransfer(group, "/topic/group/" + groupId, "GROUP",
+                NotificationType.GROUP_MODERATOR_REMOVED);
+
+        // Send notification to members
+        createAndSendNotifs(NotificationType.GROUP_MODERATOR_REMOVED, user, group);
 
         return "{\"action\": \"none\"}";
     }
