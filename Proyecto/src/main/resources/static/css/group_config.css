@@ -12,6 +12,10 @@ body {
 
 /* ------------ COL-1 ------------ */
 
+.empty {
+  width: 8vh;
+}
+
 #name {
     height: 4vh;
 }
